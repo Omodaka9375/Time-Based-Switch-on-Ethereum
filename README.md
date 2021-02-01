@@ -37,10 +37,10 @@ npm run dev
 - Add support for [] of benefitors and executors, max. 5 per each 
 - Add update, termination fees
 - Hook contract calls to JS
-- Add eventLister on front-end
-- Add support for % based dispersal of switch towards benefitors
-- Separate OUR bussines payout logic from EIP in separate contract
-- Check long-term gas comsumption
+- Add eventListener on front-end
+- Add support for % based dispersal of switch funds towards benefitors
+- Separate bussines payout logic from main contract in separate contract
+- Check long-term gas consumption
 
 ## License
 
