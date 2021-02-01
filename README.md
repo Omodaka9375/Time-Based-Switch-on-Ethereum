@@ -1,4 +1,4 @@
-# Dead Man's Switch
+# Dead Account Switch
 
 This is a simple demo implementing Dead Account Switch on Ethereum Blockchain.
 This ```DeadAccountSwitch.sol``` provides standard methods and processes for safe transactions based on `block height`. This enables users to upfront secure their accounts from lockout after account user-predefined time, by predefining fallback addresses to transfer the funds to.
@@ -6,6 +6,12 @@ This ```DeadAccountSwitch.sol``` provides standard methods and processes for saf
 *Google's Inactive Account Manager allows the account holder to nominate someone else to access their services if not used for an extended period.*
 
 Source: https://en.wikipedia.org/wiki/Dead_man%27s_switch
+## Team
+[Branislav Đalić](https://github.com/Omodaka9375) \
+[Mališa Pušonja](https://github.com/horohronos) \
+[Ivor Jugo](https://github.com/ivorrr) \
+[Marko Kolašinac](https://github.com/SefSmrka) \
+[Filip Pajić](https://github.com/pajicf)
 
 ## How it will work here?
 
