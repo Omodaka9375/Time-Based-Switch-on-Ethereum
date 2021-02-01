@@ -1,0 +1,7 @@
+- Install OpenZeppelin Ownable, Pausable, Destructible, ReentrancyGuard etc.
+- Add support for [] of benefitors and executors, max. 5 per each 
+- Add update, termination fees
+- Add eventLister on front-end
+- Add support for % based dispersal of switch towards benefitors
+- Separate OUR bussines payout logic from EIP in separate contract
+- Check long-term gas comsumption

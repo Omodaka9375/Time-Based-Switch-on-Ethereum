@@ -1,10 +1,5 @@
-var ConvertLib = artifacts.require("./ConvertLib.sol");
-var MetaCoin = artifacts.require("./MetaCoin.sol");
-var DMSContract = artifacts.require("./DMSContract.sol");
+var DASContract = artifacts.require("./DeadAccountSwitch.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(ConvertLib);
-  deployer.link(ConvertLib, MetaCoin);
-  deployer.deploy(MetaCoin);
-  deployer.deploy(DMSContract);
+  deployer.deploy(DASContract);
 };

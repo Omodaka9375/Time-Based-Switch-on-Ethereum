@@ -1,37 +1,68 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Deadman Switch</title>
+  <title>Dead Account Switch</title>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
   <script src="./app.js"></script>
 </head>
 <body>
-  <img src="dmslogo.png">
-  <h2>Click To Show You Are Alive</h2>
-  <h2>Get your dead friend's secret</h2>
-<br>
-  If you don't check in by <span class="black"><b><span id="timeleft"></b></span> you will be presumed dead.</span>
+  <header style="display: block;">
+    <img src="daslogo.png"/>
+    <br><br><br>
+    <h2>I Want To <a href="#" onclick="App.showCreate();">Create</a> New Dead Account Switch</h2>
+    <br><br><h2>I Want To <a href="#" onclick="App.showCheck();">Check</a> On Existing Switch</h2>
+  </header>
+  <div id="create" style="display: none;">
+    <br>
+    <label for="amountC">Set amount in <i>ether</i> to be locked in smart contract:</label>
+    <br>
+    <input id="amountC" type="number" min="0"/>
+    <br><br>
+    <label for="timeC">Set time in days for this payment to be locked:</label><br>
+    <input id="timeC" type="number" min="0"/>
+    <br><br>
+    <label for="executorC">Set executor for this switch:</label><br>
+    <input id="executorC" type="text"/>
+    <br><br>
+    <label for="benefitorC">Set time in days for this payment to be locked:</label><br>
+    <input id="benefitorC" type="text"/>
+    <br><br>
+    <input id="bttn" type="button" value="Create Switch" onclick="App.createSwitch();"/>
+  </div>
+  <div id="checkSwitch" style="display: none;">
+    <p id="checkStatus"></p>
+    <div id="checkRole">
+      <h2>Are You The <a href="#" onclick="App.showCreatorOptions();">Creator</a> Or The <a href="#" onclick="App.showExecutorsOptions();">Executor</a> Of This Switch?</h2>
+      <div id="executorR" style="display: none;">
+        <br><br>
+        <input id="tryExecute" type="button" value="Try Execute" onclick="App.tryExecute();"/>
+      </div>
+      <div id="creatorR" style="display: none;">
+        <br><br>
+        <input id="terminate" type="button" value="Terminate Early" onclick="App.terminate();"/>
+        <br><br>
+        <label for="updateAmount">Update amount (in ether):</label><br>
+        <input id="updateAmount" type="number"/><br>
+        <input id="bttn" type="button" value="Update amount" onclick="App.updateAmount();"/><br><br>
 
-  <!-- <br><label for="amount">Amount:</label><input type="text" id="amount" placeholder="e.g., 95"></input> -->
-  <!-- <br><label for="receiver">To Address:</label><input type="text" id="receiver" placeholder="e.g., 0x93e66d9baea28c17d9fc393b53e3fbdd76899dae"></input> -->
-  <!-- <br><br><button id="send" onclick="App.sendCoin()">Send MetaCoin</button> -->
-  Are you a trustor? Click here to say you're still alive!
-  <br><button id="send" onclick="App.kick()">Kick the clock</button>
+        <label for="updateBenefitor">Update benefitor address:</label><br>
+        <input id="updateBenefitor" type="text"/><br>
+        <input id="bttn" type="button" value="Update benefitor" onclick="App.updateBenefitor();"/><br><br>
 
-<br><br>
-  Are you checking for a secret of a dead person? Enter the trustor's key here to get their secret if they're dead:
-  <br><input type="text" id="beneficiary" placeholder="e.g., 0x93e66d9baea28c17d9fc393b53e3fbdd76899dae"></input>
-  <br><button id="send" onclick="App.check()">Check living status</button>
+        <label for="updateExecutor">Update executor address:</label><br>
+        <input id="updateExecutor" type="text"/><br>
+        <input id="bttn" type="button" value="Update executor" onclick="App.updateExecutor();"/><br><br>
 
+        <label for="updateCooldown">Update cooldown (in days):</label><br>
+        <input id="updateCooldown" type="number"/><br>
+        <input id="bttn" type="button" value="Update cooldown" onclick="App.updateCooldown();"/><br><br>
 
-
-
-
-  <br><br>
-  <span id="status"></span>
-  <br>
-  <span class="hint"><strong>Hint:</strong> open the browser developer console to view any errors and warnings.</span>
-
-<br><br><br><br>
+      </div>
+    </div>
+    
+  </div>
+  <div id="footer">
+    <p>@omodaka9375</p>
+  </div>
 </body>
 </html>

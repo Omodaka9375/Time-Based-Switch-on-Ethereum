@@ -1,15 +1,18 @@
 body {
   margin-left: 25%;
   margin-right: 25%;
-  margin-top: 10%;
+  margin: auto 0;
   font-family: "Open Sans", sans-serif;
 }
 
-.Center {text-align:center;}
+header{
+  text-align: center;
+  padding-top: 50px;
+}
 
 label {
   display: inline-block;
-  width: 100px;
+ 
 }
 
 input {
@@ -41,18 +44,25 @@ h3 {
   font-size: 24px;
 }
 
-.black {
-  color: black;
+#create{
+  margin: auto 0;
+  text-align: center;
+  padding-top: 20px;
 }
 
-#balance {
-  color: black;
+#checkSwitch{
+  margin: auto 0;
+  text-align: center;
+  padding-top: 20px;
 }
 
-.hint {
-  color: #666;
+#bttn{
+  margin-top: 5px;
 }
 
-body {
+#footer{
+  bottom:2px;
+  left:5px;
+  position: fixed;
   text-align: center;
 }
