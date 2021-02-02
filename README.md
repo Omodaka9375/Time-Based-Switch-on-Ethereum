@@ -40,16 +40,6 @@ npm install -g truffle
 npm run dev
 ```
 
-## TODO
-- Install OpenZeppelin Ownable, Pausable, Destructible, ReentrancyGuard etc.
-- Add support for [] of benefitors and executors, max. 5 per each 
-- Add update, termination fees
-- Hook contract calls to JS
-- Add eventListener on front-end
-- Add support for % based dispersal of switch funds towards benefitors
-- Separate bussines payout logic from main contract in separate contract
-- Check long-term gas consumption
-
 ## License
 
 This project is licensed under the MIT License
