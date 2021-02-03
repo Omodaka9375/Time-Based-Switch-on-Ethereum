@@ -15,7 +15,7 @@ Source: https://en.wikipedia.org/wiki/Dead_man%27s_switch
 [Marko Kolašinac](https://github.com/SefSmrka) \
 [Filip Pajić](https://github.com/pajicf)
 
-## How it will work here?
+## How will it work here?
 
 ### Flowchart
 
