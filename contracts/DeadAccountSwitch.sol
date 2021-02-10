@@ -12,10 +12,6 @@ contract DeadAccountSwitch {
     }
     /* Storage */
     address private owner; //only owner can initiate fee payout 
-    address payable private ain; //set in constructor
-    address payable private mvp; //set in constructor
-    uint private balance; //total balance of the fees collected
-    uint private fee; // eg. 185 = 1.85% in basic points (parts per 10,000)
     mapping(address => Switch) private users; //store switch per user account
     /* Events */
     event SwitchCreated(uint unlockBlock);
@@ -58,12 +54,7 @@ contract DeadAccountSwitch {
       require(msg.value == amount, 'must send exact amount');
       _;
     }
-    /// @notice Checks that a balance value is above 0
-    /// @dev To be used in any situation where we want to do anything with the balance 
-    modifier checkBalance() {
-      require(balance > 0, 'balance is 0');
-      _;
-    }
+
     /// @notice Checks that a specified time parameter is set to minimum 1 day
     /// @dev To be used in any situation where we check that user is setting unlock time minimum 1 day a head
     /// @param time The time to be checked
@@ -80,16 +71,10 @@ contract DeadAccountSwitch {
     /* Functions */
     /// @notice Constructor function which establishes the contract owner, two payout addresses for fees and fee amount
     /// @dev Ownership should be managed through Open-Zeppelin's Ownable.sol which this contract uses.
-    /// @param _mvp The address of the partner
-    /// @param _ain The address of the partner
-    /// @param _fee The creation fee amount
-    constructor(address payable _mvp, address payable _ain, uint _fee)
+    constructor()
     public
     {
       owner = msg.sender;
-      ain = _ain;
-      mvp = _mvp;
-      fee = _fee;
     }
     /// @notice The fallback function for the contract
     /// @dev Will simply accept any unexpected eth, but no data
@@ -130,9 +115,7 @@ contract DeadAccountSwitch {
             uint amount = users[account].amount;
             users[account].amount = 0;
             users[account].isValid = false;
-            uint _fee = uint128(int256(amount) * int256(fee) / int256(10000));
-            balance += _fee;
-            (bool success, ) = users[account].benefitor.call.value(amount - _fee)("");
+            (bool success, ) = users[account].benefitor.call.value(amount)("");
             require(success, 'transfer failed');
             emit SwitchTriggered(account); 
             delete users[account];
@@ -156,28 +139,7 @@ contract DeadAccountSwitch {
     {
       return (users[account].unlockBlock);
     }
-    /// @notice Function that tries to withdraw fee balance from the contract
-    /// @dev This function is allowed only for contract owner and splits the payment in two parts is balance is no zero
-    function withrawFee()
-    onlyOwner
-    checkBalance
-    public
-    {
-      uint _fee = balance/2;
-      (bool ain_success, ) = ain.call.value(_fee)("");
-      require(ain_success, 'transfer failed');
-      (bool mvp_success, ) = mvp.call.value(_fee)("");
-      require(mvp_success, 'transfer failed');
-    }
-    /// @notice Function that tries to update switch trigger fee 
-    /// @dev This function is allowed only for contract owner 
-    /// @param _fee New fee value
-    function updateFee(uint _fee)
-    onlyOwner
-    public
-    {
-      fee = _fee;
-    }
+
     /// @notice Function that tries to terminate switch before the unlock block  
     /// @dev This function is allowed only for switch creator. Funds are returned to the owner before destroying switch
     function terminateSwitchEarly()
