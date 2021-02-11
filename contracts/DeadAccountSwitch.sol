@@ -4,7 +4,7 @@ contract DeadAccountSwitch {
     /* Structs */
     struct Switch {
         uint amount; //amount locked (in eth)
-        uint unlockBlock; //minimum block to unlock eth
+        uint unlockTimestamp; //minimum block to unlock eth
         uint cooldown; //lockout time in seconds
         address executor; //account allowed to try execute a switch
         address payable benefitor; //account for eth to be transfered to
@@ -14,9 +14,9 @@ contract DeadAccountSwitch {
     address private owner; //only owner can initiate fee payout 
     mapping(address => Switch) private users; //store switch per user account
     /* Events */
-    event SwitchCreated(uint unlockBlock);
+    event SwitchCreated(uint unlockTimestamp);
     event SwitchTriggered(address account);
-    event TimerKicked(uint newUnlockBlock);
+    event TimerKicked(uint newUnlockTimestamp);
     event SwitchTerminated(address account);
     event SwitchUpdated(bytes32 message);
     /* Modifiers */
@@ -83,7 +83,7 @@ contract DeadAccountSwitch {
     }
     /// @notice Function that creates a switch struct and stores it to users map object
     /// @dev This function works if the switch for this account doesn't exist, is not valid, if the amount is not correct or if time parameter is less then minimum of 1 day
-    /// @param _time The time parameter sets the number of blocks for the lock expiration
+    /// @param _time The time parameter sets the number of blocks for the lock expiration in seconds
     /// @param _amount The amount to lock
     /// @param _executor The executor of the switch
     /// @param _benefitor The benefitor of the switch
@@ -95,13 +95,13 @@ contract DeadAccountSwitch {
     payable
     {
         require(msg.sender != _benefitor,'creator can not be one of the benefitors');
-        users[msg.sender].unlockBlock = block.number + (_time / 14);
+        users[msg.sender].unlockTimestamp = block.timestamp + _time;
         users[msg.sender].cooldown = _time;
         users[msg.sender].executor = _executor;
         users[msg.sender].benefitor = _benefitor;
         users[msg.sender].amount = _amount;
         users[msg.sender].isValid = true;
-        emit SwitchCreated(users[msg.sender].unlockBlock);
+        emit SwitchCreated(users[msg.sender].unlockTimestamp);
     }
     /// @notice Function that if triggered before lock expires - kicks the timer in the future, otherwise it executes the switch 
     /// @dev This function allows only executors to access it 
@@ -112,7 +112,7 @@ contract DeadAccountSwitch {
     public
     payable
     {
-        if (block.number >= users[account].unlockBlock){
+        if (block.timestamp >= users[account].unlockTimestamp){
             uint amount = users[account].amount;
             users[account].amount = 0;
             users[account].isValid = false;
@@ -122,15 +122,15 @@ contract DeadAccountSwitch {
             delete users[account];
             emit SwitchTerminated(account);
         } else {
-            users[account].unlockBlock = block.number + users[account].cooldown;
-            emit TimerKicked(users[account].unlockBlock);
+            users[account].unlockTimestamp = block.timestamp + users[account].cooldown;
+            emit TimerKicked(users[account].unlockTimestamp);
         }
     }
-    /// @notice Function that tries to fetch unlock block for an account 
+    /// @notice Function that tries to fetch unlock time for an account 
     /// @dev This function is allowed only for executors, befitors or switch creator 
     /// @param account The account mapped to the switch
     /// @return Returns unlock block for the switch
-    function getUnlockBlock(address account)
+    function getUnlockTime(address account)
     onlyValid(account)
     onlyAllowed(account)
     public
@@ -138,7 +138,7 @@ contract DeadAccountSwitch {
     returns
     (uint)
     {
-      return (users[account].unlockBlock);
+      return (users[account].unlockTimestamp);
     }
 
     /// @notice Function that tries to terminate switch before the unlock block  
