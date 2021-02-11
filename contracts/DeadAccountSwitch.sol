@@ -23,28 +23,28 @@ contract DeadAccountSwitch {
     /// @notice Checks that the the function is being called by the owner of the contract
     /// @dev  To be used in any situation where the function performs a privledged action to the contract
     modifier onlyOwner() {
-      require(msg.sender == owner, 'Not owner account');
+      require(msg.sender == owner, 'not owner account');
       _;
     }
     /// @notice Checks that the the account passed is a valid switch
     /// @dev To be used in any situation where the function performs a check of existing/valid switches
     /// @param account The account to check the validity of
     modifier onlyValid(address account) {
-      require(users[account].isValid && users[account].amount > 0, 'Not a valid account');
+      require(users[account].isValid && users[account].amount > 0, 'not a valid account query');
       _;
     }
     /// @notice Checks that the the function is being called only by the involved parties
     /// @dev To be used in any situation where the function performs a privledged action to the switch
     /// @param account The account to check the owner of
     modifier onlyAllowed(address account) {
-      require(users[account].benefitor == msg.sender || users[account].executor == msg.sender || account == msg.sender, "You do not have rights to check on this switch!");
+      require(users[account].benefitor == msg.sender || users[account].executor == msg.sender || account == msg.sender, "you do not have rights to check on this switch!");
       _;
     }
     /// @notice Checks that the the function is being called only by the executor of the switch
     /// @dev To be used in any situation where the function performs a privledged action to the switch
     /// @param account The account to check the owner of
-    modifier onlyExecutors(address account) {
-      require(users[account].executor == msg.sender, 'You do not have rights to execute this switch!');
+    modifier onlyExecutorsOrOwner(address account) {
+      require(users[account].executor == msg.sender || (users[msg.sender].isValid && msg.sender == account), 'you do not have rights to execute this switch!');
       _;
     }
     /// @notice Checks that a specified amount matches the msg.value sent
@@ -54,7 +54,6 @@ contract DeadAccountSwitch {
       require(msg.value == amount, 'must send exact amount');
       _;
     }
-
     /// @notice Checks that a specified time parameter is set to minimum 1 day
     /// @dev To be used in any situation where we check that user is setting unlock time minimum 1 day a head
     /// @param time The time to be checked
@@ -103,28 +102,35 @@ contract DeadAccountSwitch {
         users[msg.sender].isValid = true;
         emit SwitchCreated(users[msg.sender].unlockTimestamp);
     }
-    /// @notice Function that if triggered before lock expires - kicks the timer in the future, otherwise it executes the switch 
-    /// @dev This function allows only executors to access it 
+    /// @notice Function that if triggered after lock expires executes the switch
+    /// @dev This function allows only executors or the switch creator to access it 
     /// @param account The account mapped to the switch
     function tryExecuteSwitch(address account)
     onlyValid(account)
-    onlyExecutors(account)
+    onlyExecutorsOrOwner(account)
     public
     payable
     {
-        if (block.timestamp >= users[account].unlockTimestamp){
-            uint amount = users[account].amount;
-            users[account].amount = 0;
-            users[account].isValid = false;
-            (bool success, ) = users[account].benefitor.call.value(amount)("");
-            require(success, 'transfer failed');
-            emit SwitchTriggered(account); 
-            delete users[account];
-            emit SwitchTerminated(account);
-        } else {
-            users[account].unlockTimestamp = block.timestamp + users[account].cooldown;
-            emit TimerKicked(users[account].unlockTimestamp);
-        }
+      require(block.timestamp >= users[account].unlockTimestamp,'this switch has not expired, yet');
+      uint amount = users[account].amount;
+      users[account].amount = 0;
+      users[account].isValid = false;
+      (bool success, ) = users[account].benefitor.call.value(amount)("");
+      require(success, 'transfer failed');
+      emit SwitchTriggered(account); 
+      delete users[account];
+      emit SwitchTerminated(account);
+    }
+    /// @notice Function that if triggered before lock expires kicks the timer in future
+    /// @dev This function allows only switch creator to access it 
+    function tryKickTimer()
+    onlyValid(msg.sender)
+    public
+    payable
+    {
+      require(block.timestamp < users[msg.sender].unlockTimestamp,'switch expired');
+      users[msg.sender].unlockTimestamp = block.timestamp + users[msg.sender].cooldown;
+      emit TimerKicked(users[msg.sender].unlockTimestamp);
     }
     /// @notice Function that tries to fetch unlock time for an account 
     /// @dev This function is allowed only for executors, befitors or switch creator 
