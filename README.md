@@ -1,10 +1,11 @@
 # Dead Account Switch
 
 This is a simple demo implementing Dead Account Switch on Ethereum Blockchain.
-```DeadAccountSwitch.sol``` smart contract provides standard methods and processes for safe transactions based on `block height`. This enables users to secure their accounts from lockout by predefining fallback addresses to transfer the funds after the predefined time.
+```DeadAccountSwitch.sol``` smart contract provides standard methods and processes for safe transactions based on `block.timestamp`. This enables users to secure their accounts from lockout by predefining fallback addresses to transfer the funds after the predefined time.
 
 It includes a minimalistic front-end built using Truffle.
 
+Inspiration:
 *Google's Inactive Account Manager allows the account holder to nominate someone else to access their services if not used for an extended period.*
 
 Source: https://en.wikipedia.org/wiki/Dead_man%27s_switch
