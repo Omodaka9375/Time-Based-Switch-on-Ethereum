@@ -94,6 +94,7 @@ contract DeadAccountSwitch {
     public
     payable
     {
+        require(msg.sender != _benefitor,'creator can not be one of the benefitors');
         users[msg.sender].unlockBlock = block.number + (_time / 14);
         users[msg.sender].cooldown = _time;
         users[msg.sender].executor = _executor;
