@@ -13,7 +13,7 @@ Source: https://en.wikipedia.org/wiki/Dead_man%27s_switch
 [Mališa Pušonja](https://github.com/horohronos) \
 [Ivor Jugo](https://github.com/ivorrr) \
 [Marko Kolašinac](https://github.com/SefSmrka) \
-[Filip Pajić](https://github.com/pajicf)
+[Andrej Rakić](https://github.com/andrejrakic)
 
 ## How will it work here?
 
@@ -27,6 +27,7 @@ Source: https://en.wikipedia.org/wiki/Dead_man%27s_switch
 ## Requirements
 
 Node.js version +5
+Truffle v12 
 
 ## Installation
 
