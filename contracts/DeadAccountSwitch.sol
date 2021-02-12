@@ -1,4 +1,9 @@
-pragma solidity 0.5.16;
+pragma solidity 0.6.0;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+
 /// @notice This contract is used to creater, store, execute or delay a transaction trigger based on block.number aproximation
 contract DeadAccountSwitch {
     /* Structs */
@@ -11,7 +16,6 @@ contract DeadAccountSwitch {
         bool isValid; //check validity of existing switch if exists
     }
     /* Storage */
-    address private owner; //only owner can initiate fee payout 
     mapping(address => Switch) private users; //store switch per user account
     /* Events */
     event SwitchCreated(uint unlockTimestamp);
@@ -19,13 +23,8 @@ contract DeadAccountSwitch {
     event TimerKicked(uint newUnlockTimestamp);
     event SwitchTerminated(address account);
     event SwitchUpdated(bytes32 message);
+    event EtherReceived(address sender, uint amount);
     /* Modifiers */
-    /// @notice Checks that the the function is being called by the owner of the contract
-    /// @dev  To be used in any situation where the function performs a privledged action to the contract
-    modifier onlyOwner() {
-      require(msg.sender == owner, 'not owner account');
-      _;
-    }
     /// @notice Checks that the the account passed is a valid switch
     /// @dev To be used in any situation where the function performs a check of existing/valid switches
     /// @param account The account to check the validity of
@@ -68,17 +67,14 @@ contract DeadAccountSwitch {
       _;
     }
     /* Functions */
-    /// @notice Constructor function which establishes the contract owner, two payout addresses for fees and fee amount
-    /// @dev Ownership should be managed through Open-Zeppelin's Ownable.sol which this contract uses.
+    /// @notice Constructor function which establishes two payout addresses for fees and fee amount
     constructor()
     public
-    {
-      owner = msg.sender;
-    }
+    {}
     /// @notice The fallback function for the contract
     /// @dev Will simply accept any unexpected eth, but no data
-    function() payable external {
-      require(msg.data.length == 0);
+    receive() payable external {
+      emit EtherReceived(msg.sender, msg.value);
     }
     /// @notice Function that creates a switch struct and stores it to users map object
     /// @dev This function works if the switch for this account doesn't exist, is not valid, if the amount is not correct or if time parameter is less then minimum of 1 day
