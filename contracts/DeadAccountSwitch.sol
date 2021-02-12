@@ -123,7 +123,6 @@ contract DeadAccountSwitch is ReentrancyGuard {
       delete users[account];
       emit SwitchTerminated(account);
     }
-
     /// @notice Function to withdraw amount of given ERC20 token
     /// @param _tokenAddress - address of ERC20 token
     /// @param _amount - amount to withdraw
@@ -136,7 +135,6 @@ contract DeadAccountSwitch is ReentrancyGuard {
 
         IERC20(_tokenAddress).safeTransfer(_receiver, _amount);
     }
-
     /// @notice Function to withdraw ERC721 collectible
     /// @param _tokenAddress - address of ERC721 token
     /// @param _tokenId - id of colletible
@@ -169,7 +167,6 @@ contract DeadAccountSwitch is ReentrancyGuard {
 
         ERC721(_tokenAddress).approve(address(this), _tokenId);
     }
-
     /// @notice Function that if triggered before lock expires kicks the timer in future
     /// @dev This function allows only switch creator to access it 
     function tryKickTimer()
