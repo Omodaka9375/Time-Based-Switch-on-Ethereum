@@ -146,6 +146,27 @@ contract DeadAccountSwitch is ReentrancyGuard {
 
         ERC721(_tokenAddress).safeTransferFrom(address(this), _receiver, _tokenId);
     }
+
+    /// @notice Function to approve transfering of ERC20 token by DeadAccountSwitch contract to benefitor
+    /// @param _tokenAddress - address of ERC20 token
+    /// @param _amount - amount to approve
+    /// No return, reverts on error
+    function approveToken(address _tokenAddress, uint256 _amount) public {
+        require(_tokenAddress != address(0), "approveToken: Invalid token address");
+        require(_amount > 0, "approveToken: Amount must be greater than 0");
+
+        IERC20(_tokenAddress).safeIncreaseAllowance(address(this), _amount);
+    }
+
+    /// @notice Function to approve transfering of particular ERC721 token by DeadAccountSwitch contract to benefitor
+    /// @param _tokenAddress - address of ERC721 token
+    /// @param _tokenId - id of colletible
+    /// No return, reverts on error
+    function approveCollectible(address _tokenAddress, uint256 _tokenId) public {
+        require(_tokenAddress != address(0), "approveCollectible: Invalid token address");
+
+        ERC721(_tokenAddress).approve(address(this), _tokenId);
+    }
     /// @notice Function that if triggered before lock expires kicks the timer in future
     /// @dev This function allows only switch creator to access it 
     function tryKickTimer()
