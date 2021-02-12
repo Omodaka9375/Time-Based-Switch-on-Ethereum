@@ -6,16 +6,16 @@ module.exports = {
     development: {
       host: 'localhost',
       port: 8545,
-      network_id: '*',
+      network_id: '*'
+    },
+  },
   compilers: {
     solc: { 
-      version: "^0.5.16",
+      version: "0.6.0",
       optimizer: {
         enabled: true,
         runs: 200
       }
     }
   }
-}
-}
 }
