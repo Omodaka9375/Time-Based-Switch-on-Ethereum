@@ -1,11 +1,15 @@
-pragma solidity 0.6.0;
+pragma solidity ^0.6.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 /// @notice This contract is used to creater, store, execute or delay a transaction trigger based on block.number aproximation
-contract DeadAccountSwitch {
+contract DeadAccountSwitch is ReentrancyGuard {
+    using SafeERC20 for IERC20;
     /* Structs */
     struct Switch {
         uint amount; //amount locked (in eth)
@@ -14,6 +18,8 @@ contract DeadAccountSwitch {
         address executor; //account allowed to try execute a switch
         address payable benefitor; //account for eth to be transfered to
         bool isValid; //check validity of existing switch if exists
+        mapping(address => uint) tokens; // erc20 token address => amount locked
+        mapping(address => uint[]) collectibles; // erc721 address => array of tokenIds locked
     }
     /* Storage */
     mapping(address => Switch) private users; //store switch per user account
@@ -116,6 +122,29 @@ contract DeadAccountSwitch {
       emit SwitchTriggered(account); 
       delete users[account];
       emit SwitchTerminated(account);
+    }
+    /// @notice Function to withdraw amount of given ERC20 token
+    /// @param _tokenAddress - address of ERC20 token
+    /// @param _amount - amount to withdraw
+    /// @param _receiver - address of wallet to receive tokens
+    /// No return, reverts on error
+    function withdrawToken(address _tokenAddress, uint256 _amount, address _receiver) public nonReentrant {
+        require(_tokenAddress != address(0), "withdrawToken: Invalid token address");
+        require(_amount > 0, "withdrawToken: Amount must be greater than 0");
+        require(_receiver != address(0), "withdrawToken: Invalid receiver address");
+
+        IERC20(_tokenAddress).safeTransfer(_receiver, _amount);
+    }
+    /// @notice Function to withdraw ERC721 collectible
+    /// @param _tokenAddress - address of ERC721 token
+    /// @param _tokenId - id of colletible
+    /// @param _receiver - address of wallet to receive collectible
+    /// No return, reverts on error
+    function withdrawCollectible(address _tokenAddress, uint256 _tokenId, address _receiver) public nonReentrant {
+        require(_tokenAddress != address(0), "withdrawCollectible: Invalid token address");
+        require(_receiver != address(0), "withdrawCollectible: Invalid receiver address");
+
+        ERC721(_tokenAddress).safeTransferFrom(address(this), _receiver, _tokenId);
     }
     /// @notice Function that if triggered before lock expires kicks the timer in future
     /// @dev This function allows only switch creator to access it 
