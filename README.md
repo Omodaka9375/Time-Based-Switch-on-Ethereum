@@ -1,7 +1,7 @@
-# Dead Account Switch
+# Time-Based Switch on Ethereum Blockchain
 
-This is a simple demo implementing Dead Account Switch on Ethereum Blockchain.
-```DeadAccountSwitch.sol``` smart contract provides standard methods and processes for safe transactions based on `block.timestamp`. This enables users to secure their accounts from lockout by predefining fallback addresses to transfer the funds after the predefined time.
+This is a simple demo implementing Time-Based Switch on Ethereum Blockchain.
+```TimeBasedSwitch.sol``` smart contract provides standard methods and processes for safe transactions based on `block.timestamp`. This enables users to secure their accounts from lockout by predefining fallback addresses to transfer the funds after the predefined time.
 
 It includes a minimalistic front-end built using Truffle.
 
