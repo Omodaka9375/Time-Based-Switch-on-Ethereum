@@ -215,17 +215,17 @@ contract TimeBasedSwitch is ReentrancyGuard {
       users[msg.sender].amount += msg.value;
       emit SwitchUpdated("Amount updated");
     }
-    /// @notice Function that tries to update switch unlock block parameter. New unlock period will set in after next kick.
+    /// @notice Function that directly sets unlockTimestamp parameter as new unlock time
     /// @dev This function is allowed only for switch owner and it requires time parameter to be minimum 1 day 
-    /// @param cooldown New cooldown value
-    function updateSwitchUnlockTime(uint cooldown)
+    /// @param _unlockTimestamp New unlock time
+    function updateSwitchUnlockTime(uint _unlockTimestamp)
     onlyValid(msg.sender)
-    checkTime(cooldown)
+    checkTime(_unlockTimestamp)
     public
     payable
     {
-      users[msg.sender].cooldown = cooldown;
-      emit SwitchUpdated("Cooldown updated");
+      users[msg.sender].unlockTimestamp = _unlockTimestamp;
+      emit SwitchUpdated("Unlock time updated");
     }
     /// @notice Function that tries to update switch executors address
     /// @dev This function is allowed only for switch owner
