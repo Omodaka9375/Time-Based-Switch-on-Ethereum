@@ -167,19 +167,26 @@ contract TimeBasedSwitch is ReentrancyGuard {
         ERC721(_tokenAddress).approve(address(this), _tokenId);
     }
 
-    /// @notice Function that tries to fetch unlock time for an account 
+    /// @notice Function that returns Switch struct of given _switchOwner address 
     /// @dev This function is allowed only for executors, befitors or switch creator 
-    /// @param account The account mapped to the switch
-    /// @return Returns unlock block for the switch
-    function getUnlockTime(address account)
-    onlyValid(account)
-    onlyAllowed(account)
+    /// @param _switchOwner The account mapped to the switch
+    /// @return Returns Switch struct
+    function getSwitchInfo(address _switchOwner)
+    onlyValid(_switchOwner)
+    onlyAllowed(_switchOwner)
     public
     view
     returns
-    (uint)
+    (uint, uint, address, address, bool)
     {
-      return (users[account].unlockTimestamp);
+      Switch memory _switch = users[_switchOwner];
+      return (
+        _switch.amount,
+        _switch.unlockTimestamp,
+        _switch.executor,
+        _switch.benefitor,
+        _switch.isValid
+      );
     }
 
     /// @notice Function that tries to terminate switch before the unlock block  
