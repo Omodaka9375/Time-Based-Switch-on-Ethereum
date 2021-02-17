@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 /// @notice This contract is used to creater, store, execute or delay a transaction trigger based on block.number aproximation
-contract DeadAccountSwitch is ReentrancyGuard {
+contract TimeBasedSwitch is ReentrancyGuard {
     using SafeERC20 for IERC20;
     /* Structs */
     struct Switch {
@@ -147,7 +147,7 @@ contract DeadAccountSwitch is ReentrancyGuard {
         ERC721(_tokenAddress).safeTransferFrom(address(this), _receiver, _tokenId);
     }
 
-    /// @notice Function to approve transfering of ERC20 token by DeadAccountSwitch contract to benefitor
+    /// @notice Function to approve transfering of ERC20 token by TimeBasedSwitch contract to benefitor
     /// @param _tokenAddress - address of ERC20 token
     /// @param _amount - amount to approve
     /// No return, reverts on error
@@ -158,7 +158,7 @@ contract DeadAccountSwitch is ReentrancyGuard {
         IERC20(_tokenAddress).safeIncreaseAllowance(address(this), _amount);
     }
 
-    /// @notice Function to approve transfering of particular ERC721 token by DeadAccountSwitch contract to benefitor
+    /// @notice Function to approve transfering of particular ERC721 token by TimeBasedSwitch contract to benefitor
     /// @param _tokenAddress - address of ERC721 token
     /// @param _tokenId - id of colletible
     /// No return, reverts on error

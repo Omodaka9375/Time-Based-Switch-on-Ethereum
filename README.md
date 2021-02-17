@@ -20,11 +20,11 @@ Source: https://en.wikipedia.org/wiki/Dead_man%27s_switch
 
 ### Flowchart
 
-![Dead Account Switch Flowchart](flowchart.png)
+![Time Based Switch Flowchart](flowchart.png)
 
 ### Entities
 
-![Dead Account Switch Entities](das.png)
+![Time Based Switch Entities](das.png)
 ## Requirements
 
 Node.js version +5

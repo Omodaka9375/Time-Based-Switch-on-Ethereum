@@ -1,68 +1,73 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Dead Account Switch</title>
+  <title>Time Based Switch</title>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
   <script src="./app.js"></script>
 </head>
+
 <body>
   <header style="display: block;">
-    <img src="daslogo.png"/>
+    <img src="daslogo.png" />
     <br><br><br>
-    <h2>I Want To <a href="#" onclick="App.showCreate();">Create</a> New Dead Account Switch</h2>
-    <br><br><h2>I Want To <a href="#" onclick="App.showCheck();">Check</a> On Existing Switch</h2>
+    <h2>I Want To <a href="#" onclick="App.showCreate();">Create</a> New Time Based Switch</h2>
+    <br><br>
+    <h2>I Want To <a href="#" onclick="App.showCheck();">Check</a> On Existing Switch</h2>
   </header>
   <div id="create" style="display: none;">
     <br>
     <label for="amountC">Set amount in <i>ether</i> to be locked in smart contract:</label>
     <br>
-    <input id="amountC" type="number" min="0"/>
+    <input id="amountC" type="number" min="0" />
     <br><br>
     <label for="timeC">Set time in days for this payment to be locked:</label><br>
-    <input id="timeC" type="number" min="0"/>
+    <input id="timeC" type="number" min="0" />
     <br><br>
     <label for="executorC">Set executor for this switch:</label><br>
-    <input id="executorC" type="text"/>
+    <input id="executorC" type="text" />
     <br><br>
     <label for="benefitorC">Set time in days for this payment to be locked:</label><br>
-    <input id="benefitorC" type="text"/>
+    <input id="benefitorC" type="text" />
     <br><br>
-    <input id="bttn" type="button" value="Create Switch" onclick="App.createSwitch();"/>
+    <input id="bttn" type="button" value="Create Switch" onclick="App.createSwitch();" />
   </div>
   <div id="checkSwitch" style="display: none;">
     <p id="checkStatus"></p>
     <div id="checkRole">
-      <h2>Are You The <a href="#" onclick="App.showCreatorOptions();">Creator</a> Or The <a href="#" onclick="App.showExecutorsOptions();">Executor</a> Of This Switch?</h2>
+      <h2>Are You The <a href="#" onclick="App.showCreatorOptions();">Creator</a> Or The <a href="#"
+          onclick="App.showExecutorsOptions();">Executor</a> Of This Switch?</h2>
       <div id="executorR" style="display: none;">
         <br><br>
-        <input id="tryExecute" type="button" value="Try Execute" onclick="App.tryExecute();"/>
+        <input id="tryExecute" type="button" value="Try Execute" onclick="App.tryExecute();" />
       </div>
       <div id="creatorR" style="display: none;">
         <br><br>
-        <input id="terminate" type="button" value="Terminate Early" onclick="App.terminate();"/>
+        <input id="terminate" type="button" value="Terminate Early" onclick="App.terminate();" />
         <br><br>
         <label for="updateAmount">Update amount (in ether):</label><br>
-        <input id="updateAmount" type="number"/><br>
-        <input id="bttn" type="button" value="Update amount" onclick="App.updateAmount();"/><br><br>
+        <input id="updateAmount" type="number" /><br>
+        <input id="bttn" type="button" value="Update amount" onclick="App.updateAmount();" /><br><br>
 
         <label for="updateBenefitor">Update benefitor address:</label><br>
-        <input id="updateBenefitor" type="text"/><br>
-        <input id="bttn" type="button" value="Update benefitor" onclick="App.updateBenefitor();"/><br><br>
+        <input id="updateBenefitor" type="text" /><br>
+        <input id="bttn" type="button" value="Update benefitor" onclick="App.updateBenefitor();" /><br><br>
 
         <label for="updateExecutor">Update executor address:</label><br>
-        <input id="updateExecutor" type="text"/><br>
-        <input id="bttn" type="button" value="Update executor" onclick="App.updateExecutor();"/><br><br>
+        <input id="updateExecutor" type="text" /><br>
+        <input id="bttn" type="button" value="Update executor" onclick="App.updateExecutor();" /><br><br>
 
         <label for="updateCooldown">Update cooldown (in days):</label><br>
-        <input id="updateCooldown" type="number"/><br>
-        <input id="bttn" type="button" value="Update cooldown" onclick="App.updateCooldown();"/><br><br>
+        <input id="updateCooldown" type="number" /><br>
+        <input id="bttn" type="button" value="Update cooldown" onclick="App.updateCooldown();" /><br><br>
 
       </div>
     </div>
-    
+
   </div>
   <div id="footer">
     <p>@omodaka9375</p>
   </div>
 </body>
+
 </html>
