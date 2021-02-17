@@ -26,7 +26,6 @@ contract TimeBasedSwitch is ReentrancyGuard {
     /* Events */
     event SwitchCreated(uint unlockTimestamp);
     event SwitchTriggered(address account);
-    event TimerKicked(uint newUnlockTimestamp);
     event SwitchTerminated(address account);
     event SwitchUpdated(bytes32 message);
     event EtherReceived(address sender, uint amount);
@@ -167,17 +166,7 @@ contract TimeBasedSwitch is ReentrancyGuard {
 
         ERC721(_tokenAddress).approve(address(this), _tokenId);
     }
-    /// @notice Function that if triggered before lock expires kicks the timer in future
-    /// @dev This function allows only switch creator to access it 
-    function tryKickTimer()
-    onlyValid(msg.sender)
-    public
-    payable
-    {
-      require(block.timestamp < users[msg.sender].unlockTimestamp,'switch expired');
-      users[msg.sender].unlockTimestamp = block.timestamp + users[msg.sender].cooldown;
-      emit TimerKicked(users[msg.sender].unlockTimestamp);
-    }
+
     /// @notice Function that tries to fetch unlock time for an account 
     /// @dev This function is allowed only for executors, befitors or switch creator 
     /// @param account The account mapped to the switch
