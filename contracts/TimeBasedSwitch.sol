@@ -14,7 +14,6 @@ contract TimeBasedSwitch is ReentrancyGuard {
     struct Switch {
         uint amount; //amount locked (in eth)
         uint unlockTimestamp; //minimum block to unlock eth
-        uint cooldown; //lockout time in seconds
         address executor; //account allowed to try execute a switch
         address payable benefitor; //account for eth to be transfered to
         bool isValid; //check validity of existing switch if exists
@@ -96,7 +95,6 @@ contract TimeBasedSwitch is ReentrancyGuard {
     {
         require(msg.sender != _benefitor,'creator can not be one of the benefitors');
         users[msg.sender].unlockTimestamp = block.timestamp + _time;
-        users[msg.sender].cooldown = _time;
         users[msg.sender].executor = _executor;
         users[msg.sender].benefitor = _benefitor;
         users[msg.sender].amount = _amount;
