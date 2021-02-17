@@ -5,9 +5,9 @@ import "../stylesheets/app.css";
 import { default as Web3 } from 'web3';
 import { default as contract } from 'truffle-contract'
 
-import DeadAccountSwitch_artifacts from '../../build/contracts/DeadAccountSwitch.json'
+import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.json'
 
-var DeadAccountSwitch = contract(DeadAccountSwitch_artifacts);
+var TimeBasedSwitch = contract(TimeBasedSwitch_artifacts);
 
 var accounts;
 var account;
@@ -15,7 +15,7 @@ var account;
 window.App = {
   start: function () {
     var self = this;
-    DeadAccountSwitch.setProvider(web3.currentProvider);
+    TimeBasedSwitch.setProvider(web3.currentProvider);
     // Get the initial account balance so it can be displayed.
     web3.eth.getAccounts(function (err, accs) {
       if (err != null) {
@@ -50,12 +50,12 @@ window.App = {
   },
   createSwitch: function () {
     var self = this;
-    var das;
+    var tbs;
     var timeleft_element = document.getElementById("timeleft");
 
-    DeadAccountSwitch.deployed().then(function(instance) {
-    das = instance;
-    return das.createSwitch.call();}).then(function(value) {
+    TimeBasedSwitch.deployed().then(function(instance) {
+    tbs = instance;
+    return tbs.createSwitch.call();}).then(function(value) {
      	var timeleft_element = document.getElementById("timeleft");
 	    var d = new Date(value.valueOf()*1000);
      	      timeleft_element.innerHTML = d.toString();
@@ -83,10 +83,10 @@ window.App = {
 
   terminate: function () {
     var self = this;
-    var DMS;
-    DeadAccountSwitch.deployed().then(function (instance) {
-      DMS = instance;
-      return DMS.tick({ from: account });
+    var TBS;
+    TimeBasedSwitch.deployed().then(function (instance) {
+      TBS = instance;
+      return TBS.tick({ from: account });
     }).then(function () {
       self.setStatus("Tick complete!");
       self.refreshTimeLeft();
@@ -99,10 +99,10 @@ window.App = {
   tryExecute: function () {
     var self = this;
 
-    var DMS;
-    DeadAccountSwitch.deployed().then(function (instance) {
-      DMS = instance;
-      return DMS.kick( Date.now()/1000 + 30, {from: account});
+    var TBS;
+    TimeBasedSwitch.deployed().then(function (instance) {
+      TBS = instance;
+      return TBS.kick( Date.now()/1000 + 30, {from: account});
     }).then(function() {
       self.setStatus("Kick complete!");
       self.refreshTimeLeft();
@@ -120,11 +120,11 @@ window.App = {
     var beneficiary = document.getElementById("beneficiary").value;
     var data = document.getElementById("data").value;
 
-    var dms;
+    var TBS;
 
-    DeadAccountSwitch.deployed().then(function (instance) {
-      dms = instance;
-      return dms.CreateDeadAccountSwitch(beneficiary, data, Date.now()/1000, {from: account, gas: 3141592});
+    TimeBasedSwitchh.deployed().then(function (instance) {
+      TBS = instance;
+      return TBS.CreateDeadAccountSwitch(beneficiary, data, Date.now()/1000, {from: account, gas: 3141592});
     }).then(function() {
       self.setStatus("Transaction complete!");
 
@@ -146,13 +146,13 @@ window.App = {
 
   updateExecutor: function (sender) {
     var self = this;
-    var DMS;
+    var TBS;
     var message_element = document.getElementById("message");
     console.log("getMessage for " + sender);
-    DeadAccountSwitch.deployed().then(function (instance) {
-      DMS = instance;
+    TimeBasedSwitch.deployed().then(function (instance) {
+      TBS = instance;
       console.log("resolved contract instance getMessage");
-      return DMS.getDataFromAddress.call(sender, {from: account});
+      return TBS.getDataFromAddress.call(sender, {from: account});
     }).then(function (value) {
       console.log("resolved getDataFromAddress");
       message_element.innerHTML = web3.toAscii(value.valueOf());
@@ -166,13 +166,13 @@ window.App = {
 
   updateCooldown: function (sender) {
     var self = this;
-    var DMS;
+    var TBS;
     var heatbeat_time_element = document.getElementById("heartbeat");
     console.log("getLastHeartbeat for " + sender);
-    DeadAccountSwitch.deployed().then(function (instance) {
+    TimeBasedSwitch.deployed().then(function (instance) {
       console.log("getLastHeartbeat resolved contract instance");
-      DMS = instance;
-      return DMS.getExpirationTime.call(sender);
+      TBS = instance;
+      return TBS.getExpirationTime.call(sender);
     }).then(function (value) {
       console.log("resolved getExpirationTime " + value);
       var lastHeartbeat = new Date((value * 1000) - 30);

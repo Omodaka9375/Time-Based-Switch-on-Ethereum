@@ -1,5 +1,5 @@
-var DASContract = artifacts.require("./DeadAccountSwitch.sol");
+var TBSContract = artifacts.require("./TimeBasedSwitch.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(DASContract);
+  deployer.deploy(TBSContract);
 };
