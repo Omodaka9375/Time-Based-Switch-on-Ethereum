@@ -19,7 +19,7 @@ contract TimeBasedSwitch is ReentrancyGuard {
     struct Switch {
         uint amount; //amount locked (in eth)
         uint unlockTimestamp; //minimum block to unlock eth
-        string switchName; //name of the switch (taken from UI, maybe we don't need to store this info on-chain)
+        bytes32 switchName; //name of the switch
         bool isValid; //check validity of existing switch if exists
         address payable[] benefitors; //accounts for funds to be transfered to
         address[] tokensLocked; // list of addresses of all erc20 tokens locked in switch
@@ -95,13 +95,14 @@ contract TimeBasedSwitch is ReentrancyGuard {
     /// @param _executors The executors of the switch
     /// @param _benefitors The benefitors of the switch
     /// @param _benefitorsShares The percentage share (in Basis Points) of each benefitor in portfolio
-    function createSwitch(uint _time, uint _amount, address[] memory _executors, address payable[] memory _benefitors, uint16[] memory _benefitorsShares)
+    function createSwitch(bytes32 _name, uint _time, uint _amount, address[] memory _executors, address payable[] memory _benefitors, uint16[] memory _benefitorsShares)
     doesntExist
     checkAmount(_amount)
     checkTime(_time)
     public
     payable
     {
+        users[msg.sender].switchName = _name;
         users[msg.sender].unlockTimestamp = block.timestamp + _time;
         for (uint i = 0; i < _executors.length; i++) {
           users[msg.sender].executors[_executors[i]] = true;
