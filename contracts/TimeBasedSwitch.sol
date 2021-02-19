@@ -125,14 +125,39 @@ contract TimeBasedSwitch is ReentrancyGuard {
       uint amount = users[account].amount;
       users[account].amount = 0;
       users[account].isValid = false;
-      // (bool success, ) = users[account].benefitor.call.value(amount)("");
-      // require(success, 'transfer failed');
+
+      uint benefitorsLength = users[account].benefitors.length;
+      uint tokensLockedLength = users[account].tokensLocked.length;
+
+      for(uint i = 0; i < benefitorsLength; i++) {
+          address currentBenefitor = users[account].benefitors[i];
+
+          (bool success, ) = currentBenefitor.call.value(amount)("");
+          require(success, 'transfer of eth failed');
+
+          for(uint j = 0; j < tokensLockedLength; j++) {
+            address currentToken = users[account].tokensLocked[j];
+            uint toWitdhraw = users[account].benefitorShares[currentBenefitor] * users[account].tokens[currentToken] / 10000;
+            users[account].tokens[currentToken] -= toWitdhraw;
+            withdrawToken(currentToken, toWitdhraw, currentBenefitor); 
+          }
+      }
+
+      uint collectiblesLength = users[account].collectiblesLocked.length;
+      for(uint i = 0; i < collectiblesLength; i++) {
+        NFT storage currentCollectible = users[account].collectiblesLocked[i];
+        withdrawCollectible(currentCollectible.tokenAddress, currentCollectible.id, currentCollectible.benefitor);
+      }
+      
       emit SwitchTriggered(account); 
       delete users[account];
       emit SwitchTerminated(account);
     }
 
-    // 
+    /// @notice Function to lock erc20 token into switch
+    /// @param _tokenAddress - Address of erc20 token
+    /// @param _amount - Amount of token to lock
+    /// No return, reverts on error
     function lockToken(address _tokenAddress, uint256 _amount) public {
         require(_tokenAddress != address(0), "lockToken: Invalid token address");
         require(_amount > 0, "lockToken: Amount must be greater than 0");
@@ -148,6 +173,11 @@ contract TimeBasedSwitch is ReentrancyGuard {
         emit SwitchUpdated("Token locked");
     }
 
+    /// @notice Function to lock erc721 token into switch
+    /// @param _tokenAddress - Address of erc721 token
+    /// @param _tokenId - Id of token to lock
+    /// @param _benefitor - Address of wallet which gets this NFT once switch is executed
+    /// No return, reverts on error
     function lockCollectible(address _tokenAddress, uint256 _tokenId, address _benefitor) public {
         require(_tokenAddress != address(0), "lockCollectible: Invalid token address");
         require(users[msg.sender].benefitorShares[msg.sender] > 0, "lockCollectible: Invalid benefitor");
