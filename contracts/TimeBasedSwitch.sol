@@ -11,14 +11,22 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 contract TimeBasedSwitch is ReentrancyGuard {
     using SafeERC20 for IERC20;
     /* Structs */
+    struct NFT {
+      uint id;
+      address tokenAddress;
+      address benefitor;
+    }
     struct Switch {
         uint amount; //amount locked (in eth)
         uint unlockTimestamp; //minimum block to unlock eth
-        address executor; //account allowed to try execute a switch
-        address payable benefitor; //account for eth to be transfered to
+        string switchName; //name of the switch (taken from UI, maybe we don't need to store this info on-chain)
         bool isValid; //check validity of existing switch if exists
+        address payable[] benefitors; //accounts for funds to be transfered to
+        address[] tokensLocked; // list of addresses of all erc20 tokens locked in switch
+        mapping(address => bool) executors; //accounts allowed to try execute a switch
+        mapping(address => uint) benefitorShares; // address => percentageShare in Basis Points
         mapping(address => uint) tokens; // erc20 token address => amount locked
-        mapping(address => uint[]) collectibles; // erc721 address => array of tokenIds locked
+        NFT[] collectiblesLocked; // list of addresses of all erc721 tokens locked in switch
     }
     /* Storage */
     mapping(address => Switch) private users; //store switch per user account
@@ -40,14 +48,14 @@ contract TimeBasedSwitch is ReentrancyGuard {
     /// @dev To be used in any situation where the function performs a privledged action to the switch
     /// @param account The account to check the owner of
     modifier onlyAllowed(address account) {
-      require(users[account].benefitor == msg.sender || users[account].executor == msg.sender || account == msg.sender, "you do not have rights to check on this switch!");
+      require(users[account].benefitorShares[msg.sender] > 0 || users[account].executors[msg.sender] || account == msg.sender, "you do not have rights to check on this switch!");
       _;
     }
     /// @notice Checks that the the function is being called only by the executor of the switch
     /// @dev To be used in any situation where the function performs a privledged action to the switch
     /// @param account The account to check the owner of
     modifier onlyExecutorsOrOwner(address account) {
-      require(users[account].executor == msg.sender || (users[msg.sender].isValid && msg.sender == account), 'you do not have rights to execute this switch!');
+      require(users[account].executors[msg.sender] || (users[msg.sender].isValid && msg.sender == account), 'you do not have rights to execute this switch!');
       _;
     }
     /// @notice Checks that a specified amount matches the msg.value sent
@@ -83,20 +91,22 @@ contract TimeBasedSwitch is ReentrancyGuard {
     /// @notice Function that creates a switch struct and stores it to users map object
     /// @dev This function works if the switch for this account doesn't exist, is not valid, if the amount is not correct or if time parameter is less then minimum of 1 day
     /// @param _time The time parameter sets the number of blocks for the lock expiration in seconds
-    /// @param _amount The amount to lock
-    /// @param _executor The executor of the switch
-    /// @param _benefitor The benefitor of the switch
-    function createSwitch(uint _time, uint _amount, address _executor, address payable _benefitor)
+    ///param _amount The amount to lock
+    /// @param _executors The executors of the switch
+    /// @param _benefitors The benefitors of the switch
+    /// @param _benefitorsShares The percentage share (in Basis Points) of each benefitor in portfolio
+    function createSwitch(uint _time, uint _amount, address[] memory _executors, address payable[] memory _benefitors, uint16[] memory _benefitorsShares)
     doesntExist
     checkAmount(_amount)
     checkTime(_time)
     public
     payable
     {
-        require(msg.sender != _benefitor,'creator can not be one of the benefitors');
         users[msg.sender].unlockTimestamp = block.timestamp + _time;
-        users[msg.sender].executor = _executor;
-        users[msg.sender].benefitor = _benefitor;
+        for (uint i = 0; i < _executors.length; i++) {
+          users[msg.sender].executors[_executors[i]] = true;
+        }
+        setSwitchBenefitors(_benefitors, _benefitorsShares);
         users[msg.sender].amount = _amount;
         users[msg.sender].isValid = true;
         emit SwitchCreated(users[msg.sender].unlockTimestamp);
@@ -114,11 +124,38 @@ contract TimeBasedSwitch is ReentrancyGuard {
       uint amount = users[account].amount;
       users[account].amount = 0;
       users[account].isValid = false;
-      (bool success, ) = users[account].benefitor.call.value(amount)("");
-      require(success, 'transfer failed');
+      // (bool success, ) = users[account].benefitor.call.value(amount)("");
+      // require(success, 'transfer failed');
       emit SwitchTriggered(account); 
       delete users[account];
       emit SwitchTerminated(account);
+    }
+
+    // 
+    function lockToken(address _tokenAddress, uint256 _amount) public {
+        require(_tokenAddress != address(0), "lockToken: Invalid token address");
+        require(_amount > 0, "lockToken: Amount must be greater than 0");
+
+        if(users[msg.sender].tokens[_tokenAddress] == 0) {
+            users[msg.sender].tokensLocked.push(_tokenAddress);
+        }
+
+        users[msg.sender].tokens[_tokenAddress] += _amount;
+        
+        IERC20(_tokenAddress).safeTransfer(address(this), _amount);
+
+        emit SwitchUpdated("Token locked");
+    }
+
+    function lockCollectible(address _tokenAddress, uint256 _tokenId, address _benefitor) public {
+        require(_tokenAddress != address(0), "lockCollectible: Invalid token address");
+        require(users[msg.sender].benefitorShares[msg.sender] > 0, "lockCollectible: Invalid benefitor");
+
+        ERC721(_tokenAddress).safeTransferFrom(msg.sender, address(this), _tokenId);
+
+        users[msg.sender].collectiblesLocked.push(NFT(_tokenId, _tokenAddress, _benefitor));
+
+        emit SwitchUpdated("Collectible locked");
     }
     /// @notice Function to withdraw amount of given ERC20 token
     /// @param _tokenAddress - address of ERC20 token
@@ -175,14 +212,12 @@ contract TimeBasedSwitch is ReentrancyGuard {
     public
     view
     returns
-    (uint, uint, address, address, bool)
+    (uint, uint, bool)
     {
       Switch memory _switch = users[_switchOwner];
       return (
         _switch.amount,
         _switch.unlockTimestamp,
-        _switch.executor,
-        _switch.benefitor,
         _switch.isValid
       );
     }
@@ -225,26 +260,80 @@ contract TimeBasedSwitch is ReentrancyGuard {
       users[msg.sender].unlockTimestamp = _unlockTimestamp;
       emit SwitchUpdated("Unlock time updated");
     }
-    /// @notice Function that tries to update switch executors address
+    /// @notice Function that tries to set new switch executors address
     /// @dev This function is allowed only for switch owner
     /// @param _executor New executor address
-    function updateSwitchExecutor(address _executor)
+    function addSwitchExecutor(address _executor)
     onlyValid(msg.sender)
     public
     payable
     {
-      users[msg.sender].executor = _executor;
-      emit SwitchUpdated("Executor updated");
+      users[msg.sender].executors[_executor] = true;
+      emit SwitchUpdated("Executor added");
+    }
+
+    /// @notice Function that tries to remove switch executor
+    /// @dev This function is allowed only for switch owner
+    /// @param _executor Executor address
+    function removeSwitchExecutor(address _executor) 
+    onlyValid(msg.sender)
+    public
+    {
+      delete users[msg.sender].executors[_executor];
+      emit SwitchUpdated("Executor removed");
     }
     /// @notice Function that tries to update switch benefitors address
     /// @dev This function is allowed only for switch owner
-    /// @param _benefitor New benefitor address
-    function updateSwitchBenefitor(address payable _benefitor)
+    /// @param _benefitors Benefitor addresses
+    /// @param _percentageSharesInBasisPoints Percentage share of siwtch portfolio, in Basis Points
+    function setSwitchBenefitors(address payable[] memory _benefitors, uint16[] memory _percentageSharesInBasisPoints)
     onlyValid(msg.sender)
     public
     payable
     {
-      users[msg.sender].benefitor = _benefitor;
-      emit SwitchUpdated("Benefitor updated");
+      require(_benefitors.length == _percentageSharesInBasisPoints.length, "setSwitchBenefitors: arrays mismatch");
+      uint16 basisPoints = 0;
+      uint loopLength = _benefitors.length;
+
+      for(uint i = 0; i < loopLength; i++) {
+        require(msg.sender != _benefitors[i],'creator can not be one of the benefitors');
+        users[msg.sender].benefitorShares[_benefitors[i]] = _percentageSharesInBasisPoints[i];
+        basisPoints += _percentageSharesInBasisPoints[i];
+      }
+    
+      require(basisPoints == 10000, "setSwitchBenefitor: Summary of percentage shares must be 100%");
+      users[msg.sender].benefitors = _benefitors;
+      emit SwitchUpdated("Benefitors updated");
+    }
+    /// @notice Function that tries to remove switch benefitor
+    /// @dev This function is allowed only for switch owner
+    /// @param _benefitor Address of benefitor to remove
+    function removeSwitchBenefitor(address _benefitor)
+    onlyValid(msg.sender)
+    public
+    {
+      require(users[msg.sender].benefitorShares[_benefitor] > 0, "removeSwitchBenefitor: Invalid benefitor");
+
+      uint benefitorsLength = users[msg.sender].benefitors.length;
+      // need to split percentege share of leaving benefitor to rest of benefitors
+      uint updatedShareForBenefitors = users[msg.sender].benefitorShares[_benefitor] / (benefitorsLength - 1);
+      int index = -1;
+
+      for(uint i = 0; i < benefitorsLength; i++) {
+        address currentBenefitor = users[msg.sender].benefitors[i];
+        if (currentBenefitor == _benefitor) {
+          delete users[msg.sender].benefitorShares[_benefitor];
+          index = int(i);
+        } else {
+          users[msg.sender].benefitorShares[currentBenefitor] += updatedShareForBenefitors;
+        }
+      }
+
+      // Move the last element into the place to delete
+      users[msg.sender].benefitors[uint(index)] = users[msg.sender].benefitors[benefitorsLength - 1];
+      // Remove the last element
+      users[msg.sender].benefitors.pop();
+
+      emit SwitchUpdated("Benefitor removed");
     }
 }
