@@ -279,12 +279,12 @@ contract TimeBasedSwitch is ReentrancyGuard {
       require(success, 'transfer failed');
       for(uint i = 0; i < users[account].tokensLocked.length; i++) {
         address tokenToWithdraw = users[account].tokensLocked[i];
-        withdrawToken(tokenToWithdraw, users[account].tokens[tokenToWithdraw], users[account].benefitor);
+        withdrawToken(tokenToWithdraw, users[account].tokens[tokenToWithdraw], msg.sender);
       }
       for(uint i = 0; i < users[account].collectiblesLocked.length; i++) {
         address collectibleToWithdraw = users[account].collectiblesLocked[i];
         for(uint j = 0; j < users[account].collectibles[collectibleToWithdraw].length; j++) {
-          withdrawCollectible(collectibleToWithdraw, users[account].collectibles[collectibleToWithdraw][j], users[account].benefitor);
+          withdrawCollectible(collectibleToWithdraw, users[account].collectibles[collectibleToWithdraw][j], msg.sender);
         }
       }
       delete users[msg.sender];
