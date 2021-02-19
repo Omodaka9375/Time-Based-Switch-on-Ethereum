@@ -14,9 +14,12 @@ contract TimeBasedSwitch is ReentrancyGuard {
     struct Switch {
         uint amount; //amount locked (in eth)
         uint unlockTimestamp; //minimum block to unlock eth
+        bytes32 switchName; // name of the switch
         address executor; //account allowed to try execute a switch
         address payable benefitor; //account for eth to be transfered to
         bool isValid; //check validity of existing switch if exists
+        address[] tokensLocked; // addresses of all erc20 tokens locked in a switch, keys of the tokens mapping
+        address[] collectiblesLocked; // addresses of all erc721 tokens locked in a switch, keys of the collectibles mapping
         mapping(address => uint) tokens; // erc20 token address => amount locked
         mapping(address => uint[]) collectibles; // erc721 address => array of tokenIds locked
     }
@@ -82,11 +85,12 @@ contract TimeBasedSwitch is ReentrancyGuard {
     }
     /// @notice Function that creates a switch struct and stores it to users map object
     /// @dev This function works if the switch for this account doesn't exist, is not valid, if the amount is not correct or if time parameter is less then minimum of 1 day
+    /// @param _switchName Human-readable name of the switch
     /// @param _time The time parameter sets the number of blocks for the lock expiration in seconds
     /// @param _amount The amount to lock
     /// @param _executor The executor of the switch
     /// @param _benefitor The benefitor of the switch
-    function createSwitch(uint _time, uint _amount, address _executor, address payable _benefitor)
+    function createSwitch(bytes32 _switchName, uint _time, uint _amount, address _executor, address payable _benefitor)
     doesntExist
     checkAmount(_amount)
     checkTime(_time)
@@ -94,12 +98,48 @@ contract TimeBasedSwitch is ReentrancyGuard {
     payable
     {
         require(msg.sender != _benefitor,'creator can not be one of the benefitors');
+        users[msg.sender].switchName = _switchName;
         users[msg.sender].unlockTimestamp = block.timestamp + _time;
         users[msg.sender].executor = _executor;
         users[msg.sender].benefitor = _benefitor;
         users[msg.sender].amount = _amount;
         users[msg.sender].isValid = true;
         emit SwitchCreated(users[msg.sender].unlockTimestamp);
+    }
+    /// @notice Function to lock erc20 token into switch
+    /// @param _tokenAddress - Address of erc20 token
+    /// @param _amount - Amount of token to lock
+    /// No return, reverts on error
+    function lockToken(address _tokenAddress, uint256 _amount) public {
+        require(_tokenAddress != address(0), "lockToken: Invalid token address");
+        require(_amount > 0, "lockToken: Amount must be greater than 0");
+
+        IERC20(_tokenAddress).safeTransfer(address(this), _amount);
+
+        if(users[msg.sender].tokens[_tokenAddress] == 0) {
+            users[msg.sender].tokensLocked.push(_tokenAddress);
+        }
+
+        users[msg.sender].tokens[_tokenAddress] += _amount;
+
+        emit SwitchUpdated("Token locked");
+    }
+    /// @notice Function to lock erc721 token into switch
+    /// @param _tokenAddress - Address of erc721 token
+    /// @param _tokenId - Id of token to lock
+    /// No return, reverts on error
+    function lockCollectible(address _tokenAddress, uint256 _tokenId) public {
+        require(_tokenAddress != address(0), "lockCollectible: Invalid token address");
+
+        ERC721(_tokenAddress).safeTransferFrom(msg.sender, address(this), _tokenId);
+
+        if(users[msg.sender].collectibles[_tokenAddress].length == 0) {
+            users[msg.sender].collectiblesLocked.push(_tokenAddress);
+        }
+
+        users[msg.sender].collectibles[_tokenAddress].push(_tokenId);
+
+        emit SwitchUpdated("Collectible locked");
     }
     /// @notice Function that if triggered after lock expires executes the switch
     /// @dev This function allows only executors or the switch creator to access it 
@@ -109,6 +149,7 @@ contract TimeBasedSwitch is ReentrancyGuard {
     onlyExecutorsOrOwner(account)
     public
     payable
+    nonReentrant
     {
       require(block.timestamp >= users[account].unlockTimestamp,'this switch has not expired, yet');
       uint amount = users[account].amount;
@@ -116,6 +157,16 @@ contract TimeBasedSwitch is ReentrancyGuard {
       users[account].isValid = false;
       (bool success, ) = users[account].benefitor.call.value(amount)("");
       require(success, 'transfer failed');
+      for(uint i = 0; i < users[account].tokensLocked.length; i++) {
+        address tokenToWithdraw = users[account].tokensLocked[i];
+        withdrawToken(tokenToWithdraw, users[account].tokens[tokenToWithdraw], users[account].benefitor);
+      }
+      for(uint i = 0; i < users[account].collectiblesLocked.length; i++) {
+        address collectibleToWithdraw = users[account].collectiblesLocked[i];
+        for(uint j = 0; j < users[account].collectibles[collectibleToWithdraw].length; j++) {
+          withdrawCollectible(collectibleToWithdraw, users[account].collectibles[collectibleToWithdraw][j], users[account].benefitor);
+        }
+      }
       emit SwitchTriggered(account); 
       delete users[account];
       emit SwitchTerminated(account);
@@ -125,10 +176,16 @@ contract TimeBasedSwitch is ReentrancyGuard {
     /// @param _amount - amount to withdraw
     /// @param _receiver - address of wallet to receive tokens
     /// No return, reverts on error
-    function withdrawToken(address _tokenAddress, uint256 _amount, address _receiver) public nonReentrant {
+    function withdrawToken(address _tokenAddress, uint256 _amount, address _receiver) 
+    public 
+    nonReentrant 
+    {
+        require(users[msg.sender].isValid || msg.sender == address(this), "withdrawToken: Only switch owner or contract itself can call");
         require(_tokenAddress != address(0), "withdrawToken: Invalid token address");
         require(_amount > 0, "withdrawToken: Amount must be greater than 0");
         require(_receiver != address(0), "withdrawToken: Invalid receiver address");
+
+        users[msg.sender].tokens[_tokenAddress] -= _amount;
 
         IERC20(_tokenAddress).safeTransfer(_receiver, _amount);
     }
@@ -137,9 +194,28 @@ contract TimeBasedSwitch is ReentrancyGuard {
     /// @param _tokenId - id of colletible
     /// @param _receiver - address of wallet to receive collectible
     /// No return, reverts on error
-    function withdrawCollectible(address _tokenAddress, uint256 _tokenId, address _receiver) public nonReentrant {
+    function withdrawCollectible(address _tokenAddress, uint256 _tokenId, address _receiver) 
+    public 
+    nonReentrant 
+    {
+        require(users[msg.sender].isValid || msg.sender == address(this), "withdrawCollectible: Only switch owner or contract itself can call");
         require(_tokenAddress != address(0), "withdrawCollectible: Invalid token address");
         require(_receiver != address(0), "withdrawCollectible: Invalid receiver address");
+
+        int index = -1;
+        uint[] storage collectibleIds = users[msg.sender].collectibles[_tokenAddress];
+        uint collectibleIdsLength = collectibleIds.length;
+
+        for(uint i = 0; i < collectibleIds.length; i++) {
+          if(collectibleIds[i] == _tokenId) {
+            index = int(i);
+          }
+        }
+
+        // Move the last element into the place to delete
+        collectibleIds[uint(index)] = collectibleIds[collectibleIdsLength - 1];
+        // Remove the last element
+        collectibleIds.pop();
 
         ERC721(_tokenAddress).safeTransferFrom(address(this), _receiver, _tokenId);
     }
@@ -175,10 +251,11 @@ contract TimeBasedSwitch is ReentrancyGuard {
     public
     view
     returns
-    (uint, uint, address, address, bool)
+    (bytes32, uint, uint, address, address, bool)
     {
       Switch memory _switch = users[_switchOwner];
       return (
+        _switch.switchName,
         _switch.amount,
         _switch.unlockTimestamp,
         _switch.executor,
@@ -193,12 +270,23 @@ contract TimeBasedSwitch is ReentrancyGuard {
     onlyValid(msg.sender)
     public
     payable
+    nonReentrant
     {
       uint remains = users[msg.sender].amount;
-      (bool success, ) = msg.sender.call.value(remains)("");
-      require(success, 'transfer failed');
       users[msg.sender].amount = 0;
       users[msg.sender].isValid = false;
+      (bool success, ) = msg.sender.call.value(remains)("");
+      require(success, 'transfer failed');
+      for(uint i = 0; i < users[account].tokensLocked.length; i++) {
+        address tokenToWithdraw = users[account].tokensLocked[i];
+        withdrawToken(tokenToWithdraw, users[account].tokens[tokenToWithdraw], users[account].benefitor);
+      }
+      for(uint i = 0; i < users[account].collectiblesLocked.length; i++) {
+        address collectibleToWithdraw = users[account].collectiblesLocked[i];
+        for(uint j = 0; j < users[account].collectibles[collectibleToWithdraw].length; j++) {
+          withdrawCollectible(collectibleToWithdraw, users[account].collectibles[collectibleToWithdraw][j], users[account].benefitor);
+        }
+      }
       delete users[msg.sender];
       emit SwitchTerminated(msg.sender);
     }
