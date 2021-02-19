@@ -69,7 +69,7 @@ contract TimeBasedSwitch is ReentrancyGuard {
     /// @dev To be used in any situation where we check that user is setting unlock time minimum 1 day a head
     /// @param time The time to be checked
     modifier checkTime(uint time) {
-      require(time >= 86400, 'one day is minimum time for switch'); //86400 seconds = 1 day
+      require(time >= block.timestamp + 86400, 'one day is minimum time for switch'); //86400 seconds = 1 day
       _;
     }
     /// @notice Checks that a switch doesnt exist or isnt valid
