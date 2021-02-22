@@ -253,7 +253,7 @@ contract TimeBasedSwitch is ReentrancyGuard {
     returns
     (bytes32, uint, uint, address, address, bool)
     {
-      Switch memory _switch = users[_switchOwner];
+      Switch storage _switch = users[_switchOwner];
       return (
         _switch.switchName,
         _switch.amount,
@@ -275,16 +275,16 @@ contract TimeBasedSwitch is ReentrancyGuard {
       uint remains = users[msg.sender].amount;
       users[msg.sender].amount = 0;
       users[msg.sender].isValid = false;
-      (bool success, ) = msg.sender.call.value(remains)("");
+      (bool success, ) = msg.sender.call{value: remains}("");
       require(success, 'transfer failed');
-      for(uint i = 0; i < users[account].tokensLocked.length; i++) {
-        address tokenToWithdraw = users[account].tokensLocked[i];
-        withdrawToken(tokenToWithdraw, users[account].tokens[tokenToWithdraw], msg.sender);
+      for(uint i = 0; i < users[msg.sender].tokensLocked.length; i++) {
+        address tokenToWithdraw = users[msg.sender].tokensLocked[i];
+        withdrawToken(tokenToWithdraw, users[msg.sender].tokens[tokenToWithdraw], msg.sender);
       }
-      for(uint i = 0; i < users[account].collectiblesLocked.length; i++) {
-        address collectibleToWithdraw = users[account].collectiblesLocked[i];
-        for(uint j = 0; j < users[account].collectibles[collectibleToWithdraw].length; j++) {
-          withdrawCollectible(collectibleToWithdraw, users[account].collectibles[collectibleToWithdraw][j], msg.sender);
+      for(uint i = 0; i < users[msg.sender].collectiblesLocked.length; i++) {
+        address collectibleToWithdraw = users[msg.sender].collectiblesLocked[i];
+        for(uint j = 0; j < users[msg.sender].collectibles[collectibleToWithdraw].length; j++) {
+          withdrawCollectible(collectibleToWithdraw, users[msg.sender].collectibles[collectibleToWithdraw][j], msg.sender);
         }
       }
       delete users[msg.sender];
