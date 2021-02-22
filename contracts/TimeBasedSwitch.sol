@@ -27,10 +27,10 @@ contract TimeBasedSwitch is ReentrancyGuard {
     mapping(address => Switch) private users; //store switch per user account
     /* Events */
     event SwitchCreated(uint unlockTimestamp);
-    event SwitchTriggered(address account);
-    event SwitchTerminated(address account);
+    event SwitchTriggered(address indexed account);
+    event SwitchTerminated(address indexed account);
     event SwitchUpdated(bytes32 message);
-    event EtherReceived(address sender, uint amount);
+    event EtherReceived(address indexed sender, uint amount);
     /* Modifiers */
     /// @notice Checks that the the account passed is a valid switch
     /// @dev To be used in any situation where the function performs a check of existing/valid switches
@@ -114,7 +114,7 @@ contract TimeBasedSwitch is ReentrancyGuard {
         require(_tokenAddress != address(0), "lockToken: Invalid token address");
         require(_amount > 0, "lockToken: Amount must be greater than 0");
 
-        IERC20(_tokenAddress).safeTransfer(address(this), _amount);
+        IERC20(_tokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
 
         if(users[msg.sender].tokens[_tokenAddress] == 0) {
             users[msg.sender].tokensLocked.push(_tokenAddress);
@@ -180,7 +180,6 @@ contract TimeBasedSwitch is ReentrancyGuard {
     public 
     nonReentrant 
     {
-        require(users[msg.sender].isValid || msg.sender == address(this), "withdrawToken: Only switch owner or contract itself can call");
         require(_tokenAddress != address(0), "withdrawToken: Invalid token address");
         require(_amount > 0, "withdrawToken: Amount must be greater than 0");
         require(_receiver != address(0), "withdrawToken: Invalid receiver address");
@@ -198,7 +197,6 @@ contract TimeBasedSwitch is ReentrancyGuard {
     public 
     nonReentrant 
     {
-        require(users[msg.sender].isValid || msg.sender == address(this), "withdrawCollectible: Only switch owner or contract itself can call");
         require(_tokenAddress != address(0), "withdrawCollectible: Invalid token address");
         require(_receiver != address(0), "withdrawCollectible: Invalid receiver address");
 
