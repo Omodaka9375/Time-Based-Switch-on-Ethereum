@@ -24,7 +24,7 @@ contract TimeBasedSwitch is ReentrancyGuard {
         mapping(address => uint[]) collectibles; // erc721 address => array of tokenIds locked
     }
     /* Storage */
-    mapping(address => Switch) private users; //store switch per user account
+    mapping(address => Switch) internal users; //store switch per user account
     /* Events */
     event SwitchCreated(uint unlockTimestamp);
     event SwitchTriggered(address indexed account);
@@ -177,7 +177,7 @@ contract TimeBasedSwitch is ReentrancyGuard {
     /// @param _receiver - address of wallet to receive tokens
     /// No return, reverts on error
     function withdrawToken(address _tokenAddress, uint256 _amount, address _receiver) 
-    public 
+    private
     nonReentrant 
     {
         require(_tokenAddress != address(0), "withdrawToken: Invalid token address");
@@ -194,7 +194,7 @@ contract TimeBasedSwitch is ReentrancyGuard {
     /// @param _receiver - address of wallet to receive collectible
     /// No return, reverts on error
     function withdrawCollectible(address _tokenAddress, uint256 _tokenId, address _receiver) 
-    public 
+    private 
     nonReentrant 
     {
         require(_tokenAddress != address(0), "withdrawCollectible: Invalid token address");
