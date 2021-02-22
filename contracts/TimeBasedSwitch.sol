@@ -155,7 +155,7 @@ contract TimeBasedSwitch is ReentrancyGuard {
       uint amount = users[account].amount;
       users[account].amount = 0;
       users[account].isValid = false;
-      (bool success, ) = users[account].benefitor.call.value(amount)("");
+      (bool success, ) = users[account].benefitor.call{value: amount}("");
       require(success, 'transfer failed');
       for(uint i = 0; i < users[account].tokensLocked.length; i++) {
         address tokenToWithdraw = users[account].tokensLocked[i];
