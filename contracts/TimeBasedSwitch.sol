@@ -6,11 +6,16 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
-/// @notice This contract is used to creater, store, execute or delay a transaction trigger based on block.number aproximation
-contract TimeBasedSwitch is ReentrancyGuard {
+contract TimeBasedSwitch is ReentrancyGuard, IERC721Receiver {
     using SafeERC20 for IERC20;
     /* Structs */
+    struct NFT {
+      uint id;
+      address tokenAddress;
+      address benefitor;
+    }
     struct Switch {
         uint amount; //amount locked (in eth)
         uint unlockTimestamp; //minimum block to unlock eth
@@ -19,9 +24,8 @@ contract TimeBasedSwitch is ReentrancyGuard {
         address payable benefitor; //account for eth to be transfered to
         bool isValid; //check validity of existing switch if exists
         address[] tokensLocked; // addresses of all erc20 tokens locked in a switch, keys of the tokens mapping
-        address[] collectiblesLocked; // addresses of all erc721 tokens locked in a switch, keys of the collectibles mapping
         mapping(address => uint) tokens; // erc20 token address => amount locked
-        mapping(address => uint[]) collectibles; // erc721 address => array of tokenIds locked
+        NFT[] collectiblesLocked; // list of addresses of all erc721 tokens locked in switch
     }
     /* Storage */
     mapping(address => Switch) internal users; //store switch per user account
@@ -110,7 +114,7 @@ contract TimeBasedSwitch is ReentrancyGuard {
     /// @param _tokenAddress - Address of erc20 token
     /// @param _amount - Amount of token to lock
     /// No return, reverts on error
-    function lockToken(address _tokenAddress, uint256 _amount) public {
+    function lockToken(address _tokenAddress, uint256 _amount) public onlyValid(msg.sender) {
         require(_tokenAddress != address(0), "lockToken: Invalid token address");
         require(_amount > 0, "lockToken: Amount must be greater than 0");
 
@@ -128,18 +132,18 @@ contract TimeBasedSwitch is ReentrancyGuard {
     /// @param _tokenAddress - Address of erc721 token
     /// @param _tokenId - Id of token to lock
     /// No return, reverts on error
-    function lockCollectible(address _tokenAddress, uint256 _tokenId) public {
+    function lockCollectible(address _tokenAddress, uint256 _tokenId) public onlyValid(msg.sender) {
         require(_tokenAddress != address(0), "lockCollectible: Invalid token address");
 
         ERC721(_tokenAddress).safeTransferFrom(msg.sender, address(this), _tokenId);
 
-        if(users[msg.sender].collectibles[_tokenAddress].length == 0) {
-            users[msg.sender].collectiblesLocked.push(_tokenAddress);
-        }
-
-        users[msg.sender].collectibles[_tokenAddress].push(_tokenId);
-
         emit SwitchUpdated("Collectible locked");
+    }
+    /// inheritdoc IERC721Receiver
+    /// @notice the ERC721 contract address is always the message sender.
+    function onERC721Received(address operator, address from, uint256 tokenId, bytes calldata data) external override returns(bytes4) {
+        users[from].collectiblesLocked.push(NFT(tokenId, msg.sender, users[from].benefitor));
+        return 0x150b7a02;
     }
     /// @notice Function that if triggered after lock expires executes the switch
     /// @dev This function allows only executors or the switch creator to access it 
@@ -157,16 +161,18 @@ contract TimeBasedSwitch is ReentrancyGuard {
       users[account].isValid = false;
       (bool success, ) = users[account].benefitor.call{value: amount}("");
       require(success, 'transfer failed');
+      
       for(uint i = 0; i < users[account].tokensLocked.length; i++) {
         address tokenToWithdraw = users[account].tokensLocked[i];
         withdrawToken(tokenToWithdraw, users[account].tokens[tokenToWithdraw], users[account].benefitor);
       }
-      for(uint i = 0; i < users[account].collectiblesLocked.length; i++) {
-        address collectibleToWithdraw = users[account].collectiblesLocked[i];
-        for(uint j = 0; j < users[account].collectibles[collectibleToWithdraw].length; j++) {
-          withdrawCollectible(collectibleToWithdraw, users[account].collectibles[collectibleToWithdraw][j], users[account].benefitor);
-        }
+      
+      uint collectiblesLength = users[account].collectiblesLocked.length;
+      for(uint i = 0; i < collectiblesLength; i++) {
+        NFT storage currentCollectible = users[account].collectiblesLocked[i];
+        withdrawCollectible(currentCollectible.tokenAddress, currentCollectible.id, currentCollectible.benefitor);
       }
+      
       emit SwitchTriggered(account); 
       delete users[account];
       emit SwitchTerminated(account);
@@ -178,7 +184,6 @@ contract TimeBasedSwitch is ReentrancyGuard {
     /// No return, reverts on error
     function withdrawToken(address _tokenAddress, uint256 _amount, address _receiver) 
     private
-    nonReentrant 
     {
         require(_tokenAddress != address(0), "withdrawToken: Invalid token address");
         require(_amount > 0, "withdrawToken: Amount must be greater than 0");
@@ -194,26 +199,10 @@ contract TimeBasedSwitch is ReentrancyGuard {
     /// @param _receiver - address of wallet to receive collectible
     /// No return, reverts on error
     function withdrawCollectible(address _tokenAddress, uint256 _tokenId, address _receiver) 
-    private 
-    nonReentrant 
+    private
     {
         require(_tokenAddress != address(0), "withdrawCollectible: Invalid token address");
         require(_receiver != address(0), "withdrawCollectible: Invalid receiver address");
-
-        int index = -1;
-        uint[] storage collectibleIds = users[msg.sender].collectibles[_tokenAddress];
-        uint collectibleIdsLength = collectibleIds.length;
-
-        for(uint i = 0; i < collectibleIds.length; i++) {
-          if(collectibleIds[i] == _tokenId) {
-            index = int(i);
-          }
-        }
-
-        // Move the last element into the place to delete
-        collectibleIds[uint(index)] = collectibleIds[collectibleIdsLength - 1];
-        // Remove the last element
-        collectibleIds.pop();
 
         ERC721(_tokenAddress).safeTransferFrom(address(this), _receiver, _tokenId);
     }
@@ -275,16 +264,18 @@ contract TimeBasedSwitch is ReentrancyGuard {
       users[msg.sender].isValid = false;
       (bool success, ) = msg.sender.call{value: remains}("");
       require(success, 'transfer failed');
+      
       for(uint i = 0; i < users[msg.sender].tokensLocked.length; i++) {
         address tokenToWithdraw = users[msg.sender].tokensLocked[i];
         withdrawToken(tokenToWithdraw, users[msg.sender].tokens[tokenToWithdraw], msg.sender);
       }
-      for(uint i = 0; i < users[msg.sender].collectiblesLocked.length; i++) {
-        address collectibleToWithdraw = users[msg.sender].collectiblesLocked[i];
-        for(uint j = 0; j < users[msg.sender].collectibles[collectibleToWithdraw].length; j++) {
-          withdrawCollectible(collectibleToWithdraw, users[msg.sender].collectibles[collectibleToWithdraw][j], msg.sender);
-        }
+      
+      uint collectiblesLength = users[msg.sender].collectiblesLocked.length;
+      for(uint i = 0; i < collectiblesLength; i++) {
+        NFT storage currentCollectible = users[msg.sender].collectiblesLocked[i];
+        withdrawCollectible(currentCollectible.tokenAddress, currentCollectible.id, msg.sender);
       }
+      
       delete users[msg.sender];
       emit SwitchTerminated(msg.sender);
     }
