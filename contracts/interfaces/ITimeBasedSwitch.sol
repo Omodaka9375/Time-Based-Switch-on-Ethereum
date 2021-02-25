@@ -24,26 +24,6 @@ interface ITimeBasedSwitch {
     function createSwitch(bytes32 _switchName, uint _time, uint _amount, address _executor, address payable _benefitor) external payable;
 
     /**
-     * @notice Function to approve transfering of ERC20 token by TimeBasedSwitch
-     *
-     * @param _tokenAddress - address of ERC20 token
-     * @param _amount - amount to approve
-     *
-     * No return, reverts on error
-     */
-    function approveToken(address _tokenAddress, uint256 _amount) external;
-
-    /**
-     * @notice Function to approve transfering of particular ERC721 token by TimeBasedSwitch
-     *
-     * @param _tokenAddress - address of ERC721 token
-     * @param _tokenId - id of colletible
-     *
-     * No return, reverts on error
-     */
-    function approveCollectible(address _tokenAddress, uint256 _tokenId) external;
-
-    /**
      * @notice Function to lock erc20 token into switch
      *
      * @param _tokenAddress - Address of erc20 token

@@ -136,29 +136,6 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     
     
     /// inheritdoc ITimeBasedSwitch
-    function approveToken(address _tokenAddress, uint256 _amount) 
-    public 
-    override
-    {
-        require(_tokenAddress != address(0), "approveToken: Invalid token address");
-        require(_amount > 0, "approveToken: Amount must be greater than 0");
-
-        IERC20(_tokenAddress).safeIncreaseAllowance(address(this), _amount);
-    }
-    
-    
-    /// inheritdoc ITimeBasedSwitch
-    function approveCollectible(address _tokenAddress, uint256 _tokenId) 
-    public 
-    override
-    {
-        require(_tokenAddress != address(0), "approveCollectible: Invalid token address");
-
-        ERC721(_tokenAddress).approve(address(this), _tokenId);
-    }
-    
-    
-    /// inheritdoc ITimeBasedSwitch
     function lockToken(address _tokenAddress, uint256 _amount) 
     public
     override
