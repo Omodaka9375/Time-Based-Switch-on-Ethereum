@@ -1,6 +1,8 @@
-pragma solidity ^0.6.0;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.7.0;
 
 import "./interfaces/ITimeBasedSwitch.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -8,7 +10,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
-    
+    using SafeMath for uint256;
     using SafeERC20 for IERC20;
     
     /* Structs */
@@ -111,7 +113,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
       emit EtherReceived(msg.sender, msg.value);
     }
     
-    /// inheritdoc ITimeBasedSwitch
+    /// @inheritdoc ITimeBasedSwitch
     function createSwitch(bytes32 _switchName, uint _time, uint _amount, address _executor, address payable _benefitor)
     public
     payable
@@ -123,7 +125,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
         require(msg.sender != _benefitor,'creator can not be one of the benefitors');
         
         users[msg.sender].switchName = _switchName;
-        users[msg.sender].unlockTimestamp = block.timestamp + _time;
+        users[msg.sender].unlockTimestamp = block.timestamp.add(_time);
         users[msg.sender].executor = _executor;
         users[msg.sender].benefitor = _benefitor;
         users[msg.sender].amount = _amount;
@@ -133,7 +135,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     }
     
     
-    /// inheritdoc ITimeBasedSwitch
+    /// @inheritdoc ITimeBasedSwitch
     function lockToken(address _tokenAddress, uint256 _amount) 
     public
     override
@@ -142,19 +144,21 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
         require(_tokenAddress != address(0), "lockToken: Invalid token address");
         require(_amount > 0, "lockToken: Amount must be greater than 0");
 
+        uint256 tokenAmount = users[msg.sender].tokens[_tokenAddress];
+
         IERC20(_tokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
 
-        if(users[msg.sender].tokens[_tokenAddress] == 0) {
+        if(tokenAmount == 0) {
             users[msg.sender].tokensLocked.push(_tokenAddress);
         }
 
-        users[msg.sender].tokens[_tokenAddress] += _amount;
+        users[msg.sender].tokens[_tokenAddress] = tokenAmount.add(_amount);
 
         emit SwitchUpdated("Token locked");
     }
     
     
-    /// inheritdoc ITimeBasedSwitch
+    /// @inheritdoc ITimeBasedSwitch
     function lockCollectible(address _tokenAddress, uint256 _tokenId) 
     public
     override
@@ -168,7 +172,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     }
     
     
-    /// inheritdoc IERC721Receiver
+    /// @inheritdoc IERC721Receiver
     /// @notice the ERC721 contract address is always the message sender.
     function onERC721Received(address operator, address from, uint256 tokenId, bytes calldata data) 
     external 
@@ -180,7 +184,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     }
     
     
-    /// inheritdoc ITimeBasedSwitch
+    /// @inheritdoc ITimeBasedSwitch
     function terminateSwitchEarly()
     public
     payable
@@ -192,7 +196,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
       users[msg.sender].amount = 0;
       users[msg.sender].isValid = false;
       
-      (bool success, ) = msg.sender.call.value(remains)("");
+      (bool success, ) = msg.sender.call{value: remains}("");
       require(success, 'transfer failed');
       
       for(uint i = 0; i < users[msg.sender].tokensLocked.length; i++) {
@@ -211,7 +215,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     }
     
     
-    /// inheritdoc ITimeBasedSwitch
+    /// @inheritdoc ITimeBasedSwitch
     function tryExecuteSwitch(address account)
     public
     payable
@@ -226,7 +230,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
       users[account].amount = 0;
       users[account].isValid = false;
       
-      (bool success, ) = users[account].benefitor.call.value(amount)("");
+      (bool success, ) = users[account].benefitor.call{value: amount}("");
       require(success, 'transfer failed');
       
       for(uint i = 0; i < users[account].tokensLocked.length; i++) {
@@ -246,7 +250,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     }
     
     
-    /// inheritdoc ITimeBasedSwitch
+    /// @inheritdoc ITimeBasedSwitch
     function updateSwitchAmount()
     public
     payable
@@ -255,13 +259,13 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     {
       require(msg.value > 0 , 'must send some amount');
       
-      users[msg.sender].amount += msg.value;
+      users[msg.sender].amount = users[msg.sender].amount.add(msg.value);
       
       emit SwitchUpdated("Amount updated");
     }
     
     
-    /// inheritdoc ITimeBasedSwitch
+    /// @inheritdoc ITimeBasedSwitch
     function updateSwitchUnlockTime(uint _unlockTimestamp)
     public
     payable
@@ -274,7 +278,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     }
     
     
-    /// inheritdoc ITimeBasedSwitch
+    /// @inheritdoc ITimeBasedSwitch
     function updateSwitchExecutor(address _executor)
     public
     payable
@@ -286,7 +290,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     }
     
     
-    /// inheritdoc ITimeBasedSwitch
+    /// @inheritdoc ITimeBasedSwitch
     function updateSwitchBenefitor(address payable _benefitor)
     public
     payable
@@ -298,7 +302,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     }
     
     
-    /// inheritdoc ITimeBasedSwitch
+    /// @inheritdoc ITimeBasedSwitch
     function getSwitchInfo(address _switchOwner)
     public
     view
@@ -336,7 +340,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
         require(_amount > 0, "withdrawToken: Amount must be greater than 0");
         require(_receiver != address(0), "withdrawToken: Invalid receiver address");
 
-        users[msg.sender].tokens[_tokenAddress] -= _amount;
+        users[msg.sender].tokens[_tokenAddress] = users[msg.sender].tokens[_tokenAddress].sub(_amount);
 
         IERC20(_tokenAddress).safeTransfer(_receiver, _amount);
     }

@@ -2,12 +2,12 @@ body {
   margin-left: 25%;
   margin-right: 25%;
   margin: auto 0;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 header{
-  text-align: center;
-  padding-top: 50px;
+  display: flex;
+  align-items: center;
 }
 
 label {
@@ -15,10 +15,16 @@ label {
  
 }
 
-input {
-  width: 500px;
-  padding: 5px;
+input, select {
+  border: 1px solid #AAA;
+  border-radius: 5px;
+  margin-top: 5px;
+  height: 50px;
+  width: 95%;
+  padding-left: 5%;
   font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 25px;
 }
 
 button {
@@ -60,9 +66,18 @@ h3 {
   margin-top: 5px;
 }
 
-#footer{
-  bottom:2px;
-  left:5px;
+#createFooter, #assetsFooter, #executionFooter {
+  height: 12%;
+  bottom: 1px;
   position: fixed;
   text-align: center;
+  background-color: white;
+  width: 100%;
+  display: none;
+}
+
+#dots {
+  color:#f0f0f0; 
+  align-self: center; 
+  margin: 3px;
 }
