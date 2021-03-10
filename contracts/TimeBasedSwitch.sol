@@ -35,7 +35,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, Ownable, ReentrancyGuard, IERC721R
     }
     
     /* Storage */
-    address private keeperRegistry;
+    address internal keeperRegistry;
     mapping(address => Switch) internal users; //store switch per user account
 
     /* Modifiers */
@@ -361,6 +361,14 @@ contract TimeBasedSwitch is ITimeBasedSwitch, Ownable, ReentrancyGuard, IERC721R
     }
 
 
+    /**
+     * @notice Updates Keeper Registry Contract Address
+     * @notice Only Administrator can call
+     *
+     * @param _keeperRegistry - new Keeper Registry Contract Address
+     *
+     * No return, reverts on error
+     */
     function setKeeperRegistry(address _keeperRegistry)
     public
     onlyOwner
