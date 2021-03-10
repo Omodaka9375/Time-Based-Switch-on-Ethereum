@@ -19,28 +19,28 @@
     </div>
 
     <div style=" width: 33%; display: flex; justify-content:space-evenly">
-      <h4 style="cursor: pointer;">How it works?</h4>
-      <h4 style="cursor: pointer;"
-        onclick="App.openExternalWebsite(`https://github.com/Omodaka9375/Time-Based-Switch-on-Ethereum`);">GitHub</h4>
-      <h4 style="cursor: pointer;" onclick="App.openExternalWebsite(`https://discord.com/invite/ZWZ9Jk77vt`);">Discord
-      </h4>
+      <h5 style="cursor: pointer;" class="menu-item">How it works?</h5>
+      <h5 style="cursor: pointer;"
+        onclick="App.openExternalWebsite(`https://github.com/Omodaka9375/Time-Based-Switch-on-Ethereum`);">GitHub</h5>
+      <h5 style="cursor: pointer;" onclick="App.openExternalWebsite(`https://discord.com/invite/ZWZ9Jk77vt`);">Discord
+      </h5>
     </div>
 
 
     <div style="width: 33%; display: flex; justify-content: flex-end; padding-right: 3%;">
       <div id="connectMetamask" onclick="App.connectMetamask();"
-        style="display: flex; justify-content: center; height: 5vh; width: 40%; border: 1px solid #AAA; border-radius: 5px; cursor: pointer;">
+        style="display: flex; justify-content: center; height: 5vh; width: 170px; border: 1px solid #AAA; border-radius: 5px; cursor: pointer;">
         <img src="metamask.png" style="width: 25px; height: 25px; align-self: center; margin-right: 10px;" />
-        <p style="align-self:center; font-weight: bold; font-size: 15px;">Connect Wallet</p>
+        <div style="align-self:center; font-weight: bold; font-size: 13px;">Connect Wallet</div>
       </div>
       <div id="wallet"
-        style="display: none; height: 5vh; width: 45%; border: 1px solid #AAA; border-radius: 5px; cursor: pointer;">
+        style="display: none; height: 40px; border: 1px solid #AAA; border-radius: 5px; cursor: pointer;">
         <img src="avatar1.png"
           style="width: 25px; height: 25px; align-self: center; margin-right: 10px; margin-left: 10px;" />
-        <p id="walletAddress" style="align-self: center; font-weight: bold; font-size: 15px;"></p>
-        <p id="walletBalance"
-          style="align-self: center; background-color: #f0f0f0; border-radius: 15px; margin-left: 10px; padding-left: 10px; padding-right: 10px; font-weight: bold; font-size: 15px;">
-        </p>
+        <div id="walletAddress" style="align-self: center; font-weight: bold; font-size: 15px;"></div>
+        <div id="walletBalance"
+          style="align-self: center; background-color: #f0f0f0; border-radius: 15px; margin: 0 10px 0 20px; padding-left: 10px; padding-right: 10px; font-weight: bold; font-size: 15px;">
+        </div>
       </div>
     </div>
   </header>
@@ -50,16 +50,17 @@
     style="background-color: #f0f0f0; height: 100vh; padding-left: 15%; padding-right: 15%; padding-top: 3.5%;">
     <div
       style="background-image: url('bg.png'); height: 12%; display: flex; justify-content: space-between; border-radius: 5px;">
-      <div style="width: 30%;">
-        <p style="font-size: 22px; margin-bottom: 1%; margin-left: 10%; color: #fff; font-weight: bold;">Nice to see
+      <div style="width: 300px;">
+        <p style="font-size: 18px; margin-bottom: 1%; margin-left: 10%; color: #fff; font-weight: bold;">Nice to see
           you!</p>
-        <p style="font-size: 15px; margin-left: 10%; color: #fff; margin-top: 0%;">
+        <p style="font-size: 11px; margin-left: 10%; color: #fff; margin-top: 0%;">
           You currently have no active switches
         </p>
       </div>
       <div style=" width: 30%; display: flex; justify-content: flex-end; padding-right: 3%;">
         <button onclick="App.showCreatePage();"
-          style=" border: none; border-radius: 5px; background-color: #00ffae; height: 45%; width: 45%; font-weight: bold; align-self: center;">+
+                class="button-primary"
+                style="background-color: #00ffae; font-weight: 600; cursor: pointer">+
           Create switch</button>
       </div>
     </div>
@@ -68,30 +69,30 @@
   <div id="create"
     style="display: none; background-color: #f0f0f0; height: 100vh; padding-left: 15%; padding-right: 15%; padding-top: 2%;">
     <div style="display:flex; flex-direction: column; width: 50%; padding-top: 10%;">
-      <p style="text-align: left; color: #AAA; font-size: 15px;">CREATE NEW SWITCH</p>
-      <h1 style="text-align: left; font-weight:bolder;">Define the basics</h1>
-      <p style="text-align: left; color: #AAA; font-weight: bold;">Lorem Ipsum is simply dummy text of the printing and
+      <div style="text-align: left; color: #AAA; font-size: 13px; font-weight: 700">CREATE NEW SWITCH</div>
+      <div style="text-align: left; font-weight: 1000; padding: 5px 0 10px 0; font-size: 30px">Define the basics</div>
+      <div style="text-align: left; color: #AAA; font-weight: bold; font-size: 13px">Lorem Ipsum is simply dummy text of the printing and
         typesetting
         industry. Lorem Ipsum is simply dummy text of the printing and
         typesetting
-        industry.</p>
+        industry.</div>
     </div>
-    <div style="width: 50%; padding-top: 12%;">
-      <div style="height: 300px; background-color: white; border-radius: 5px; border:1px solid #AAA; padding: 5%;">
-        <p style="margin: auto; text-align: left; font-weight: bold;">Switch name</p>
-        <p style="margin: auto; text-align: left; color: #AAA;">Give your switch a name of your choice</p>
+    <div style="padding-top: 12%; margin-left: 30px;">
+      <div style="width: 350px; background-color: white; border-radius: 5px; border:1px solid #AAA; padding: 5%;">
+        <div style="margin: auto; text-align: left; font-weight: bold; font-size: 11px;">Switch name</div>
+        <div style="margin: auto; text-align: left; color: #AAA; font-weight: bold; font-size: 11px;">Give your switch a name of your choice</div>
         <input type="text" />
-        <p style="margin: auto; text-align: left; font-weight: bold;">Timeout period</p>
-        <p style="margin: auto; text-align: left; color: #AAA;">Set up period after which Switch can be executed</p>
+        <div style="margin: auto; text-align: left; font-weight: bold; font-size: 11px;">Timeout period</div>
+        <div style="margin: auto; text-align: left; color: #AAA; font-weight: bold; font-size: 11px;">Set up period after which Switch can be executed</div>
         <div style="display: flex; justify-content: space-between;">
-          <select name="timestamp" style="width: 42%; background-color: #fff;">
+          <select name="timestamp" style="width: 42%; background-color: #fff; font-size: 13px; padding: 6px; height: 48px">
             <option name="days">Days</option>
             <option name="months">Months</option>
             <option name="years">Years</option>
           </select>
           <input style="width: 42%" />
         </div>
-        <p style="margin: auto; text-align: left; color: blue">Your timeout ...</p>
+        <div style="margin: auto; text-align: left; color: #1c22ff; font-weight: bold; font-size: 11px;">Your timeout will expire on<span></span> at <span></span></div>
       </div>
     </div>
   </div>
@@ -246,10 +247,12 @@
     </div>
     <div style="width: 50%; display: flex; justify-content: flex-end; padding-right: 15%;">
       <button onclick="App.reset();"
-        style="border: none; border-radius: 5px; background-color: #fff; height: 45%; width: 30%; font-weight: bold; align-self: center; text-decoration: underline;">
+              class="button-primary"
+              style="background-color: #fff; text-decoration: underline;">
         Reset</button>
       <button onclick="App.showAssetsPage();"
-        style="border: none; border-radius: 5px; background-color: #00ffae; height: 45%; width: 30%; font-weight: bold; align-self: center;">
+              class="button-primary"
+              style="background-color: #00ffae;">
         Next step</button>
     </div>
   </div>
@@ -265,7 +268,8 @@
         style="border: none; border-radius: 5px; background-color: #fff; height: 45%; width: 30%; font-weight: bold; align-self: center; text-decoration: underline;">
         Back</button>
       <button onclick="App.showExecutionPage();"
-        style="border: none; border-radius: 5px; background-color: #00ffae; height: 45%; width: 30%; font-weight: bold; align-self: center;">
+              class="button-primary"
+        style="background-color: #00ffae;">
         Next step</button>
     </div>
   </div>
