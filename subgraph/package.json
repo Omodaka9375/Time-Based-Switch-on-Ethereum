@@ -1,5 +1,5 @@
 {
-  "name": "TimeBasedSwitch",
+  "name": "time-based-switch",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",

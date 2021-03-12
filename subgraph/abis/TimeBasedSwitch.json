@@ -241,7 +241,7 @@
       { "internalType": "bool", "name": "upkeepNeeded", "type": "bool" },
       { "internalType": "bytes", "name": "performData", "type": "bytes" }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {

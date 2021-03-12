@@ -489,44 +489,6 @@ export class ConstructorCall__Outputs {
   }
 }
 
-export class CheckUpkeepCall extends ethereum.Call {
-  get inputs(): CheckUpkeepCall__Inputs {
-    return new CheckUpkeepCall__Inputs(this);
-  }
-
-  get outputs(): CheckUpkeepCall__Outputs {
-    return new CheckUpkeepCall__Outputs(this);
-  }
-}
-
-export class CheckUpkeepCall__Inputs {
-  _call: CheckUpkeepCall;
-
-  constructor(call: CheckUpkeepCall) {
-    this._call = call;
-  }
-
-  get checkData(): Bytes {
-    return this._call.inputValues[0].value.toBytes();
-  }
-}
-
-export class CheckUpkeepCall__Outputs {
-  _call: CheckUpkeepCall;
-
-  constructor(call: CheckUpkeepCall) {
-    this._call = call;
-  }
-
-  get upkeepNeeded(): boolean {
-    return this._call.outputValues[0].value.toBoolean();
-  }
-
-  get performData(): Bytes {
-    return this._call.outputValues[1].value.toBytes();
-  }
-}
-
 export class CreateSwitchCall extends ethereum.Call {
   get inputs(): CreateSwitchCall__Inputs {
     return new CreateSwitchCall__Inputs(this);

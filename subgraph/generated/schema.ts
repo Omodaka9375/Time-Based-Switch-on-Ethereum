@@ -12,136 +12,6 @@ import {
   BigDecimal
 } from "@graphprotocol/graph-ts";
 
-export class Token extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id !== null, "Cannot save Token entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save Token entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("Token", id.toString(), this);
-  }
-
-  static load(id: string): Token | null {
-    return store.get("Token", id) as Token | null;
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get tokenAddress(): Bytes | null {
-    let value = this.get("tokenAddress");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set tokenAddress(value: Bytes | null) {
-    if (value === null) {
-      this.unset("tokenAddress");
-    } else {
-      this.set("tokenAddress", Value.fromBytes(value as Bytes));
-    }
-  }
-
-  get amountLocked(): BigInt | null {
-    let value = this.get("amountLocked");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set amountLocked(value: BigInt | null) {
-    if (value === null) {
-      this.unset("amountLocked");
-    } else {
-      this.set("amountLocked", Value.fromBigInt(value as BigInt));
-    }
-  }
-}
-
-export class Collectible extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id !== null, "Cannot save Collectible entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save Collectible entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("Collectible", id.toString(), this);
-  }
-
-  static load(id: string): Collectible | null {
-    return store.get("Collectible", id) as Collectible | null;
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get collectibleId(): BigInt | null {
-    let value = this.get("collectibleId");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set collectibleId(value: BigInt | null) {
-    if (value === null) {
-      this.unset("collectibleId");
-    } else {
-      this.set("collectibleId", Value.fromBigInt(value as BigInt));
-    }
-  }
-
-  get benefitor(): Bytes | null {
-    let value = this.get("benefitor");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set benefitor(value: Bytes | null) {
-    if (value === null) {
-      this.unset("benefitor");
-    } else {
-      this.set("benefitor", Value.fromBytes(value as Bytes));
-    }
-  }
-}
-
 export class Switch extends Entity {
   constructor(id: string) {
     super();
@@ -276,6 +146,136 @@ export class Switch extends Entity {
         "collectiblesLocked",
         Value.fromStringArray(value as Array<string>)
       );
+    }
+  }
+}
+
+export class Token extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save Token entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save Token entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("Token", id.toString(), this);
+  }
+
+  static load(id: string): Token | null {
+    return store.get("Token", id) as Token | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get tokenAddress(): Bytes | null {
+    let value = this.get("tokenAddress");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set tokenAddress(value: Bytes | null) {
+    if (value === null) {
+      this.unset("tokenAddress");
+    } else {
+      this.set("tokenAddress", Value.fromBytes(value as Bytes));
+    }
+  }
+
+  get amountLocked(): BigInt | null {
+    let value = this.get("amountLocked");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set amountLocked(value: BigInt | null) {
+    if (value === null) {
+      this.unset("amountLocked");
+    } else {
+      this.set("amountLocked", Value.fromBigInt(value as BigInt));
+    }
+  }
+}
+
+export class Collectible extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save Collectible entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save Collectible entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("Collectible", id.toString(), this);
+  }
+
+  static load(id: string): Collectible | null {
+    return store.get("Collectible", id) as Collectible | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get collectibleId(): BigInt | null {
+    let value = this.get("collectibleId");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set collectibleId(value: BigInt | null) {
+    if (value === null) {
+      this.unset("collectibleId");
+    } else {
+      this.set("collectibleId", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get benefitor(): Bytes | null {
+    let value = this.get("benefitor");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set benefitor(value: Bytes | null) {
+    if (value === null) {
+      this.unset("benefitor");
+    } else {
+      this.set("benefitor", Value.fromBytes(value as Bytes));
     }
   }
 }
