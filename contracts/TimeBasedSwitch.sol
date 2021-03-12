@@ -130,7 +130,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, Ownable, ReentrancyGuard, IERC721R
         require(msg.sender != _benefitor,'creator can not be one of the benefitors');
         
         users[msg.sender].switchName = _switchName;
-        users[msg.sender].unlockTimestamp = block.timestamp.add(_time);
+        users[msg.sender].unlockTimestamp = _time;
         users[msg.sender].executor = _executor;
         users[msg.sender].benefitor = _benefitor;
         users[msg.sender].amount = _amount;
@@ -323,14 +323,13 @@ contract TimeBasedSwitch is ITimeBasedSwitch, Ownable, ReentrancyGuard, IERC721R
     returns
     (bytes32, uint, uint, address, address, bool)
     {
-      Switch storage _switch = users[_switchOwner];
       return (
-        _switch.switchName,
-        _switch.amount,
-        _switch.unlockTimestamp,
-        _switch.executor,
-        _switch.benefitor,
-        _switch.isValid
+        users[_switchOwner].switchName,
+        users[_switchOwner].amount,
+        users[_switchOwner].unlockTimestamp,
+        users[_switchOwner].executor,
+        users[_switchOwner].benefitor,
+        users[_switchOwner].isValid
       );
     }
 
@@ -338,6 +337,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, Ownable, ReentrancyGuard, IERC721R
     /// @inheritdoc KeeperCompatibleInterface
     function checkUpkeep(bytes calldata checkData)
     public
+    view
     override
     returns(bool upkeepNeeded, bytes memory performData)
     {

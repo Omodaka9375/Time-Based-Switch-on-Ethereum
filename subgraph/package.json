@@ -1,0 +1,16 @@
+{
+  "name": "TimeBasedSwitch",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ andrejrakic/time-based-switch",
+    "create-local": "graph create --node http://localhost:8020/ andrejrakic/time-based-switch",
+    "remove-local": "graph remove --node http://localhost:8020/ andrejrakic/time-based-switch",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 andrejrakic/time-based-switch"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.19.0",
+    "@graphprotocol/graph-ts": "0.19.0"
+  }
+}
