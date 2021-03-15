@@ -1,0 +1,58 @@
+specVersion: 0.0.2
+description: Standardized way to delay or schedule Ethereum transactions
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: TimeBasedSwitch
+    network: kovan
+    source:
+      address: "0x0e179683C05b430487e88ca0baa6080Ac00fc03D"
+      abi: TimeBasedSwitch
+      startBlock: 23887432
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - AmountUpdated
+        - BenefitorUpdated
+        - CollectibleLocked
+        - EtherReceived
+        - ExecutorUpdated
+        - KeeperRegistryUpdated
+        - OwnershipTransferred
+        - SwitchCreated
+        - SwitchTerminated
+        - SwitchTriggered
+        - TokenLocked
+        - UnlockTimeUpdated
+      abis:
+        - name: TimeBasedSwitch
+          file: ./abis/TimeBasedSwitch.json
+      eventHandlers:
+        - event: AmountUpdated(uint256)
+          handler: handleAmountUpdated
+        - event: BenefitorUpdated(indexed address)
+          handler: handleBenefitorUpdated
+        - event: CollectibleLocked(indexed address,indexed address,uint256,indexed address)
+          handler: handleCollectibleLocked
+        - event: EtherReceived(indexed address,uint256)
+          handler: handleEtherReceived
+        - event: ExecutorUpdated(indexed address)
+          handler: handleExecutorUpdated
+        - event: KeeperRegistryUpdated(indexed address)
+          handler: handleKeeperRegistryUpdated
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: SwitchCreated(bytes32,uint256,indexed address,indexed address,uint256)
+          handler: handleSwitchCreated
+        - event: SwitchTerminated(indexed address)
+          handler: handleSwitchTerminated
+        - event: SwitchTriggered(indexed address)
+          handler: handleSwitchTriggered
+        - event: TokenLocked(indexed address,indexed address,uint256)
+          handler: handleTokenLocked
+        - event: UnlockTimeUpdated(uint256)
+          handler: handleUnlockTimeUpdated
+      file: ./src/mapping.ts
