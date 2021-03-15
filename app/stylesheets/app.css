@@ -91,3 +91,150 @@ h3 {
   border: none;
   border-radius: 5px;
 }
+
+.button-secondary {
+    background-color: #fff;
+    text-decoration: underline;
+    outline: none;
+}
+.central-wrapper {
+    display: none;
+    background-color: #f0f0f0;
+    height: 100vh;
+    padding-left: 15%;
+    padding-right: 15%;
+    padding-top: 2%;
+}
+
+.left-wrapper {
+    display:flex;
+    flex-direction: column;
+    width: 50%;
+    padding-top: 10%;
+}
+
+.right-wrapper {
+    padding-top: 12%;
+    margin-left: 30px;
+}
+
+.form-box {
+    width: 350px;
+    background-color: white;
+    border-radius: 5px;
+    border:1px solid #AAA;
+    padding: 5%;
+}
+
+.text-up-header {
+    text-align: left;
+    color: #AAA;
+    font-size: 13px;
+    font-weight: 700
+}
+
+.content-title {
+    text-align: left;
+    font-weight: 1000;
+    padding: 5px 0 10px 0;
+    font-size: 30px
+}
+
+.central-text {
+    text-align: left;
+    color: #AAA;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.form-element-header {
+    margin: auto;
+    text-align: left;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.form-element-subheader {
+    margin: auto;
+    text-align: left;
+    color: #AAA;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.select-element {
+    width: 42%;
+    background-color: #fff;
+    font-size: 13px;
+    padding: 6px;
+    height: 48px
+}
+
+.options-wrapper {
+    display: flex;
+    margin-bottom: 30px;
+}
+
+.container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    margin-left: 15px;
+}
+
+.option {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 16px;
+    width: 40px;
+    background-color: lightgray;
+    border-radius: 10%;
+    font-size: 12px;
+    text-align: center;
+    padding: 5px 0;
+    line-height: 16px;
+    font-weight: bold;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* When the radio button is checked, add a blue background */
+.container input:checked ~ .checkmark {
+    background-color: #00ffae;
+}
+
+/* Show the indicator (dot/circle) when checked */
+.container .option ~ .checkmark:after {
+    display: block;
+}
+
+.notification-box {
+    color: blue;
+    align-self: center;
+    font-size: 11px;
+    padding: 10px;
+    font-weight: bold;
+}
+
+.fa-info {
+    color: blue;
+    padding: 10px 0 0 10px;
+}

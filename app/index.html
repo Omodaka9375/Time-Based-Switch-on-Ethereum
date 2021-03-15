@@ -3,6 +3,7 @@
 
 <head>
   <title>Time Based Switch</title>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <link href='https://fonts.googleapis.com/css?family=Poppins:wght@500&display=swap' rel='stylesheet' type='text/css'>
   <script src="./app.js"></script>
 </head>
@@ -67,25 +68,25 @@
   </div>
 
   <div id="create"
-    style="display: none; background-color: #f0f0f0; height: 100vh; padding-left: 15%; padding-right: 15%; padding-top: 2%;">
-    <div style="display:flex; flex-direction: column; width: 50%; padding-top: 10%;">
-      <div style="text-align: left; color: #AAA; font-size: 13px; font-weight: 700">CREATE NEW SWITCH</div>
-      <div style="text-align: left; font-weight: 1000; padding: 5px 0 10px 0; font-size: 30px">Define the basics</div>
-      <div style="text-align: left; color: #AAA; font-weight: bold; font-size: 13px">Lorem Ipsum is simply dummy text of the printing and
+    class="central-wrapper">
+    <div class="left-wrapper">
+      <div class="text-up-header">CREATE NEW SWITCH</div>
+      <div class="content-title">Define the basics</div>
+      <div class="central-text">Lorem Ipsum is simply dummy text of the printing and
         typesetting
         industry. Lorem Ipsum is simply dummy text of the printing and
         typesetting
         industry.</div>
     </div>
-    <div style="padding-top: 12%; margin-left: 30px;">
-      <div style="width: 350px; background-color: white; border-radius: 5px; border:1px solid #AAA; padding: 5%;">
-        <div style="margin: auto; text-align: left; font-weight: bold; font-size: 11px;">Switch name</div>
-        <div style="margin: auto; text-align: left; color: #AAA; font-weight: bold; font-size: 11px;">Give your switch a name of your choice</div>
+    <div class="right-wrapper">
+      <div class="form-box">
+        <div class="form-element-header">Switch name</div>
+        <div class="form-element-subheader">Give your switch a name of your choice</div>
         <input type="text" />
-        <div style="margin: auto; text-align: left; font-weight: bold; font-size: 11px;">Timeout period</div>
-        <div style="margin: auto; text-align: left; color: #AAA; font-weight: bold; font-size: 11px;">Set up period after which Switch can be executed</div>
+        <div class="form-element-header">Timeout period</div>
+        <div class="form-element-subheader">Set up period after which Switch can be executed</div>
         <div style="display: flex; justify-content: space-between;">
-          <select name="timestamp" style="width: 42%; background-color: #fff; font-size: 13px; padding: 6px; height: 48px">
+          <select name="timestamp" class="select-element">
             <option name="days">Days</option>
             <option name="months">Months</option>
             <option name="years">Years</option>
@@ -97,22 +98,20 @@
     </div>
   </div>
 
-  <div id="assets"
-    style="display: none; background-color: #f0f0f0; height: 100vh; padding-left: 15%; padding-right: 15%; padding-top: 2%;">
-    <div style="display:flex; flex-direction: column; width: 50%; padding-top: 10%;">
-      <p style="text-align: left; color: #AAA; font-size: 15px;">CREATE NEW SWITCH</p>
-      <h1 style="text-align: left; font-weight:bolder;">Manage assets</h1>
-      <p style="text-align: left; color: #AAA; font-weight: bold;">Lorem Ipsum is simply dummy text of the printing and
+  <div id="assets" class="central-wrapper">
+    <div class="left-wrapper">
+      <div class="text-up-header">CREATE NEW SWITCH</div>
+      <div class="content-title">Manage assets</div>
+      <div class="central-text">Lorem Ipsum is simply dummy text of the printing and
         typesetting
         industry. Lorem Ipsum is simply dummy text of the printing and
         typesetting
-        industry.</p>
+        industry.</div>
     </div>
-    <div style="width: 50%; padding-top: 12%;">
-      <div id="asset"
-        style="height: 300px; background-color: white; border-radius: 5px; border:1px solid #AAA; padding: 5%;">
-        <p style="margin: auto; text-align: left; font-weight: bold;">Select asset</p>
-        <select name="token" style="width: 100%; background-color: #fff;">
+    <div class="right-wrapper">
+      <div id="asset" class="form-box">
+        <div class="form-element-header">Select asset</div>
+        <select name="token" class="select-element" style="width: 100%;">
           <option name="days">
             <div style="display: flex;">
               <img src="metamask.png">
@@ -133,52 +132,82 @@
           </optgroup>
           <option name="years">ERC721</option>
         </select>
-        <p style="margin: auto; text-align: left; font-weight: bold;">Amount</p>
-        <p style="margin: auto; text-align: left; color: #AAA; font-size: 14px;">Set up the amount that will be locked
+        <div class="form-element-header">Amount</div>
+        <div class="form-element-subheader">Set up the amount that will be locked
           and sent once the
-          switch expires</p>
+          switch expires</div>
         <div style="display: flex; justify-content: space-between;">
           <input type="number" style="width: 42%" />
           <input style="width: 42%" disabled />
         </div>
+        <div class="options-wrapper">
+          <label class="container">
+            <input type="radio" id="queter" class="option" name="gender" value="25%">
+            <span class="checkmark">25%</span>
+          </label>
+          <label class="container">
+            <input type="radio" id="half" class="option" name="gender" value="50%">
+            <span class="checkmark">50%</span>
+          </label>
+          <label class="container">
+            <input type="radio" id="tree-queters" class="option" name="gender" value="75%">
+            <span class="checkmark">75%</span>
+          </label>
+          <label class="container">
+            <input type="radio" id="full" class="option" name="gender" value="100%">
+            <span class="checkmark">100%</span>
+          </label>
+        </div>
         <button
-          style="border: none; border-radius: 5px; background-color: #e8e8e8; height: 20%; width: 100%; font-weight: bold; align-self: center;">Approve
+          style="border: none; border-radius: 5px; background-color: #e8e8e8; height: 30px; font-size: 11px; width: 100%; font-weight: bold; outline: none; align-self: center;">Approve
           ETH</button>
       </div>
       <div
-        style="width: 100%; height: 8%; border-radius: 5px; border:1px dashed #aaa; background-color: #f5f5f5; margin-top: 3%; display: flex; cursor: pointer;">
+        style="width: 388px; height: 8%; border-radius: 5px; border:1px dashed #aaa; background-color: #f5f5f5; margin-top: 3%; display: flex; cursor: pointer;">
         <h5 style="margin-left: 5%; align-self: center;">+ Add new asset</h5>
       </div>
     </div>
   </div>
 
-  <div id="execution"
-    style="display: none; background-color: #f0f0f0; height: 100vh; padding-left: 15%; padding-right: 15%; padding-top: 2%;">
-    <div style="display:flex; flex-direction: column; width: 50%; padding-top: 10%;">
-      <p style="text-align: left; color: #AAA; font-size: 15px;">CREATE NEW SWITCH</p>
-      <h1 style="text-align: left; font-weight:bolder;">Execution</h1>
-      <p style="text-align: left; color: #AAA; font-weight: bold;">Lorem Ipsum is simply dummy text of the printing and
+  <div id="execution" class="central-wrapper">
+    <div class="left-wrapper">
+      <div class="text-up-header">CREATE NEW SWITCH</div>
+      <div class="content-title">Execution</div>
+      <div class="central-text">Lorem Ipsum is simply dummy text of the printing and
         typesetting
         industry. Lorem Ipsum is simply dummy text of the printing and
         typesetting
-        industry.</p>
+        industry.</div>
     </div>
-    <div style="width: 50%; padding-top: 12%;">
-      <div style="height: 350px; background-color: white; border-radius: 5px; border:1px solid #AAA; padding: 5%;">
-        <p style="margin: auto; text-align: left; font-weight: bold;">Recepient</p>
-        <p style="margin: auto; text-align: left; color: #AAA; font-size: 14px;">Once the switch is executed, assets
-          will be sent to the following wallet address</p>
-        <input type="text" />
-        <p style="margin: auto; text-align: left; font-weight: bold;">Executor</p>
-        <p style="margin: auto; text-align: left; color: #AAA; font-size: 14px;">Please paste the executor wallet
-          address</p>
-        <input type="text" />
-        <div
-          style="background-color: #9ef7dd; width: 90%; height: 20%; border-radius: 5px; padding-left: 10%; display: flex;">
-          <p style="color: blue; align-self: center;">Executor is the one who will initiate the transaction once
+    <div class="right-wrapper">
+      <div class="form-box">
+        <div class="form-element-header">Recepient</div>
+        <div class="form-element-subheader">Once the switch is executed, assets
+          will be sent to the following wallet address</div>
+        <input type="text" placeholder="Paste contract address"/>
+        <div class="form-element-header">Executor</div>
+        <div class="form-element-subheader">Please paste the executor wallet
+          address</div>
+        <select name="token" class="select-element" style="width: 100%;">
+          <option name="auto">
+            <div style="display: flex;">
+              <p style="font-weight: bold;">Automatically</p>
+            </div>
+          </option>
+          <option name="manu">
+            <div style="display: flex;">
+              <p style="font-weight: bold;">Manually</p>
+            </div>
+          </option>
+        </select>
+        <input type="text" placeholder="Paste executor address"/>
+        <div style="background-color: #9ef7dd; border-radius: 5px; display: flex;">
+          <i class="fas fa-info"></i>
+          <div class="notification-box">
+            Executor is the one who will initiate the transaction once
             switch
             expire, it can be you
-            or anyone you choose.</p>
+            or anyone you choose.</div>
         </div>
       </div>
     </div>
@@ -247,8 +276,7 @@
     </div>
     <div style="width: 50%; display: flex; justify-content: flex-end; padding-right: 15%;">
       <button onclick="App.reset();"
-              class="button-primary"
-              style="background-color: #fff; text-decoration: underline;">
+              class="button-primary button-secondary">
         Reset</button>
       <button onclick="App.showAssetsPage();"
               class="button-primary"
@@ -265,7 +293,7 @@
     </div>
     <div style="width: 50%; display: flex; justify-content: flex-end; padding-right: 15%;">
       <button onclick="App.showCreatePage();"
-        style="border: none; border-radius: 5px; background-color: #fff; height: 45%; width: 30%; font-weight: bold; align-self: center; text-decoration: underline;">
+              class="button-primary button-secondary">
         Back</button>
       <button onclick="App.showExecutionPage();"
               class="button-primary"
@@ -282,14 +310,11 @@
     </div>
     <div style="width: 50%; display: flex; justify-content: flex-end; padding-right: 15%;">
       <button onclick="App.showAssetsPage();"
-        style="border: none; border-radius: 5px; background-color: #fff; height: 45%; width: 30%; font-weight: bold; align-self: center; text-decoration: underline;">
+              class="button-primary button-secondary">
         Back</button>
-      <button
-        style="border: none; border-radius: 5px; background-color: #00ffae; height: 45%; width: 30%; font-weight: bold; align-self: center;">
+      <button class="button-primary" style="background-color: #00ffae;">
         Next</button>
     </div>
   </div>
-
 </body>
-
 </html>
