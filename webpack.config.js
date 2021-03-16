@@ -11,11 +11,12 @@ module.exports = {
     // Copy our app's index.html to the build folder.
     new CopyWebpackPlugin([
       { from: './app/index.html', to: "index.html" },
-      { from: './app/daslogo.png', to: "daslogo.png" },
-      { from: './app/logo.png', to: "logo.png" },
-      { from: './app/bg.png', to: "bg.png" },
-      { from: './app/metamask.png', to: "metamask.png" },
-      { from: './app/random-avatar-1.png', to: "avatar1.png" }
+      { from: './app/assets/daslogo.png', to: "daslogo.png" },
+      { from: './app/assets/logo.png', to: "logo.png" },
+      { from: './app/assets/cryptotimer-logo.svg', to: "cryptotimer-logo.svg" },
+      { from: './app/assets/bg.png', to: "bg.png" },
+      { from: './app/assets/metamask.png', to: "metamask.png" },
+      { from: './app/assets/random-avatar-1.png', to: "avatar1.png" }
     ])
   ],
   module: {

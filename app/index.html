@@ -16,7 +16,7 @@
     <br><br>
     <h2>I Want To <a href="#" onclick="App.showCheck();">Check</a> On Existing Switch</h2> -->
     <div style="width: 33%; padding-left: 2%;">
-      <img src="logo.png" style="width: 50%;" />
+      <img src="cryptotimer-logo.svg" />
     </div>
 
     <div style=" width: 33%; display: flex; justify-content:space-evenly">
@@ -50,7 +50,7 @@
   <div id="dashboard"
     style="background-color: #f0f0f0; height: 100vh; padding-left: 15%; padding-right: 15%; padding-top: 3.5%;">
     <div
-      style="background-image: url('bg.png'); height: 12%; display: flex; justify-content: space-between; border-radius: 5px;">
+      style="background-image: url('bg.png'); height: 12%; display: flex; justify-content: space-between; border-radius: 5px; margin-bottom: 5%;">
       <div style="width: 300px;">
         <p style="font-size: 18px; margin-bottom: 1%; margin-left: 10%; color: #fff; font-weight: bold;">Nice to see
           you!</p>
@@ -59,16 +59,14 @@
         </p>
       </div>
       <div style=" width: 30%; display: flex; justify-content: flex-end; padding-right: 3%;">
-        <button onclick="App.showCreatePage();"
-                class="button-primary"
-                style="background-color: #00ffae; font-weight: 600; cursor: pointer">+
+        <button onclick="App.showCreatePage();" class="button-primary"
+          style="background-color: #00ffae; font-weight: 600; cursor: pointer">+
           Create switch</button>
       </div>
     </div>
   </div>
 
-  <div id="create"
-    class="central-wrapper">
+  <div id="create" class="central-wrapper">
     <div class="left-wrapper">
       <div class="text-up-header">CREATE NEW SWITCH</div>
       <div class="content-title">Define the basics</div>
@@ -93,7 +91,8 @@
           </select>
           <input style="width: 42%" />
         </div>
-        <div style="margin: auto; text-align: left; color: #1c22ff; font-weight: bold; font-size: 11px;">Your timeout will expire on<span></span> at <span></span></div>
+        <div style="margin: auto; text-align: left; color: #1c22ff; font-weight: bold; font-size: 11px;">Your timeout
+          will expire on<span></span> at <span></span></div>
       </div>
     </div>
   </div>
@@ -184,7 +183,7 @@
         <div class="form-element-header">Recepient</div>
         <div class="form-element-subheader">Once the switch is executed, assets
           will be sent to the following wallet address</div>
-        <input type="text" placeholder="Paste contract address"/>
+        <input type="text" placeholder="Paste contract address" />
         <div class="form-element-header">Executor</div>
         <div class="form-element-subheader">Please paste the executor wallet
           address</div>
@@ -200,7 +199,7 @@
             </div>
           </option>
         </select>
-        <input type="text" placeholder="Paste executor address"/>
+        <input type="text" placeholder="Paste executor address" />
         <div style="background-color: #9ef7dd; border-radius: 5px; display: flex;">
           <i class="fas fa-info"></i>
           <div class="notification-box">
@@ -275,12 +274,9 @@
       <span id="dots">&#9679;</span>
     </div>
     <div style="width: 50%; display: flex; justify-content: flex-end; padding-right: 15%;">
-      <button onclick="App.reset();"
-              class="button-primary button-secondary">
+      <button onclick="App.reset();" class="button-primary button-secondary">
         Reset</button>
-      <button onclick="App.showAssetsPage();"
-              class="button-primary"
-              style="background-color: #00ffae;">
+      <button onclick="App.showAssetsPage();" class="button-primary" style="background-color: #00ffae;">
         Next step</button>
     </div>
   </div>
@@ -292,12 +288,9 @@
       <span id="dots">&#9679;</span>
     </div>
     <div style="width: 50%; display: flex; justify-content: flex-end; padding-right: 15%;">
-      <button onclick="App.showCreatePage();"
-              class="button-primary button-secondary">
+      <button onclick="App.showCreatePage();" class="button-primary button-secondary">
         Back</button>
-      <button onclick="App.showExecutionPage();"
-              class="button-primary"
-        style="background-color: #00ffae;">
+      <button onclick="App.showExecutionPage();" class="button-primary" style="background-color: #00ffae;">
         Next step</button>
     </div>
   </div>
@@ -309,12 +302,12 @@
       <span id="dots" style="color:#00ffae;">&#9679;</span>
     </div>
     <div style="width: 50%; display: flex; justify-content: flex-end; padding-right: 15%;">
-      <button onclick="App.showAssetsPage();"
-              class="button-primary button-secondary">
+      <button onclick="App.showAssetsPage();" class="button-primary button-secondary">
         Back</button>
       <button class="button-primary" style="background-color: #00ffae;">
         Next</button>
     </div>
   </div>
 </body>
+
 </html>
