@@ -4,6 +4,7 @@
 <head>
   <title>Time Based Switch</title>
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> -->
   <link href='https://fonts.googleapis.com/css?family=Poppins:wght@500&display=swap' rel='stylesheet' type='text/css'>
   <script src="./app.js"></script>
 </head>
@@ -15,52 +16,46 @@
     <h2>I Want To <a href="#" onclick="App.showCreate();">Create</a> New Time Based Switch</h2>
     <br><br>
     <h2>I Want To <a href="#" onclick="App.showCheck();">Check</a> On Existing Switch</h2> -->
-    <div style="width: 33%; padding-left: 2%;">
+    <div class="logo-style">
       <img src="cryptotimer-logo.svg" />
     </div>
 
-    <div style=" width: 33%; display: flex; justify-content:space-evenly">
-      <h5 style="cursor: pointer;" class="menu-item">How it works?</h5>
-      <h5 style="cursor: pointer;"
+    <div class="nav-menu-items">
+      <h5 class="menu-item">How it works?</h5>
+      <h5 class="menu-item"
         onclick="App.openExternalWebsite(`https://github.com/Omodaka9375/Time-Based-Switch-on-Ethereum`);">GitHub</h5>
-      <h5 style="cursor: pointer;" onclick="App.openExternalWebsite(`https://discord.com/invite/ZWZ9Jk77vt`);">Discord
+      <h5 class="menu-item" onclick="App.openExternalWebsite(`https://discord.com/invite/ZWZ9Jk77vt`);">Discord
       </h5>
     </div>
 
 
-    <div style="width: 33%; display: flex; justify-content: flex-end; padding-right: 3%;">
-      <div id="connectMetamask" onclick="App.connectMetamask();"
-        style="display: flex; justify-content: center; height: 5vh; width: 170px; border: 1px solid #AAA; border-radius: 5px; cursor: pointer;">
-        <img src="metamask.png" style="width: 25px; height: 25px; align-self: center; margin-right: 10px;" />
-        <div style="align-self:center; font-weight: bold; font-size: 13px;">Connect Wallet</div>
+    <div class="metamask-wrapper">
+      <div id="connectMetamask" class="connect-metamask-box" onclick="App.connectMetamask();">
+        <img class="metamask-image" src="metamask.png" />
+        <div class="metamask-button-text">Connect Wallet</div>
       </div>
-      <div id="wallet"
-        style="display: none; height: 40px; border: 1px solid #AAA; border-radius: 5px; cursor: pointer;">
-        <img src="avatar1.png"
-          style="width: 25px; height: 25px; align-self: center; margin-right: 10px; margin-left: 10px;" />
-        <div id="walletAddress" style="align-self: center; font-weight: bold; font-size: 15px;"></div>
-        <div id="walletBalance"
-          style="align-self: center; background-color: #f0f0f0; border-radius: 15px; margin: 0 10px 0 20px; padding-left: 10px; padding-right: 10px; font-weight: bold; font-size: 15px;">
+      <div id="wallet" class="wallet-box">
+        <img class="wallet-image" src="avatar1.png" />
+        <div class="wallet-address-box" id="walletAddress"></div>
+        <div class="wallet-balance-box" id="walletBalance">
         </div>
       </div>
     </div>
   </header>
 
 
-  <div id="dashboard"
-    style="background-color: #f0f0f0; height: 100vh; padding-left: 15%; padding-right: 15%; padding-top: 3.5%;">
-    <div
-      style="background-image: url('bg.png'); height: 12%; display: flex; justify-content: space-between; border-radius: 5px; margin-bottom: 5%;">
-      <div style="width: 300px;">
-        <p style="font-size: 18px; margin-bottom: 1%; margin-left: 10%; color: #fff; font-weight: bold;">Nice to see
+  <div id="dashboard" class="dashboard-box">
+    <div class="dashboard-content">
+      <div class="welcome-text">
+        <p class="nice-text-class">Nice to see
           you!</p>
-        <p style="font-size: 11px; margin-left: 10%; color: #fff; margin-top: 0%;">
+        <p class="active-switches-class">
           You currently have no active switches
         </p>
       </div>
-      <div style=" width: 30%; display: flex; justify-content: flex-end; padding-right: 3%;">
-        <button onclick="App.showCreatePage();" class="button-primary"
-          style="background-color: #00ffae; font-weight: 600; cursor: pointer">+
+      <div class="create-switch-button-box">
+        <button onclick="App.showCreatePage()" class="button-primary"
+          style="font-weight: 600;">+
           Create switch</button>
       </div>
     </div>
@@ -83,7 +78,7 @@
         <input type="text" />
         <div class="form-element-header">Timeout period</div>
         <div class="form-element-subheader">Set up period after which Switch can be executed</div>
-        <div style="display: flex; justify-content: space-between;">
+        <div class="select-wrapper">
           <select name="timestamp" class="select-element">
             <option name="days">Days</option>
             <option name="months">Months</option>
@@ -91,7 +86,7 @@
           </select>
           <input style="width: 42%" />
         </div>
-        <div style="margin: auto; text-align: left; color: #1c22ff; font-weight: bold; font-size: 11px;">Your timeout
+        <div class="expire-date">Your timeout
           will expire on<span></span> at <span></span></div>
       </div>
     </div>
@@ -108,6 +103,7 @@
         industry.</div>
     </div>
     <div class="right-wrapper">
+      <div class="add-new-asset">
       <div id="asset" class="form-box">
         <div class="form-element-header">Select asset</div>
         <select name="token" class="select-element" style="width: 100%;">
@@ -157,13 +153,12 @@
             <span class="checkmark">100%</span>
           </label>
         </div>
-        <button
-          style="border: none; border-radius: 5px; background-color: #e8e8e8; height: 30px; font-size: 11px; width: 100%; font-weight: bold; outline: none; align-self: center;">Approve
+        <button class="approve-eth-button">Approve
           ETH</button>
       </div>
-      <div
-        style="width: 388px; height: 8%; border-radius: 5px; border:1px dashed #aaa; background-color: #f5f5f5; margin-top: 3%; display: flex; cursor: pointer;">
-        <h5 style="margin-left: 5%; align-self: center;">+ Add new asset</h5>
+    </div>
+      <div class="new-asset-button" onclick="App.addAsset()">
+        <h5>+ Add new asset</h5>
       </div>
     </div>
   </div>
@@ -189,18 +184,18 @@
           address</div>
         <select name="token" class="select-element" style="width: 100%;">
           <option name="auto">
-            <div style="display: flex;">
-              <p style="font-weight: bold;">Automatically</p>
+            <div class="token-tarnsaction">
+              <p>Automatically</p>
             </div>
           </option>
           <option name="manu">
-            <div style="display: flex;">
-              <p style="font-weight: bold;">Manually</p>
+            <div class="token-tarnsaction" >
+              <p>Manually</p>
             </div>
           </option>
         </select>
         <input type="text" placeholder="Paste executor address" />
-        <div style="background-color: #9ef7dd; border-radius: 5px; display: flex;">
+        <div class="notification-message-box">
           <i class="fas fa-info"></i>
           <div class="notification-box">
             Executor is the one who will initiate the transaction once
@@ -268,41 +263,41 @@
 
 
   <div id="createFooter">
-    <div style="width: 50%; display: flex; justify-content: flex-start; padding-left: 15%;">
+    <div class="footer-flex-start-class">
       <span id="dots" style="color:#00ffae;">&#9679;</span>
       <span id="dots">&#9679;</span>
       <span id="dots">&#9679;</span>
     </div>
-    <div style="width: 50%; display: flex; justify-content: flex-end; padding-right: 15%;">
+    <div class="footer-flex-end-class">
       <button onclick="App.reset();" class="button-primary button-secondary">
         Reset</button>
-      <button onclick="App.showAssetsPage();" class="button-primary" style="background-color: #00ffae;">
+      <button onclick="App.showAssetsPage()" class="button-primary" style="background-color: #00ffae;">
         Next step</button>
     </div>
   </div>
 
   <div id="assetsFooter">
-    <div style="width: 50%; display: flex; justify-content: flex-start; padding-left: 15%;">
+    <div class="footer-flex-start-class">
       <span id="dots">&#9679;</span>
       <span id="dots" style="color:#00ffae;">&#9679;</span>
       <span id="dots">&#9679;</span>
     </div>
-    <div style="width: 50%; display: flex; justify-content: flex-end; padding-right: 15%;">
-      <button onclick="App.showCreatePage();" class="button-primary button-secondary">
+    <div class="footer-flex-end-class">
+      <button onclick="App.showCreatePage()" class="button-primary button-secondary">
         Back</button>
-      <button onclick="App.showExecutionPage();" class="button-primary" style="background-color: #00ffae;">
+      <button onclick="App.showExecutionPage()" class="button-primary" style="background-color: #00ffae;">
         Next step</button>
     </div>
   </div>
 
   <div id="executionFooter">
-    <div style="width: 50%; display: flex; justify-content: flex-start; padding-left: 15%;">
+    <div class="footer-flex-start-class">
       <span id="dots">&#9679;</span>
       <span id="dots">&#9679;</span>
       <span id="dots" style="color:#00ffae;">&#9679;</span>
     </div>
-    <div style="width: 50%; display: flex; justify-content: flex-end; padding-right: 15%;">
-      <button onclick="App.showAssetsPage();" class="button-primary button-secondary">
+    <div class="footer-flex-end-class">
+      <button onclick="App.showAssetsPage()" class="button-primary button-secondary">
         Back</button>
       <button class="button-primary" style="background-color: #00ffae;">
         Next</button>

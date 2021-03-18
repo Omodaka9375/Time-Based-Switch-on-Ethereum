@@ -82,6 +82,125 @@ h3 {
   margin: 3px;
 }
 
+.logo-style {
+  width: 33%; 
+  padding-left: 2%;
+}
+
+.nav-menu-items {
+  width: 33%;
+  display: flex; 
+  justify-content:space-evenly;
+}
+
+.menu-item {
+  cursor: pointer;
+}
+
+.metamask-wrapper {
+  width: 33%; display: flex; 
+  justify-content: flex-end; 
+  padding-right: 3%;
+}
+
+.connect-metamask-box {
+  display: flex; 
+  justify-content: center; 
+  height: 5vh; 
+  width: 170px; 
+  border: 1px solid #AAA; 
+  border-radius: 5px; 
+  cursor: pointer;
+}
+
+.metamask-image {
+  width: 25px; 
+  height: 25px; 
+  align-self: center; 
+  margin-right: 10px;
+}
+
+.metamask-button-text {
+  align-self:center; 
+  font-weight: bold; 
+  font-size: 13px;
+}
+.wallet-box {
+  display: none; 
+  height: 40px; 
+  border: 1px solid #AAA; 
+  border-radius: 5px; 
+  cursor: pointer;
+}
+
+.wallet-image {
+  width: 25px; 
+  height: 25px; 
+  align-self: center; 
+  margin-right: 10px; 
+  margin-left: 10px;
+}
+
+.wallet-address-box {
+  align-self: center; 
+  font-weight: bold; 
+  font-size: 15px;
+}
+
+.wallet-balance-box {
+  align-self: center; 
+  background-color: #f0f0f0; 
+  border-radius: 15px; 
+  margin: 0 10px 0 20px; 
+  padding-left: 10px; 
+  padding-right: 10px; 
+  font-weight: bold; 
+  font-size: 15px;
+}
+
+.dashboard-box {
+  background-color: #f0f0f0; 
+  height: 100vh; 
+  padding-left: 15%; 
+  padding-right: 15%; 
+  padding-top: 3.5%;
+}
+
+.dashboard-content {
+  background-image: url("/bg.png"); 
+  height: 12%; 
+  display: flex; 
+  justify-content: space-between; 
+  border-radius: 5px; 
+  margin-bottom: 5%;
+}
+
+.welcome-text {
+  width: 300px;
+}
+
+.nice-text-class {
+  font-size: 18px; 
+  margin-bottom: 1%; 
+  margin-left: 10%; 
+  color: #fff; 
+  font-weight: bold;
+}
+
+.active-switches-class {
+  font-size: 11px; 
+  margin-left: 10%; 
+  color: #fff; 
+  margin-top: 0%;
+}
+
+.create-switch-button-box {
+  width: 30%; 
+  display: flex; 
+  justify-content: flex-end; 
+  padding-right: 3%;
+}
+
 .button-primary {
   height: 40px;
   width: 170px;
@@ -90,6 +209,8 @@ h3 {
   align-self: center;
   border: none;
   border-radius: 5px;
+  background-color: #00ffae;  
+  cursor: pointer;
 }
 
 .button-secondary {
@@ -124,6 +245,7 @@ h3 {
     border-radius: 5px;
     border:1px solid #AAA;
     padding: 5%;
+    margin-bottom: 3%;
 }
 
 .text-up-header {
@@ -160,6 +282,19 @@ h3 {
     color: #AAA;
     font-weight: bold;
     font-size: 11px;
+}
+
+.select-wrapper {
+  display: flex; 
+  justify-content: space-between;
+}
+
+.expire-date {
+  margin: auto; 
+  text-align: left; 
+  color: #1c22ff; 
+  font-weight: bold; 
+  font-size: 11px;
 }
 
 .select-element {
@@ -238,3 +373,104 @@ h3 {
     color: blue;
     padding: 10px 0 0 10px;
 }
+
+.approve-eth-button {
+  border: none; 
+  border-radius: 5px; 
+  background-color: #e8e8e8; 
+  height: 30px; 
+  font-size: 11px; 
+  width: 100%; 
+  font-weight: bold; 
+  outline: none; 
+  align-self: center;
+  cursor: pointer;
+}
+.delete-assets-button {
+  border: none; 
+  border-radius: 5px; 
+  background-color: #e8e8e8; 
+  height: 30px; 
+  font-size: 11px; 
+  width: 100%; 
+  font-weight: bold; 
+  outline: none; 
+  align-self: center;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.new-asset-button {
+  width: 388px; 
+  height: 8%; 
+  border-radius: 5px; 
+  border:1px dashed #aaa; 
+  background-color: #f5f5f5; 
+  margin-top: 3%; 
+  display: flex; 
+  cursor: pointer;
+}
+
+.new-asset-button h5 {
+  margin-left: 5%; 
+  align-self: center;
+}
+
+.token-tarnsaction {
+  display: flex;
+}
+
+.token-tarnsaction p {
+  font-weight: bold;
+}
+
+.notification-message-box {
+  background-color: #9ef7dd; 
+  border-radius: 5px; 
+  display: flex;
+}
+
+.footer-flex-start-class {
+  width: 50%; 
+  display: flex; 
+  justify-content: flex-start; 
+  padding-left: 15%;
+}
+
+.footer-flex-end-class {
+  width: 50%; 
+  display: flex; 
+  justify-content: flex-end; 
+  padding-right: 15%;
+}
+
+.add-new-asset {
+  max-height: 400px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.add-new-asset::-webkit-scrollbar {
+  display: none;
+}
+
+.add-new-asset {
+-ms-overflow-style: none; 
+scrollbar-width: none;  
+}
+/* .add-new-asset::-webkit-scrollbar {
+  width: 1px;
+}
+
+.add-new-asset::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+ 
+
+.add-new-asset::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+.add-new-asset::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+} */

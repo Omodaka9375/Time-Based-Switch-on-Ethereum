@@ -6,11 +6,13 @@ import { default as Web3 } from 'web3';
 import { default as contract } from 'truffle-contract'
 
 import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.json'
+// import TimeBasedSwitch_artifacts from 'web3'
 
 var TimeBasedSwitch = contract(TimeBasedSwitch_artifacts);
 
 var accounts;
 let account;
+let idNew = 0;
 
 const graphqlUri = 'https://api.thegraph.com/subgraphs/name/andrejrakic/time-based-switch';
 
@@ -269,7 +271,73 @@ window.App = {
     const executionFooter = document.getElementById("executionFooter");
     executionFooter.style.display = "flex";
   },
-
+  
+  addAsset: function() {
+    idNew = ++idNew;
+let addAsssetContent = `
+    <div id="asset${idNew}" class="form-box">
+    <div class="form-element-header">Select asset</div>
+    <select name="token" class="select-element" style="width: 100%;">
+      <option name="days">
+        <div style="display: flex;">
+          <img src="metamask.png">
+          <p style="font-weight: bold;">Ethereum</p>
+          <p style="color: #AAA">(ETH)</p>
+        </div>
+      </option>
+      <optgroup label="ERC20">
+        <option>
+          Binance Coin (BNB)
+        </option>
+        <option>
+          Uniswap (UNI)
+        </option>
+        <option>
+          Tether (USDT)
+        </option>
+      </optgroup>
+      <option name="years">ERC721</option>
+    </select>
+    <div class="form-element-header">Amount</div>
+    <div class="form-element-subheader">Set up the amount that will be locked
+      and sent once the
+      switch expires</div>
+    <div style="display: flex; justify-content: space-between;">
+      <input type="number" style="width: 42%" />
+      <input style="width: 42%" disabled />
+    </div>
+    <div class="options-wrapper">
+      <label class="container">
+        <input type="radio" id="queter" class="option" name="gender" value="25%">
+        <span class="checkmark">25%</span>
+      </label>
+      <label class="container">
+        <input type="radio" id="half" class="option" name="gender" value="50%">
+        <span class="checkmark">50%</span>
+      </label>
+      <label class="container">
+        <input type="radio" id="tree-queters" class="option" name="gender" value="75%">
+        <span class="checkmark">75%</span>
+      </label>
+      <label class="container">
+        <input type="radio" id="full" class="option" name="gender" value="100%">
+        <span class="checkmark">100%</span>
+      </label>
+    </div>
+    <button class="approve-eth-button">Approve</button>
+      <button class="delete-assets-button" onClick="App.deleteAssets('asset${idNew}')">Delete</button>
+  </div>
+    `
+    let target = document.querySelector(".add-new-asset");
+    
+    const myNewAsset = document.createRange()
+    .createContextualFragment(addAsssetContent)
+    target.appendChild(myNewAsset)
+    
+  },
+  deleteAssets: function(id) {
+    document.getElementById(id).remove()
+  },
   // showCheck: function () {
   //   var checkDiv = document.getElementById("checkSwitch");
   //   if(checkDiv.style.display == "none"){
