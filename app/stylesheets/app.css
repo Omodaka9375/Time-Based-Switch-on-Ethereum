@@ -386,18 +386,17 @@ h3 {
   align-self: center;
   cursor: pointer;
 }
-.delete-assets-button {
+.delete-assets-button, .approve-asset-button {
   border: none; 
   border-radius: 5px; 
   background-color: #e8e8e8; 
   height: 30px; 
   font-size: 11px; 
-  width: 100%; 
+  width: 40%; 
   font-weight: bold; 
   outline: none; 
   align-self: center;
   cursor: pointer;
-  margin-top: 5px;
 }
 
 .new-asset-button {
@@ -444,6 +443,11 @@ h3 {
   padding-right: 15%;
 }
 
+.asset-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
 .add-new-asset {
   max-height: 400px;
   overflow-y: scroll;
@@ -458,19 +462,133 @@ h3 {
 -ms-overflow-style: none; 
 scrollbar-width: none;  
 }
-/* .add-new-asset::-webkit-scrollbar {
-  width: 1px;
+
+.switch, .received-switch {
+  height: 40%;
+  border-radius: 5px;
+  padding: 3%;
+  background-color: #ffffff;
+  margin-bottom: 10px;
 }
 
-.add-new-asset::-webkit-scrollbar-track {
-  background: #f1f1f1; 
+.content {
+  display: flex;
+  margin-bottom: 15px;
 }
- 
-
-.add-new-asset::-webkit-scrollbar-thumb {
-  background: #888; 
+.left-content {
+  flex: 50%;
 }
+.left-content-up {
+  display: flex;
+  height: 50%;
+}
+.assets, .expires-in {
+  height: 100%;
+  width: 50%;
+}
+/* .total-value {
 
-.add-new-asset::-webkit-scrollbar-thumb:hover {
-  background: #555; 
 } */
+.assets p, .expires-in p, .total-value p, .received-assets p, .received-total-value p, .received-expires-in p{
+  color: #AAA;
+  font-size: 13px;
+}
+/* .right-content {
+  display: flex;
+  flex-direction: column;
+  flex: 50%;
+} */
+.executor, .benefitor{
+  background-color: rgb(230, 230, 230);
+  border-radius: 5px;
+  height: 60px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+.cont-wprp {
+ padding: 15px;
+}
+.right-content-title {
+  font-size: 10px;
+  color: rgb(99, 99, 99);
+  margin-top: -10px;
+  margin-bottom: 5px;
+}
+.switch-address-wrap {
+  display: flex;
+  margin-top: 3px;
+}
+.switch-address-image {
+  width: 25px;
+  height: 25px;
+  align-self: center;
+  margin-right: 10px;
+}
+.addresses {
+  font-size: 12px;
+}
+.switch-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+.button-terciary {
+  height: 40px;
+  width: 170px;
+  font-size: 13px;
+  font-weight: bold;
+  align-self: center;
+  border: none;
+  border-radius: 5px;
+  background-color: #dddfde;  
+  cursor: pointer;
+}
+/* .switch-tabs {
+  margin-bottom: 30px;
+} */
+.tabs {
+  border-bottom: 1.5px solid rgb(99, 99, 99);
+  padding-bottom: 5px;
+  margin-bottom: 25px;
+}
+.tablinks-nav {
+  margin-right: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  padding-bottom: 5px;
+}
+.blue-undeline {
+  border-bottom: 3px solid #10159C
+}
+.upper-content {
+  display: flex;
+  flex: 50%;
+  margin-bottom: 35px;
+}
+
+.received-assets, .received-total-value, .received-expires-in {
+  height: 100%;
+  width: 25%;
+}
+.down-content {
+display: flex;
+justify-content: space-between;
+}
+.execute-button-received {
+ margin-top: 10px;
+}
+#mySwitchData, #myReceivedSwitchData {
+  max-height: 500px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+#mySwitchData::-webkit-scrollbar, #myReceivedSwitchData::-webkit-scrollbar {
+  display: none;
+}
+
+#mySwitchData, #myReceivedSwitchData {
+-ms-overflow-style: none; 
+scrollbar-width: none;  
+}
