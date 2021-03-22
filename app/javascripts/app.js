@@ -166,6 +166,7 @@ window.App = {
       .then((res) => res.json())
       .then((res) => {
         let resData = res.data.switches
+        console.log(resData)
         resData.map(el => {
           this.createReceivedSwitchesPage(el)
         })
@@ -224,6 +225,57 @@ window.App = {
           this.createReceivedSwitchesPage(el)
         })
       }); 
+  },
+
+  switchOverview: function() {
+    const dashboardDiv = document.getElementById("dashboard");
+    dashboardDiv.style.display = "none";
+    const changeClass = (element) => element.forEach(el => el.classList.add("overview-wrapper"));
+    changeClass( document.querySelectorAll(".central-wrapper"))
+    const overview = document.getElementById("swOverview");
+    overview.style.display = "block";
+    const createDiv = document.getElementById("create");
+    createDiv.style.display = "flex";
+    const assestsDiv = document.getElementById("assets");
+    assestsDiv.style.display = "flex";
+    const executionDiv = document.getElementById('execution');
+    executionDiv.classList.add("temporary-padding")
+    executionDiv.style.display = "flex";
+    const executionFooter = document.getElementById("executionFooter");
+    executionFooter.style.display = "none";
+    const overviewFooter = document.getElementById("overviewFooter");
+    overviewFooter.style.display = "flex";
+  },
+
+  createSwitch: function() {
+    let switchName = document.getElementById("name").value;
+    let period = document.querySelector("#period").value; 
+    let periodTime = document.getElementById("periodTime").value;
+    let selectTokenETH = document.querySelector("#selectToken").value;
+    let tokenAmountETH = document.getElementById("tokenAmount").value;
+    let tokenAmountOther = document.querySelectorAll("input[name=otherToken]")
+    let selectedTokenOtehr = document.querySelectorAll("[name=tokenOther]")
+    let contractAddress = document.getElementById("contractAddress").value;
+    let executorAddress = document.getElementById("executorAddress").value;
+    let otherTokens=[];
+    let tokenName=[];
+    let amount=[];
+    if(tokenAmountOther.length > 0) {
+      tokenAmountOther.forEach((el, index) => {
+        amount.push(window["amountOther" + index] = el.value); 
+        })
+        selectedTokenOtehr.forEach((elem, index) => {
+          tokenName.push(window["tokenNameOther" + index] = elem.value)
+        })
+        tokenName.forEach((el, i) => {
+          var obj = {};
+          obj.tokenName = el;
+          obj.tokenAmount = amount[i];
+          otherTokens.push(obj);
+        })
+    }
+    console.log(otherTokens)
+    console.log(switchName,period,periodTime,selectTokenETH,tokenAmountETH,contractAddress,executorAddress )
   },
 
   openExternalWebsite: function (uri) {
@@ -368,6 +420,8 @@ window.App = {
     createFooter.style.display = "flex";
     const assetsFooter = document.getElementById("assetsFooter");
     assetsFooter.style.display = "none";
+    const assestsDiv = document.getElementById('assets');
+    assestsDiv.style.display = "none";
   },
 
   reset: function () {
@@ -377,10 +431,14 @@ window.App = {
     footer.style.display = "none";
     const createDiv = document.getElementById("create");
     createDiv.style.display = "none";
-     const assestsDiv = document.getElementById("assets");
-     assestsDiv.style.display = "none";
-     const executionDiv = document.getElementById('execution');
+    const assestsDiv = document.getElementById("assets");
+    assestsDiv.style.display = "none";
+    const executionDiv = document.getElementById('execution');
     executionDiv.style.display = "none";
+    const removeElements = (element) => element.forEach(el => el.remove());
+    removeElements( document.querySelectorAll(".new-asset"));
+    const changeClass = (element) => element.forEach(el => el.classList.remove("overview-wrapper"));
+    changeClass( document.querySelectorAll(".central-wrapper"))
   },
 
   showAssetsPage: function() {
@@ -394,6 +452,8 @@ window.App = {
     executionFooter.style.display = "none";
     const assetsFooter = document.getElementById("assetsFooter");
     assetsFooter.style.display = "flex";
+    const executionDiv = document.getElementById('execution');
+    executionDiv.style.display = "none";
   },
 
   showExecutionPage: function() {
@@ -401,24 +461,30 @@ window.App = {
     assestsDiv.style.display = "none";
     const executionDiv = document.getElementById('execution');
     executionDiv.style.display = "flex";
+    executionDiv.classList.remove("temporary-padding")
     const assetsFooter = document.getElementById("assetsFooter");
     assetsFooter.style.display = "none";
     const executionFooter = document.getElementById("executionFooter");
     executionFooter.style.display = "flex";
+    const overviewFooter = document.getElementById("overviewFooter");
+    overviewFooter.style.display = "none";
+    const createDiv = document.getElementById('create');
+    createDiv.style.display = 'none';
+    const overview = document.getElementById("swOverview");
+    overview.style.display = "none";
+    
+    const changeClass = (element) => element.forEach(el => el.classList.remove("overview-wrapper"));
+    changeClass( document.querySelectorAll(".central-wrapper"))
   },
 
   addAsset: function () {
     idNew = ++idNew;
     let addAsssetContent = `
-    <div id="asset${idNew}" class="form-box">
+    <div id="asset${idNew}" class="form-box new-asset">
     <div class="form-element-header">Select asset</div>
-    <select name="token" class="select-element" style="width: 100%;">
+    <select name="tokenOther" id="selectToken${idNew}" class="select-element" style="width: 100%;">
       <option name="days">
-        <div style="display: flex;">
-          <img src="metamask.png">
-          <p style="font-weight: bold;">Ethereum</p>
-          <p style="color: #AAA">(ETH)</p>
-        </div>
+         Ethereum(ETH)
       </option>
       <optgroup label="ERC20">
         <option>
@@ -438,8 +504,8 @@ window.App = {
       and sent once the
       switch expires</div>
     <div style="display: flex; justify-content: space-between;">
-      <input type="number" style="width: 42%" />
-      <input style="width: 42%" disabled />
+      <input name="otherToken" type="number" style="width: 42%" id="tokenAmount${idNew}" min="0"/>
+      <input style="width: 42%" id="tokenAmountCash${idNew}" disabled value=""/>
     </div>
     <div class="options-wrapper">
       <label class="container">
@@ -476,6 +542,7 @@ window.App = {
   deleteAssets: function (id) {
     document.getElementById(id).remove();
   },
+
   // showCheck: function () {
   //   var checkDiv = document.getElementById("checkSwitch");
   //   if(checkDiv.style.display == "none"){

@@ -68,7 +68,10 @@
        <div id="myReceivedSwitchData"></div>
     </div>
   </div>
-
+  <div class="overview" id="swOverview">
+    <h1>Switch Overview</h1>
+    <hr>
+  </div>
   <div id="create" class="central-wrapper">
     <div class="left-wrapper">
       <div class="text-up-header">CREATE NEW SWITCH</div>
@@ -83,16 +86,16 @@
       <div class="form-box">
         <div class="form-element-header">Switch name</div>
         <div class="form-element-subheader">Give your switch a name of your choice</div>
-        <input type="text" />
+        <input type="text" id="name" value=""/>
         <div class="form-element-header">Timeout period</div>
         <div class="form-element-subheader">Set up period after which Switch can be executed</div>
         <div class="select-wrapper">
-          <select name="timestamp" class="select-element">
-            <option name="days">Days</option>
-            <option name="months">Months</option>
-            <option name="years">Years</option>
+          <select name="timestamp" class="select-element" id="period" value="days">
+            <option name="days" value="days">Days</option>
+            <option name="months" value="months">Months</option>
+            <option name="years" value="years">Years</option>
           </select>
-          <input style="width: 42%" />
+          <input type="number" min="1" style="width: 42%" id="periodTime"/>
         </div>
         <div class="expire-date">Your timeout
           will expire on<span></span> at <span></span></div>
@@ -114,34 +117,31 @@
       <div class="add-new-asset">
       <div id="asset" class="form-box">
         <div class="form-element-header">Select asset</div>
-        <select name="token" class="select-element" style="width: 100%;">
-          <option name="days">
-            <div style="display: flex;">
-              <img src="metamask.png">
-              <p style="font-weight: bold;">Ethereum</p>
-              <p style="color: #AAA">(ETH)</p>
+        <select name="token" id="selectToken" class="select-element" style="width: 100%;">
+          <option name="days" value="ETH">
+              Ethereum(ETH)
             </div>
           </option>
           <optgroup label="ERC20">
-            <option>
+            <option value="BNB">
               Binance Coin (BNB)
             </option>
-            <option>
+            <option value="UNI">
               Uniswap (UNI)
             </option>
-            <option>
+            <option value="USDT">
               Tether (USDT)
             </option>
           </optgroup>
-          <option name="years">ERC721</option>
+          <option name="years" value="ERC-721">ERC721</option>
         </select>
         <div class="form-element-header">Amount</div>
         <div class="form-element-subheader">Set up the amount that will be locked
           and sent once the
           switch expires</div>
         <div style="display: flex; justify-content: space-between;">
-          <input type="number" style="width: 42%" />
-          <input style="width: 42%" disabled />
+          <input type="number" id="tokenAmount" style="width: 42%" min="0"/>
+          <input style="width: 42%" id="tokenAmountCash" disabled value=""/>
         </div>
         <div class="options-wrapper">
           <label class="container">
@@ -186,23 +186,19 @@
         <div class="form-element-header">Recepient</div>
         <div class="form-element-subheader">Once the switch is executed, assets
           will be sent to the following wallet address</div>
-        <input type="text" placeholder="Paste contract address" />
+        <input type="text" id="contractAddress" placeholder="Paste contract address" />
         <div class="form-element-header">Executor</div>
         <div class="form-element-subheader">Please paste the executor wallet
           address</div>
         <select name="token" class="select-element" style="width: 100%;">
-          <option name="auto">
-            <div class="token-tarnsaction">
-              <p>Automatically</p>
-            </div>
+          <option name="auto" value="Automatically">
+              Automatically
           </option>
-          <option name="manu">
-            <div class="token-tarnsaction" >
-              <p>Manually</p>
-            </div>
+          <option name="manu" value="Manually">
+              Manually
           </option>
         </select>
-        <input type="text" placeholder="Paste executor address" />
+        <input type="text" id="executorAddress" placeholder="Paste executor address" />
         <div class="notification-message-box">
           <i class="fas fa-info"></i>
           <div class="notification-box">
@@ -214,9 +210,6 @@
       </div>
     </div>
   </div>
-
-
-
 
   <!-- <div id="creat" style="display: none;">
     <br>
@@ -307,8 +300,16 @@
     <div class="footer-flex-end-class">
       <button onclick="App.showAssetsPage()" class="button-primary button-secondary">
         Back</button>
-      <button class="button-primary" style="background-color: #00ffae;">
+      <button onclick="App.switchOverview()" class="button-primary" style="background-color: #00ffae;">
         Next</button>
+    </div>
+  </div>
+  <div id="overviewFooter">
+    <div class="footer-flex-end-class-overview">
+      <button onclick="App.showExecutionPage()" class="button-primary button-secondary">
+        Back</button>
+      <button onclick="App.createSwitch()" class="button-primary" style="background-color: #00ffae;">
+        Create Switch</button>
     </div>
   </div>
 </body>

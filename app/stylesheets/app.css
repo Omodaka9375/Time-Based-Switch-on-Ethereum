@@ -50,11 +50,11 @@ h3 {
   font-size: 24px;
 }
 
-#create{
+/* #create, #assets, #execution{
   margin: auto 0;
   text-align: center;
   padding-top: 20px;
-}
+} */
 
 #checkSwitch{
   margin: auto 0;
@@ -66,7 +66,7 @@ h3 {
   margin-top: 5px;
 }
 
-#createFooter, #assetsFooter, #executionFooter {
+#createFooter, #assetsFooter, #executionFooter, #overviewFooter {
   height: 12%;
   bottom: 1px;
   position: fixed;
@@ -98,7 +98,8 @@ h3 {
 }
 
 .metamask-wrapper {
-  width: 33%; display: flex; 
+  width: 33%; 
+  display: flex; 
   justify-content: flex-end; 
   padding-right: 3%;
 }
@@ -160,7 +161,7 @@ h3 {
 
 .dashboard-box {
   background-color: #f0f0f0; 
-  height: 100vh; 
+  min-height: 100vh; 
   padding-left: 15%; 
   padding-right: 15%; 
   padding-top: 3.5%;
@@ -225,25 +226,47 @@ h3 {
     padding-left: 15%;
     padding-right: 15%;
     padding-top: 2%;
+    flex-direction: row;
 }
-
+.overview {
+  display: none;
+  padding-left: 15%;
+  padding-right: 15%;
+  padding-bottom: 5%;
+  padding-top: 5%;
+  background-color: #f0f0f0;
+}
+.overview-wrapper {
+    display: none;
+    background-color: #f0f0f0;
+    height: auto;
+    padding-left: 15%;
+    padding-right: 15%;
+    padding-bottom: 5%;
+    /* border-bottom: 1px solid gray; */
+}
+.temporary-padding {
+  padding-bottom: 10%;
+}
 .left-wrapper {
     display:flex;
     flex-direction: column;
-    width: 50%;
+    /* width: 50%; */
+    flex: 50%;
     padding-top: 10%;
 }
 
 .right-wrapper {
     padding-top: 12%;
     margin-left: 30px;
+    flex: 50%;
 }
 
 .form-box {
     width: 350px;
     background-color: white;
     border-radius: 5px;
-    border:1px solid #AAA;
+    /* border:1px solid #AAA; */
     padding: 5%;
     margin-bottom: 3%;
 }
@@ -415,13 +438,13 @@ h3 {
   align-self: center;
 }
 
-.token-tarnsaction {
+/* .token-tarnsaction {
   display: flex;
 }
 
 .token-tarnsaction p {
   font-weight: bold;
-}
+} */
 
 .notification-message-box {
   background-color: #9ef7dd; 
@@ -441,6 +464,12 @@ h3 {
   display: flex; 
   justify-content: flex-end; 
   padding-right: 15%;
+}
+.footer-flex-end-class-overview {
+  display: flex; 
+  justify-content: flex-end; 
+  padding-right: 15%;
+  width: 100%;
 }
 
 .asset-buttons {
@@ -578,7 +607,7 @@ justify-content: space-between;
 .execute-button-received {
  margin-top: 10px;
 }
-#mySwitchData, #myReceivedSwitchData {
+/* #mySwitchData, #myReceivedSwitchData {
   max-height: 500px;
   overflow-y: scroll;
   overflow-x: hidden;
@@ -591,4 +620,7 @@ justify-content: space-between;
 #mySwitchData, #myReceivedSwitchData {
 -ms-overflow-style: none; 
 scrollbar-width: none;  
+} */
+#mySwitchData, #myReceivedSwitchData {
+  padding-bottom: 45px;
 }
