@@ -105,7 +105,7 @@ export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
 export function handleSwitchCreated(event: SwitchCreated): void {
   let switchEntity = new Switch(event.transaction.from.toHex());
 
-  switchEntity.name = event.params.switchName.toString();
+  switchEntity.name = event.params.switchName;
   switchEntity.executor = event.params.executor;
   switchEntity.benefitor = event.params.benefitor;
   switchEntity.unlockTimestamp = event.params.unlockTimestamp;
@@ -133,6 +133,21 @@ export function handleSwitchTriggered(event: SwitchTriggered): void {
 
 export function handleTokenLocked(event: TokenLocked): void {
   let switchEntity = Switch.load(event.params.account.toHex());
+
+  let tokenId = `${switchEntity.id}${event.params.tokenAddress.toHex()}`;
+  let tokenEntity = Token.load(tokenId);
+
+  if (tokenEntity == null) {
+      tokenEntity = new Token(tokenId);
+      tokenEntity.tokenAddress = event.params.tokenAddress;
+      tokenEntity.amountLocked = event.params.amount;
+      switchEntity.tokensLocked = switchEntity.tokensLocked.concat([tokenEntity.id]);
+  } else {
+      tokenEntity.amountLocked = tokenEntity.amountLocked.plus(event.params.amount);
+  }
+
+  tokenEntity.save();
+  switchEntity.save();
 }
 
 export function handleUnlockTimeUpdated(event: UnlockTimeUpdated): void {

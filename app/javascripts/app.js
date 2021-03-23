@@ -6,16 +6,15 @@ import { default as Web3 } from "web3";
 import { default as contract } from "truffle-contract";
 
 import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.json'
-// import TimeBasedSwitch_artifacts from "web3";
 
-var TimeBasedSwitch = contract(TimeBasedSwitch_artifacts);
+const timeBaseSwitchAddress = `0x0e179683C05b430487e88ca0baa6080Ac00fc03D`; // kovan network
+const TimeBasedSwitch = contract({abi: TimeBasedSwitch_artifacts, address: timeBaseSwitchAddress});
 
 var accounts;
 let account;
 let idNew = 0;
 
-const graphqlUri =
-  "https://api.thegraph.com/subgraphs/name/andrejrakic/time-based-switch";
+const graphqlUri = "https://api.thegraph.com/subgraphs/name/andrejrakic/time-based-switch";
 
 window.App = {
   start: function () {

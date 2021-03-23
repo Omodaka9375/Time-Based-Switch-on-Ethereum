@@ -2,7 +2,7 @@ type Switch @entity {
   id: ID!
   executor: Bytes!
   benefitor: Bytes! # address
-  name: String
+  name: Bytes
   unlockTimestamp: BigInt
   isExecuted: Boolean
   ethersLocked: BigInt! # uint256
@@ -11,7 +11,7 @@ type Switch @entity {
 }
 
 type Token @entity {
-  id: ID! # counter
+  id: ID! # switch + token address
   tokenAddress: Bytes
   amountLocked: BigInt
 }

@@ -60,20 +60,20 @@ export class Switch extends Entity {
     this.set("benefitor", Value.fromBytes(value));
   }
 
-  get name(): string | null {
+  get name(): Bytes | null {
     let value = this.get("name");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set name(value: string | null) {
+  set name(value: Bytes | null) {
     if (value === null) {
       this.unset("name");
     } else {
-      this.set("name", Value.fromString(value as string));
+      this.set("name", Value.fromBytes(value as Bytes));
     }
   }
 
