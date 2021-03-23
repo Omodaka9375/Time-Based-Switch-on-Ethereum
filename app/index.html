@@ -6,6 +6,7 @@
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <!-- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> -->
   <link href='https://fonts.googleapis.com/css?family=Poppins:wght@500&display=swap' rel='stylesheet' type='text/css'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.0/slimselect.min.css" rel="stylesheet"></link>
   <script src="./app.js"></script>
 </head>
 
@@ -90,12 +91,12 @@
         <div class="form-element-header">Timeout period</div>
         <div class="form-element-subheader">Set up period after which Switch can be executed</div>
         <div class="select-wrapper">
-          <select name="timestamp" class="select-element" id="period" value="days">
+          <select name="timestamp" class="select-element-tokens" id="period" value="days">
             <option name="days" value="days">Days</option>
             <option name="months" value="months">Months</option>
             <option name="years" value="years">Years</option>
           </select>
-          <input type="number" min="1" style="width: 42%" id="periodTime"/>
+          <input type="number" class="only-positive" min="1" style="width: 42%" id="periodTime"/>
         </div>
         <div class="expire-date">Your timeout
           will expire on<span></span> at <span></span></div>
@@ -117,7 +118,7 @@
       <div class="add-new-asset">
       <div id="asset" class="form-box">
         <div class="form-element-header">Select asset</div>
-        <select name="token" id="selectToken" class="select-element" style="width: 100%;">
+        <select name="token" id="selectToken" class="select-element-tokens" style="width: 100%;" disabled="true">
           <option name="days" value="ETH">
               Ethereum(ETH)
             </div>
@@ -140,7 +141,7 @@
           and sent once the
           switch expires</div>
         <div style="display: flex; justify-content: space-between;">
-          <input type="number" id="tokenAmount" style="width: 42%" min="0"/>
+          <input type="number" class="only-positive" id="tokenAmount" style="width: 42%" min="0"/>
           <input style="width: 42%" id="tokenAmountCash" disabled value=""/>
         </div>
         <div class="options-wrapper">
@@ -161,8 +162,8 @@
             <span class="checkmark">100%</span>
           </label>
         </div>
-        <button class="approve-eth-button">Approve
-          ETH</button>
+        <!-- <button class="approve-eth-button">Approve
+          ETH</button> -->
       </div>
     </div>
       <div class="new-asset-button" onclick="App.addAsset()">
@@ -186,11 +187,11 @@
         <div class="form-element-header">Recepient</div>
         <div class="form-element-subheader">Once the switch is executed, assets
           will be sent to the following wallet address</div>
-        <input type="text" id="contractAddress" placeholder="Paste contract address" />
+        <input type="text" id="contractAddress" placeholder="Paste contract address" value=""/>
         <div class="form-element-header">Executor</div>
         <div class="form-element-subheader">Please paste the executor wallet
           address</div>
-        <select name="token" class="select-element" style="width: 100%;">
+        <select name="token" class="select-element-tokens" id="autoManual" style="width: 100%;">
           <option name="auto" value="Automatically">
               Automatically
           </option>
@@ -198,7 +199,7 @@
               Manually
           </option>
         </select>
-        <input type="text" id="executorAddress" placeholder="Paste executor address" />
+        <input type="text" id="executorAddress" placeholder="Paste executor address" value="" />
         <div class="notification-message-box">
           <i class="fas fa-info"></i>
           <div class="notification-box">
