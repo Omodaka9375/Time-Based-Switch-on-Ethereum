@@ -2,14 +2,16 @@
 pragma solidity ^0.7.0;
 
 import "./interfaces/ITimeBasedSwitch.sol";
+import "./interfaces/KeeperCompatibleInterface.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
-contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
+contract TimeBasedSwitch is ITimeBasedSwitch, Ownable, ReentrancyGuard, IERC721Receiver, KeeperCompatibleInterface {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
     
@@ -33,6 +35,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     }
     
     /* Storage */
+    address internal keeperRegistry;
     mapping(address => Switch) internal users; //store switch per user account
 
     /* Modifiers */
@@ -100,9 +103,11 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     /* Functions */
     
     /// @notice Constructor function which establishes two payout addresses for fees and fee amount
-    constructor()
+    constructor(address _keeperRegistry)
     public
-    {}
+    {
+      keeperRegistry = _keeperRegistry;
+    }
     
     /// @notice The fallback function for the contract
     /// @dev Will simply accept any unexpected eth, but no data
@@ -125,13 +130,19 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
         require(msg.sender != _benefitor,'creator can not be one of the benefitors');
         
         users[msg.sender].switchName = _switchName;
-        users[msg.sender].unlockTimestamp = block.timestamp.add(_time);
+        users[msg.sender].unlockTimestamp = _time;
         users[msg.sender].executor = _executor;
         users[msg.sender].benefitor = _benefitor;
         users[msg.sender].amount = _amount;
         users[msg.sender].isValid = true;
         
-        emit SwitchCreated(users[msg.sender].unlockTimestamp);
+        emit SwitchCreated(
+          _switchName,
+          users[msg.sender].unlockTimestamp,
+          _executor,
+          _benefitor,
+          _amount
+        );
     }
     
     
@@ -154,7 +165,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
 
         users[msg.sender].tokens[_tokenAddress] = tokenAmount.add(_amount);
 
-        emit SwitchUpdated("Token locked");
+        emit TokenLocked(msg.sender, _tokenAddress, _amount);
     }
     
     
@@ -168,7 +179,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
 
         ERC721(_tokenAddress).safeTransferFrom(msg.sender, address(this), _tokenId);
 
-        emit SwitchUpdated("Collectible locked");
+        emit CollectibleLocked(msg.sender, _tokenAddress, _tokenId, users[msg.sender].benefitor);
     }
     
     
@@ -224,7 +235,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     onlyExecutorsOrOwner(account)
     nonReentrant
     {
-      require(block.timestamp >= users[account].unlockTimestamp,'this switch has not expired, yet');
+      require(block.timestamp >= users[account].unlockTimestamp,'this switch has not expired yet');
       
       uint amount = users[account].amount;
       users[account].amount = 0;
@@ -261,7 +272,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
       
       users[msg.sender].amount = users[msg.sender].amount.add(msg.value);
       
-      emit SwitchUpdated("Amount updated");
+      emit AmountUpdated(msg.value);
     }
     
     
@@ -274,7 +285,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     checkTime(_unlockTimestamp)
     {
       users[msg.sender].unlockTimestamp = _unlockTimestamp;
-      emit SwitchUpdated("Unlock time updated");
+      emit UnlockTimeUpdated(_unlockTimestamp);
     }
     
     
@@ -286,7 +297,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     onlyValid(msg.sender)
     {
       users[msg.sender].executor = _executor;
-      emit SwitchUpdated("Executor updated");
+      emit ExecutorUpdated(_executor);
     }
     
     
@@ -298,7 +309,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     onlyValid(msg.sender)
     {
       users[msg.sender].benefitor = _benefitor;
-      emit SwitchUpdated("Benefitor updated");
+      emit BenefitorUpdated(_benefitor);
     }
     
     
@@ -312,15 +323,58 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
     returns
     (bytes32, uint, uint, address, address, bool)
     {
-      Switch storage _switch = users[_switchOwner];
       return (
-        _switch.switchName,
-        _switch.amount,
-        _switch.unlockTimestamp,
-        _switch.executor,
-        _switch.benefitor,
-        _switch.isValid
+        users[_switchOwner].switchName,
+        users[_switchOwner].amount,
+        users[_switchOwner].unlockTimestamp,
+        users[_switchOwner].executor,
+        users[_switchOwner].benefitor,
+        users[_switchOwner].isValid
       );
+    }
+
+
+    /// @inheritdoc KeeperCompatibleInterface
+    function checkUpkeep(bytes calldata checkData)
+    public
+    view
+    override
+    returns(bool upkeepNeeded, bytes memory performData)
+    {
+      address account = bytesToAddress(checkData);
+
+      upkeepNeeded = block.timestamp >= users[account].unlockTimestamp;
+      performData = checkData;
+    }
+
+
+    /// @inheritdoc KeeperCompatibleInterface
+    function performUpkeep(bytes calldata performData)
+    public
+    override
+    {
+      require(msg.sender == keeperRegistry);
+
+      address account = bytesToAddress(performData);
+
+      tryExecuteSwitch(account);
+    }
+
+
+    /**
+     * @notice Updates Keeper Registry Contract Address
+     * @notice Only Administrator can call
+     *
+     * @param _keeperRegistry - new Keeper Registry Contract Address
+     *
+     * No return, reverts on error
+     */
+    function setKeeperRegistry(address _keeperRegistry)
+    public
+    onlyOwner
+    {
+      keeperRegistry = _keeperRegistry;
+      emit KeeperRegistryUpdated(_keeperRegistry);
     }
     
     
@@ -362,5 +416,24 @@ contract TimeBasedSwitch is ITimeBasedSwitch, ReentrancyGuard, IERC721Receiver {
         require(_receiver != address(0), "withdrawCollectible: Invalid receiver address");
 
         ERC721(_tokenAddress).safeTransferFrom(address(this), _receiver, _tokenId);
+    }
+
+
+    /**
+     * @notice Function to convert Ethereum address from bytes format to address format
+     *
+     * @param inputBytes - bytes to convert
+     *
+     * @param outputAddress - converted address
+     */
+    function bytesToAddress(bytes memory inputBytes)
+    private
+    pure
+    returns(address outputAddress)
+    {
+        uint256 bytesLength = inputBytes.length;
+        assembly {
+            outputAddress := mload(add(inputBytes, bytesLength))
+        }
     }
 }

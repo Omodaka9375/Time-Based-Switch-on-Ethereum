@@ -1,0 +1,23 @@
+type Switch @entity {
+  id: ID!
+  executor: Bytes!
+  benefitor: Bytes! # address
+  name: String
+  unlockTimestamp: BigInt
+  isExecuted: Boolean
+  ethersLocked: BigInt! # uint256
+  tokensLocked: [Token!]
+  collectiblesLocked: [Collectible!]
+}
+
+type Token @entity {
+  id: ID! # counter
+  tokenAddress: Bytes
+  amountLocked: BigInt
+}
+
+type Collectible @entity {
+  id: ID! # token address
+  collectibleId: BigInt
+  benefitor: Bytes
+}

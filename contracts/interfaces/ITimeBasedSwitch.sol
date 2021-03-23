@@ -3,10 +3,16 @@ pragma solidity ^0.7.0;
 
 interface ITimeBasedSwitch {
     /* Events */
-    event SwitchCreated(uint unlockTimestamp);
+    event SwitchCreated(bytes32 switchName, uint unlockTimestamp, address indexed executor, address indexed benefitor, uint amount);
+    event TokenLocked(address indexed account, address indexed tokenAddress, uint amount);
+    event CollectibleLocked(address indexed account, address indexed tokenAddress, uint tokenId, address indexed benefitor);
     event SwitchTriggered(address indexed account);
     event SwitchTerminated(address indexed account);
-    event SwitchUpdated(bytes32 message);
+    event AmountUpdated(uint amount);
+    event UnlockTimeUpdated(uint unlockTimestamp);
+    event ExecutorUpdated(address indexed executor);
+    event BenefitorUpdated(address indexed benefitor);
+    event KeeperRegistryUpdated(address indexed keeperRegistry);
     event EtherReceived(address indexed sender, uint amount);
 
     /**
