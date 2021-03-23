@@ -20,7 +20,7 @@ input, select {
   border-radius: 5px;
   margin-top: 5px;
   height: 44px;
-  width: 95%;
+  width: 94%;
   padding-left: 5%;
   font-size: 16px;
   font-weight: bold;
@@ -325,12 +325,43 @@ h3 {
     background-color: #fff;
     font-size: 13px;
     padding: 6px;
-    height: 48px
+    height: 48px;
+}
+/* #period #autoManual .ss-content .ss-search input {
+  display: none;
+} */
+.select-element-tokens {
+  width: 42%;
+  background-color: #fff;
+  font-size: 13px;
+  height: 48px;
+  padding-bottom: 12px;
+  padding-top: 6px
 }
 
+.ss-main {
+  color: black;
+  font-weight: 400;
+}
+.ss-main .ss-single-selected {
+    height: 48px;
+    padding: 8px;
+    border: 1px solid #AAA;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+}
+.ss-content .ss-list .ss-option.ss-highlighted, .ss-content .ss-list .ss-option:hover {
+  color: #fff;
+  background-color: #AAA;
+}
 .options-wrapper {
     display: flex;
     margin-bottom: 30px;
+}
+.ss-main .ss-single-selected.ss-disabled {
+  background-color: #ffffff;
+  cursor: not-allowed
 }
 
 .container {

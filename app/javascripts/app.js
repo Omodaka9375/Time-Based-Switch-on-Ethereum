@@ -4,6 +4,7 @@ import "../stylesheets/app.css";
 // Import libraries we need.
 import { default as Web3 } from "web3";
 import { default as contract } from "truffle-contract";
+import SlimSelect from 'slim-select'
 
 import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.json'
 
@@ -13,6 +14,7 @@ const TimeBasedSwitch = contract({abi: TimeBasedSwitch_artifacts, address: timeB
 var accounts;
 let account;
 let idNew = 0;
+// let tokenSelected;
 
 const graphqlUri = "https://api.thegraph.com/subgraphs/name/andrejrakic/time-based-switch";
 
@@ -22,6 +24,18 @@ window.App = {
     TimeBasedSwitch.setProvider(web3.currentProvider);
     this.connectMetamask();
     document.getElementById("myReceivedSwitchData").style.display="none";
+
+    new SlimSelect({
+      select: '#selectToken'
+    });
+    new SlimSelect({
+      select: '#period',
+      showSearch: false
+    });
+    new SlimSelect({
+      select: '#autoManual',
+      showSearch: false,
+    });
   },
 
   connectMetamask: function () {
@@ -253,9 +267,13 @@ window.App = {
     let selectTokenETH = document.querySelector("#selectToken").value;
     let tokenAmountETH = document.getElementById("tokenAmount").value;
     let tokenAmountOther = document.querySelectorAll("input[name=otherToken]")
-    let selectedTokenOtehr = document.querySelectorAll("[name=tokenOther]")
+    let selectedTokenOtehr = document.querySelectorAll("select[name=tokenOther]")
     let contractAddress = document.getElementById("contractAddress").value;
     let executorAddress = document.getElementById("executorAddress").value;
+
+    let contractAddressNFT = document.getElementById("contractAddressNFT").value;
+    let NFTID = document.getElementById("nftId").value;
+    
     let otherTokens=[];
     let tokenName=[];
     let amount=[];
@@ -265,7 +283,11 @@ window.App = {
         })
         selectedTokenOtehr.forEach((elem, index) => {
           tokenName.push(window["tokenNameOther" + index] = elem.value)
-        })
+        });
+        let value = "ERC721";
+          tokenName = tokenName.filter(item => {
+            return item !== value
+        });
         tokenName.forEach((el, i) => {
           var obj = {};
           obj.tokenName = el;
@@ -274,7 +296,7 @@ window.App = {
         })
     }
     console.log(otherTokens)
-    console.log(switchName,period,periodTime,selectTokenETH,tokenAmountETH,contractAddress,executorAddress )
+    console.log("switchName:",switchName,"period:",period,"periodTime:",periodTime,"selectTokenETH:",selectTokenETH,"tokenAmountETH:",tokenAmountETH,"contractAddress:",contractAddress,"executorAddress:",executorAddress,"contractAddressNFT:",contractAddressNFT,"NFTID:",NFTID )
   },
 
   openExternalWebsite: function (uri) {
@@ -481,10 +503,7 @@ window.App = {
     let addAsssetContent = `
     <div id="asset${idNew}" class="form-box new-asset">
     <div class="form-element-header">Select asset</div>
-    <select name="tokenOther" id="selectToken${idNew}" class="select-element" style="width: 100%;">
-      <option name="days">
-         Ethereum(ETH)
-      </option>
+    <select name="tokenOther" id="selectToken${idNew}" class="select-element-tokens" style="width: 100%;">
       <optgroup label="ERC20">
         <option>
           Binance Coin (BNB)
@@ -503,7 +522,7 @@ window.App = {
       and sent once the
       switch expires</div>
     <div style="display: flex; justify-content: space-between;">
-      <input name="otherToken" type="number" style="width: 42%" id="tokenAmount${idNew}" min="0"/>
+      <input name="otherToken" class="only-positive" type="number" style="width: 42%" id="tokenAmount${idNew}" min="0"/>
       <input style="width: 42%" id="tokenAmountCash${idNew}" disabled value=""/>
     </div>
     <div class="options-wrapper">
@@ -530,12 +549,56 @@ window.App = {
       </div>
   </div>
     `;
+  let erc721Content = `
+    <div id="asset${idNew}" class="form-box new-asset">
+    <div class="form-element-header">Select asset</div>
+    <select name="tokenOther" id="selectToken${idNew}" class="select-element-tokens" style="width: 100%;">
+      <optgroup label="ERC20">
+        <option>
+          Binance Coin (BNB)
+        </option>
+        <option>
+          Uniswap (UNI)
+        </option>
+        <option>
+          Tether (USDT)
+        </option>
+      </optgroup>
+      <option name="years" selected>ERC721</option>
+    </select>
+    <div class="form-element-header">Address & ID</div>
+    <div class="form-element-subheader">Please provide contract addreess and ID of NFT tocken you want to lock</div>
+    <div>
+      <input name="conAddress" type="text" style="width: 94%" id="contractAddressNFT" value="" placeholder="Contract address"/>
+      <input name="nftIdName" type="text" style="width: 94%"  id="nftId"  value="" placeholder="NFT ID"/>
+    </div>
+    <div class="asset-buttons">
+      <button class="approve-asset-button">Approve</button>
+      <button class="delete-assets-button" onClick="App.deleteAssets('asset${idNew}')">Delete</button>
+      </div>
+  </div>
+    `;
+
     let target = document.querySelector(".add-new-asset");
 
     const myNewAsset = document
       .createRange()
       .createContextualFragment(addAsssetContent);
     target.appendChild(myNewAsset);
+    const nftAsset = document.createRange().createContextualFragment(erc721Content);
+    new SlimSelect({
+      select: document.querySelector(`#selectToken${idNew}`),
+      onChange: (info) => {
+        // tokenSelected = info.value
+        if(info.value == "ERC721") {
+          App.deleteAssets(`asset${idNew}`)
+          target.appendChild(nftAsset)
+          new SlimSelect({
+            select: document.querySelector(`#selectToken${idNew}`)
+          })
+        } 
+      }
+    });
   },
 
   deleteAssets: function (id) {
