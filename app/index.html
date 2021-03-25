@@ -73,6 +73,10 @@
     <h1>Switch Overview</h1>
     <hr>
   </div>
+  <div class="overview" id="editOverview">
+    <h1>Name</h1>
+    <hr>
+  </div>
   <div id="create" class="central-wrapper">
     <div class="left-wrapper">
       <div class="text-up-header">CREATE NEW SWITCH</div>
@@ -91,7 +95,7 @@
         <div class="form-element-header">Timeout period</div>
         <div class="form-element-subheader">Set up period after which Switch can be executed</div>
         <div class="select-wrapper">
-          <select name="timestamp" class="select-element-tokens" id="period" value="days">
+          <select name="timestamp" class="select-element-tokens" id="period" value="days" >
             <option name="days" value="days">Days</option>
             <option name="months" value="months">Months</option>
             <option name="years" value="years">Years</option>
@@ -119,30 +123,15 @@
       <div id="asset" class="form-box">
         <div class="form-element-header">Select asset</div>
         <select name="token" id="selectToken" class="select-element-tokens" style="width: 100%;" disabled="true">
-          <option name="days" value="ETH">
-              Ethereum(ETH)
-            </div>
-          </option>
-          <optgroup label="ERC20">
-            <option value="BNB">
-              Binance Coin (BNB)
-            </option>
-            <option value="UNI">
-              Uniswap (UNI)
-            </option>
-            <option value="USDT">
-              Tether (USDT)
-            </option>
-          </optgroup>
-          <option name="years" value="ERC-721">ERC721</option>
+         
         </select>
         <div class="form-element-header">Amount</div>
         <div class="form-element-subheader">Set up the amount that will be locked
           and sent once the
           switch expires</div>
         <div style="display: flex; justify-content: space-between;">
-          <input type="number" class="only-positive" id="tokenAmount" style="width: 42%" min="0"/>
-          <input style="width: 42%" id="tokenAmountCash" disabled value=""/>
+          <input type="number" class="only-positive" id="tokenAmount" style="width: 42%" min="0" onkeyup="App.inputETHValue()"/>
+          <input style="width: 42%" id="tokenAmountCash" disabled value="0$"/>
         </div>
         <div class="options-wrapper">
           <label class="container">
@@ -166,7 +155,7 @@
           ETH</button> -->
       </div>
     </div>
-      <div class="new-asset-button" onclick="App.addAsset()">
+      <div class="new-asset-button" onclick="App.addAsset()" id="assetButton">
         <h5>+ Add new asset</h5>
       </div>
     </div>
@@ -191,7 +180,7 @@
         <div class="form-element-header">Executor</div>
         <div class="form-element-subheader">Please paste the executor wallet
           address</div>
-        <select name="token" class="select-element-tokens" id="autoManual" style="width: 100%;">
+        <select name="token" class="select-element-tokens" id="autoManual" style="width: 100%;" onchange="App.autoManuallInput()">
           <option name="auto" value="Automatically">
               Automatically
           </option>
@@ -199,7 +188,7 @@
               Manually
           </option>
         </select>
-        <input type="text" id="executorAddress" placeholder="Paste executor address" value="" />
+        <input type="text" id="executorAddress" placeholder="Paste executor address" value="" style="display: none;"/>
         <div class="notification-message-box">
           <i class="fas fa-info"></i>
           <div class="notification-box">
@@ -311,6 +300,14 @@
         Back</button>
       <button onclick="App.createSwitch()" class="button-primary" style="background-color: #00ffae;">
         Create Switch</button>
+    </div>
+  </div>
+  <div id="editSwicthFooter">
+    <div class="footer-flex-end-class-overview">
+      <button onclick="" class="button-primary button-secondary">
+        Discard</button>
+      <button onclick="" class="button-primary" style="background-color: #00ffae;">
+        Save</button>
     </div>
   </div>
 </body>

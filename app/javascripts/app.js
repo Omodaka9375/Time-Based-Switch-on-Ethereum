@@ -13,8 +13,13 @@ var TimeBasedSwitch = contract(TimeBasedSwitch_artifacts);
 var accounts;
 let account;
 let idNew = 0;
-// let tokenSelected;
+let dolarValues;//test
+let dolar_val;//test
+let dolar_val_eth=5;//test
+const keeperRegistry = `0xAaaD7966EBE0663b8C9C6f683FB9c3e66E03467F`;
 
+
+const dolarTokensValue = "http://api.coinlayer.com/api/live?access_key=579aba3dd8d9e499cc182b964bc311cc";//not functional api
 const graphqlUri =
   "https://api.thegraph.com/subgraphs/name/andrejrakic/time-based-switch";
 
@@ -24,19 +29,43 @@ window.App = {
     TimeBasedSwitch.setProvider(web3.currentProvider);
     this.connectMetamask();
     document.getElementById("myReceivedSwitchData").style.display="none";
-
+    
     new SlimSelect({
-      select: '#selectToken'
+      select: '#selectToken',
+      data: [
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/eth/200" /> <span class="tok">Ethereum(ETH)</span></span>', text: 'Ethereum(ETH)', value: 'ETH'},
+       { label: 'ERC20',
+        options: [
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/bnb/200" /> <span class="tok">Binance Coin (BNB)</span></span>', text: 'Binance Coin (BNB)', value: 'BNB'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/generic/200" /> <span class="tok">Uniswap (UNI)</span></span>', text: 'Uniswap (UNI)', value: 'UNI'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/usdt/200" /> <span class="tok">Tether (USDT)</span></span>', text: 'Tether (USDT)', value: 'USDT'}
+        ]
+      },
+      {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/generic/200" /> <span class="tok">ERC721</span></span>', text: 'ERC721', value: 'ERC-721'}
+      ]
     });
     new SlimSelect({
       select: '#period',
-      showSearch: false
+      showSearch: false,
     });
     new SlimSelect({
       select: '#autoManual',
       showSearch: false,
     });
   },
+
+  //not usable--api non functional
+  getDolarValueOfTokens: async function() {
+    await fetch(dolarTokensValue)
+    .then((response) => response.json())
+    .then((response) => {
+     dolarValues = response.rates;
+      console.log('success!', dolarValues);
+    }).catch((err) =>{
+      console.warn('Something went wrong.', err)
+    });  
+  },
+  //
 
   connectMetamask: function () {
     // Get the initial account balance so it can be displayed.
@@ -115,7 +144,25 @@ window.App = {
     //     }
     //   }
     // }`;
-
+  //   const SWITCHES =`{switches(where: {id: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
+  //     id
+  //     name
+  //     unlockTimestamp
+  //     benefitor
+  //     executor
+  //     isExecuted
+  //     ethersLocked
+  //     tokensLocked {
+  //       tokenAddress
+  //       amountLocked
+  //     }
+  //     collectiblesLocked {
+  //       id
+  //       collectibleId
+  //       benefitor
+  //     }
+  //   }
+  // }`
     fetch(graphqlUri, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -124,9 +171,12 @@ window.App = {
       .then((res) => res.json())
       .then((res) => {
         const resSwitch = res.data.switch;
-        console.log(resSwitch)
-        this.createSwitchPage(resSwitch);
+        console.log("RES",resSwitch)
+        resSwitch.map(el=> {
+          this.createSwitchPage(el);
+        })
       });
+      this.getDolarValueOfTokens();
   },
 
   fetchReceivedSwitches: function (_account) {
@@ -249,16 +299,58 @@ window.App = {
     overview.style.display = "block";
     const createDiv = document.getElementById("create");
     createDiv.style.display = "flex";
+    document.getElementById("name").disabled = true;
+    document.getElementById("period").disabled = true;
+    let dropdowns= document.querySelectorAll(".ss-single-selected");
+    dropdowns.forEach(el => el.style.pointerEvents="none")
+    document.getElementById("periodTime").disabled = true;
     const assestsDiv = document.getElementById("assets");
     assestsDiv.style.display = "flex";
+    document.getElementById("tokenAmount").disabled = true;
+    let valuesOfOtherTokens = document.querySelectorAll("input[name=otherToken]")
+    valuesOfOtherTokens.forEach(el => el.style.pointerEvents="none")
+    document.getElementById("queter").disabled = true;
+    document.getElementById("half").disabled = true;
+    document.getElementById("tree-queters").disabled = true;
+    document.getElementById("full").disabled = true;
+    if (document.getElementById("contractAddressNFT") && document.getElementById("nftId")) {
+      document.getElementById("contractAddressNFT").disabled = true;
+      document.getElementById("nftId").disabled = true;
+    }
+    document.getElementById("assetButton").style.pointerEvents="none";
     const executionDiv = document.getElementById('execution');
     executionDiv.classList.add("temporary-padding")
     executionDiv.style.display = "flex";
+    document.getElementById("contractAddress").disabled = true;
+    document.getElementById("autoManual").disabled = true;
+    document.getElementById("executorAddress").disabled = true;
     const executionFooter = document.getElementById("executionFooter");
     executionFooter.style.display = "none";
     const overviewFooter = document.getElementById("overviewFooter");
     overviewFooter.style.display = "flex";
   },
+
+  //started--not usable
+  singleSwitchOverviev: function() {
+    const dashboardDiv = document.getElementById("dashboard");
+    dashboardDiv.style.display = "none";
+    const changeClass = (element) => element.forEach(el => el.classList.add("overview-wrapper"));
+    changeClass( document.querySelectorAll(".central-wrapper"))
+    const overview = document.getElementById("editOverview");
+    overview.style.display = "block";
+    const createDiv = document.getElementById("create");
+    createDiv.style.display = "flex";
+    const assestsDiv = document.getElementById("assets");
+    assestsDiv.style.display = "flex";
+    const executionDiv = document.getElementById('execution');
+    executionDiv.classList.add("temporary-padding")
+    executionDiv.style.display = "flex";
+    // const executionFooter = document.getElementById("executionFooter");
+    // executionFooter.style.display = "none";
+    const overviewFooter = document.getElementById("editSwicthFooter");
+    overviewFooter.style.display = "flex";
+  },
+//
 
   createSwitch: function() {
     let switchName = document.getElementById("name").value;
@@ -269,11 +361,43 @@ window.App = {
     let tokenAmountOther = document.querySelectorAll("input[name=otherToken]")
     let selectedTokenOtehr = document.querySelectorAll("select[name=tokenOther]")
     let contractAddress = document.getElementById("contractAddress").value;
-    let executorAddress = document.getElementById("executorAddress").value;
+    let executorAddress;
+    if(document.getElementById("autoManual").value == "Manually"){
+      executorAddress = document.getElementById("executorAddress").value;
+    } else {
+      executorAddress = keeperRegistry;
+    }
+     
+    let contractAddressNFT;
+    let NFTID
+    if (document.getElementById("contractAddressNFT") && document.getElementById("nftId")) {
+      contractAddressNFT = document.getElementById("contractAddressNFT").value || "";
+      NFTID = document.getElementById("nftId").value || "";
+    } else {
+      contractAddressNFT = "";
+      NFTID = "";
+    }
+    let timeoutPeriod;
+    const today = new Date(Date.now());
+    if(period == "days") {
+      timeoutPeriod = periodTime 
+    } else if (period == "months") {
+      console.log(periodTime)
+       const oneDay = 24 * 60 * 60 * 1000;
+       const secondDate = new Date(new Date(Date.now()).setMonth(new Date(Date.now()).getMonth()+Number(periodTime)));
+       const diffDays = Math.round(Math.abs((today - secondDate) / oneDay));
+       timeoutPeriod = diffDays
+       console.log(today)
+       console.log(secondDate)
+    } else if (period == "years"){
+       const oneDay = 24 * 60 * 60 * 1000;
+       const secondDateOfYear = new Date(new Date(Date.now()).setMonth(new Date(Date.now()).getMonth()+Number(periodTime*12)));
+       const diffDaysOfYear = Math.round(Math.abs((today - secondDateOfYear) / oneDay));
+       timeoutPeriod = diffDaysOfYear
+       console.log(today)
+       console.log(secondDateOfYear)
+    }
 
-    let contractAddressNFT = document.getElementById("contractAddressNFT").value;
-    let NFTID = document.getElementById("nftId").value;
-    
     let otherTokens=[];
     let tokenName=[];
     let amount=[];
@@ -284,7 +408,7 @@ window.App = {
         selectedTokenOtehr.forEach((elem, index) => {
           tokenName.push(window["tokenNameOther" + index] = elem.value)
         });
-        let value = "ERC721";
+        let value = "ERC-721";
           tokenName = tokenName.filter(item => {
             return item !== value
         });
@@ -296,7 +420,7 @@ window.App = {
         })
     }
     console.log(otherTokens)
-    console.log("switchName:",switchName,"period:",period,"periodTime:",periodTime,"selectTokenETH:",selectTokenETH,"tokenAmountETH:",tokenAmountETH,"contractAddress:",contractAddress,"executorAddress:",executorAddress,"contractAddressNFT:",contractAddressNFT,"NFTID:",NFTID )
+    console.log("switchName:",switchName,"period:",period,"periodTime:",periodTime,"selectTokenETH:",selectTokenETH,"tokenAmountETH:",tokenAmountETH,"contractAddress:",contractAddress,"executorAddress:",executorAddress,"contractAddressNFT:",contractAddressNFT,"NFTID:",NFTID, "timeoutPeriod", timeoutPeriod )
   },
 
   openExternalWebsite: function (uri) {
@@ -305,12 +429,14 @@ window.App = {
   createReceivedSwitchesPage: function(_receivedSwitch) {
     const myReceivedSwitchData = document.getElementById("myReceivedSwitchData");
 
+    const expiresIn = new Date((_receivedSwitch.unlockTimestamp)*1000).toString().slice(3,15)
+
     const ethLocked = web3.fromWei(_receivedSwitch.ethersLocked);
     console.log(ethLocked);
 
     let receivedSwitchDiv = `
     <div class="received-switch">
-      <h1 class="title">Title</h1>
+      <h1 class="title">${_receivedSwitch.name}</h1>
       <div class="content">
         <div class="upper-content">
           <div class="received-assets">
@@ -321,12 +447,12 @@ window.App = {
           </div>
           <div class="received-total-value">
             <p>TOTAL VALUE</p>
-            <span></span>
+            <span>${ethLocked}$</span>
           </div>
           <div class="received-expires-in">
             <p>EXPIRES IN</p>
             <span></span>
-            <span></span>
+            <span>${expiresIn}</span>
           </div>
         </div>
       </div>
@@ -355,22 +481,24 @@ window.App = {
     const ethLocked = web3.fromWei(_switch.ethersLocked);
     console.log(ethLocked);
 
+    const expiresIn = new Date((_switch.unlockTimestamp)*1000).toString().slice(3,15)
+
     let switchDiv = `
     <div class="switch">
-    <h1 class="title">Title</h1>
+    <h1 class="title">${_switch.name}</h1>
     <div class="content">
       <div class="left-content">
         <div class="left-content-up">
-          <div class="assets">
+          <div class="assets" style="display:flex; flex-direction:column;">
             <p>ASSETS</p>
             <span></span>
-            <span>${ethLocked}</span>
-            <span></span>
+            <span>${ethLocked}ETH</span>
+            <span>${ethLocked}$</span>
           </div>
           <div class="expires-in">
             <p>EXPIRES IN</p>
             <span></span>
-            <span></span>
+            <span>${expiresIn}</span>
           </div>
         </div>
         <div class="total-value">
@@ -402,7 +530,7 @@ window.App = {
     <hr />
     <div class="switch-buttons">
       <div class="edit-delete-buttons">
-        <button class="button-terciary">Edit</button>
+        <button class="button-terciary" onClick="App.singleSwitchOverviev()">Edit</button>
         <button class="button-terciary">Delete</button>
       </div>
       <div class="execute-button">
@@ -493,37 +621,49 @@ window.App = {
     createDiv.style.display = 'none';
     const overview = document.getElementById("swOverview");
     overview.style.display = "none";
-    
     const changeClass = (element) => element.forEach(el => el.classList.remove("overview-wrapper"));
-    changeClass( document.querySelectorAll(".central-wrapper"))
+    changeClass( document.querySelectorAll(".central-wrapper"));
+
+    document.getElementById("name").disabled = false;
+    document.getElementById("period").disabled = false;
+    let dropdowns= document.querySelectorAll(".ss-single-selected");
+    dropdowns.forEach(el => el.style.pointerEvents="auto")
+    document.getElementById("periodTime").disabled = false;
+    document.getElementById("tokenAmount").disabled = false;
+    let valuesOfOtherTokens = document.querySelectorAll("input[name=otherToken]")
+    valuesOfOtherTokens.forEach(el => el.style.pointerEvents="auto")
+    document.getElementById("queter").disabled = false;
+    document.getElementById("half").disabled = false;
+    document.getElementById("tree-queters").disabled = false;
+    document.getElementById("full").disabled = false;
+    if (document.getElementById("contractAddressNFT") && document.getElementById("nftId")) {
+      document.getElementById("contractAddressNFT").disabled = false;
+      document.getElementById("nftId").disabled = false;
+    }
+    document.getElementById("assetButton").style.pointerEvents="auto";
+    document.getElementById("contractAddress").disabled = false;
+    document.getElementById("autoManual").disabled = false;
+    document.getElementById("executorAddress").disabled = false;
+    
   },
 
-  addAsset: function () {
+  addAsset: function (prop) {
     idNew = ++idNew;
+    dolar_val = 1;
+    
     let addAsssetContent = `
     <div id="asset${idNew}" class="form-box new-asset">
     <div class="form-element-header">Select asset</div>
-    <select name="tokenOther" id="selectToken${idNew}" class="select-element-tokens" style="width: 100%;">
-      <optgroup label="ERC20">
-        <option>
-          Binance Coin (BNB)
-        </option>
-        <option>
-          Uniswap (UNI)
-        </option>
-        <option>
-          Tether (USDT)
-        </option>
-      </optgroup>
-      <option name="years">ERC721</option>
+    <select name="tokenOther" id="selectToken${idNew}" class="select-element-tokens" style="width: 100%;" onchange="App.selectChange(${idNew})">
+
     </select>
     <div class="form-element-header">Amount</div>
     <div class="form-element-subheader">Set up the amount that will be locked
       and sent once the
       switch expires</div>
     <div style="display: flex; justify-content: space-between;">
-      <input name="otherToken" class="only-positive" type="number" style="width: 42%" id="tokenAmount${idNew}" min="0"/>
-      <input style="width: 42%" id="tokenAmountCash${idNew}" disabled value=""/>
+      <input name="otherToken" class="only-positive" type="number" style="width: 42%" id="tokenAmount${idNew}" min="0" onkeyup="App.inputTokenValue(${idNew})"/>
+      <input style="width: 42%" id="tokenAmountCash${idNew}" disabled value="0$"/>
     </div>
     <div class="options-wrapper">
       <label class="container">
@@ -553,18 +693,7 @@ window.App = {
     <div id="asset${idNew}" class="form-box new-asset">
     <div class="form-element-header">Select asset</div>
     <select name="tokenOther" id="selectToken${idNew}" class="select-element-tokens" style="width: 100%;">
-      <optgroup label="ERC20">
-        <option>
-          Binance Coin (BNB)
-        </option>
-        <option>
-          Uniswap (UNI)
-        </option>
-        <option>
-          Tether (USDT)
-        </option>
-      </optgroup>
-      <option name="years" selected>ERC721</option>
+
     </select>
     <div class="form-element-header">Address & ID</div>
     <div class="form-element-subheader">Please provide contract addreess and ID of NFT tocken you want to lock</div>
@@ -581,30 +710,79 @@ window.App = {
 
     let target = document.querySelector(".add-new-asset");
 
-    const myNewAsset = document
-      .createRange()
-      .createContextualFragment(addAsssetContent);
+    const myNewAsset = document.createRange().createContextualFragment(addAsssetContent);
     target.appendChild(myNewAsset);
     const nftAsset = document.createRange().createContextualFragment(erc721Content);
     new SlimSelect({
       select: document.querySelector(`#selectToken${idNew}`),
+      data: [
+       { label: 'ERC20',
+        options: [
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/bnb/200" /> <span class="tok">Binance Coin (BNB)</span></span>', text: 'Binance Coin (BNB)', value: 'BNB'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/generic/200" /> <span class="tok">Uniswap (UNI)</span></span>', text: 'Uniswap (UNI)', value: 'UNI'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/usdt/200" /> <span class="tok">Tether (USDT)</span></span>', text: 'Tether (USDT)', value: 'USDT'}
+        ]
+      },
+      {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/generic/200" /> <span class="tok">ERC721</span></span>', text: 'ERC721', value: 'ERC-721'}
+      ],
       onChange: (info) => {
-        // tokenSelected = info.value
-        if(info.value == "ERC721") {
+        if(info.value == "ERC-721") {
           App.deleteAssets(`asset${idNew}`)
-          target.appendChild(nftAsset)
+          target.appendChild(nftAsset) 
           new SlimSelect({
-            select: document.querySelector(`#selectToken${idNew}`)
-          })
+            select: document.querySelector(`#selectToken${idNew}`),
+            data: [
+             { label: 'ERC20',
+              options: [
+              {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/bnb/200" /> <span class="tok">Binance Coin (BNB)</span></span>', text: 'Binance Coin (BNB)', value: 'BNB'},
+              {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/generic/200" /> <span class="tok">Uniswap (UNI)</span></span>', text: 'Uniswap (UNI)', value: 'UNI'},
+              {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/usdt/200" /> <span class="tok">Tether (USDT)</span></span>', text: 'Tether (USDT)', value: 'USDT'}
+              ]
+             },
+              {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/generic/200" /> <span class="tok">ERC721</span></span>', text: 'ERC721', value: 'ERC-721', selected: true}
+            ],
+            onChange: (info) => {
+              App.deleteAssets(`asset${idNew}`)
+              App.addAsset(info.value)
+              //bug to be fixed
+            }
+          }) 
         } 
       }
     });
   },
-
+  inputTokenValue: function(id) {
+    let dolarVal = dolar_val
+    let valInput = document.getElementById("tokenAmount"+id).value;
+    document.getElementById("tokenAmountCash"+id).value = valInput*dolarVal+" $";
+   },
+  inputETHValue: function() {
+    let dolarVal = dolar_val_eth
+    let valInput = document.getElementById("tokenAmount").value;
+    document.getElementById("tokenAmountCash").value = valInput*dolarVal+" $";
+  }, 
+  selectChange: function(id, x) {
+    let valSelect = document.getElementById("selectToken"+id).value;
+    if (valSelect == "BNB"){
+      dolar_val = 1
+    }else if(valSelect == "UNI") {
+      dolar_val = 2
+    } else if (valSelect == "USDT") {
+      dolar_val = 3
+    }
+   },
   deleteAssets: function (id) {
     document.getElementById(id).remove();
   },
+  autoManuallInput: function() {
+    let val = document.getElementById("autoManual").value;
+    if(val == "Automatically") {
+      document.getElementById("executorAddress").style.display="none"
+    } else {
+      document.getElementById("executorAddress").style.display="block"
+    }
 
+  },
   // showCheck: function () {
   //   var checkDiv = document.getElementById("checkSwitch");
   //   if(checkDiv.style.display == "none"){

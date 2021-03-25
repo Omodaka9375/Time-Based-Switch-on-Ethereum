@@ -66,7 +66,7 @@ h3 {
   margin-top: 5px;
 }
 
-#createFooter, #assetsFooter, #executionFooter, #overviewFooter {
+#createFooter, #assetsFooter, #executionFooter, #overviewFooter, #editSwicthFooter {
   height: 12%;
   bottom: 1px;
   position: fixed;
@@ -654,4 +654,11 @@ scrollbar-width: none;
 } */
 #mySwitchData, #myReceivedSwitchData {
   padding-bottom: 45px;
+}
+.tok-wrapp {
+  display:flex; 
+  flex-direction:row;
+}
+.tok {
+padding-left: 5px;
 }
