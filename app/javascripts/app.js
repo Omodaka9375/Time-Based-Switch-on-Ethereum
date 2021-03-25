@@ -3,25 +3,30 @@ import "../stylesheets/app.css";
 
 // Import libraries we need.
 import { default as Web3 } from "web3";
-import { default as contract } from "truffle-contract";
 import SlimSelect from 'slim-select'
-
-import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.json'
+import abi from '../abis/tbs.abi.json';
+import erc20abi from '../abis/erc20approve.abi.json';
+import erc721abi from '../abis/erc721approve.abi.json';
 
 const timeBaseSwitchAddress = `0x0e179683C05b430487e88ca0baa6080Ac00fc03D`; // kovan network
-const TimeBasedSwitch = contract({abi: TimeBasedSwitch_artifacts, address: timeBaseSwitchAddress});
+const graphqlUri = "https://api.thegraph.com/subgraphs/name/andrejrakic/time-based-switch";
+const keeperRegistry = `0xAaaD7966EBE0663b8C9C6f683FB9c3e66E03467F`;
 
+var TimeBasedSwitch;
 var accounts;
 let account;
 let idNew = 0;
 // let tokenSelected;
 
-const graphqlUri = "https://api.thegraph.com/subgraphs/name/andrejrakic/time-based-switch";
+const day = 86400;
+const month = 2629743;
+const year = 31556926;
+
 
 window.App = {
   start: function () {
     var self = this;
-    TimeBasedSwitch.setProvider(web3.currentProvider);
+    // TimeBasedSwitch.setProvider(web3.currentProvider);
     this.connectMetamask();
     document.getElementById("myReceivedSwitchData").style.display="none";
 
@@ -36,6 +41,23 @@ window.App = {
       select: '#autoManual',
       showSearch: false,
     });
+  },
+
+  onExecutorOptionChange: function() {
+    const selectedMethod = document.getElementById("autoManual").value;
+    const executorAddressInput = document.getElementById("executorAddress");
+    const chainlinkBotBanner = document.getElementById("chainlinkBot");
+
+    if (selectedMethod === "Manually") {
+      executorAddressInput.value = "";
+      executorAddressInput.style.display = "flex";
+      chainlinkBotBanner.style.display = "none";
+    } else {
+      // automatically
+      executorAddressInput.value = keeperRegistry;
+      executorAddressInput.style.display = "none";
+      chainlinkBotBanner.style.display = "flex";
+    }
   },
 
   connectMetamask: function () {
@@ -264,6 +286,8 @@ window.App = {
     let switchName = document.getElementById("name").value;
     let period = document.querySelector("#period").value; 
     let periodTime = document.getElementById("periodTime").value;
+    let timestamp = (period === 'days') ? day * periodTime : ((period === 'months') ? month * periodTime : year * periodTime);
+    timestamp += Date.now();
     let selectTokenETH = document.querySelector("#selectToken").value;
     let tokenAmountETH = document.getElementById("tokenAmount").value;
     let tokenAmountOther = document.querySelectorAll("input[name=otherToken]")
@@ -271,8 +295,8 @@ window.App = {
     let contractAddress = document.getElementById("contractAddress").value;
     let executorAddress = document.getElementById("executorAddress").value;
 
-    let contractAddressNFT = document.getElementById("contractAddressNFT").value;
-    let NFTID = document.getElementById("nftId").value;
+    let contractAddressNFT = document.getElementById("contractAddressNFT") && document.getElementById("contractAddressNFT").value;
+    let NFTID = document.getElementById("nftId") && document.getElementById("nftId").value;
     
     let otherTokens=[];
     let tokenName=[];
@@ -297,6 +321,79 @@ window.App = {
     }
     console.log(otherTokens)
     console.log("switchName:",switchName,"period:",period,"periodTime:",periodTime,"selectTokenETH:",selectTokenETH,"tokenAmountETH:",tokenAmountETH,"contractAddress:",contractAddress,"executorAddress:",executorAddress,"contractAddressNFT:",contractAddressNFT,"NFTID:",NFTID )
+
+    const _amount = web3.toWei(tokenAmountETH, 'ether');
+    const txHash = this._createSwitch(switchName, timestamp, _amount, executorAddress, contractAddress);
+    console.log(txHash);
+  },
+
+  _createSwitch: function (_switchName, _time, _amount, _executor, _benefitor) {
+    const _name = web3.fromAscii(_switchName);
+    TimeBasedSwitch.createSwitch(_name, _time, _amount, _executor, _benefitor, { from: account, value: _amount }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
+
+  _lockCollectible: function (_tokenAddress, _tokenId) {
+    TimeBasedSwitch.lockCollectible(_tokenAddress, _tokenId, { from: account, value: 0}, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
+
+  _lockToken: function (_tokenAddress, _amount) {
+    TimeBasedSwitch.lockToken(_tokenAddress, _amount, { from: account, value: 0 }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
+
+  _terminateSwitchEarly: function () {
+    TimeBasedSwitch.terminateSwitchEarly({ from: account, value: 0 }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
+
+  _tryExecuteSwitch: function (_account) {
+    TimeBasedSwitch.tryExecuteSwitch(_account, { from: account, value: 0 }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
+
+  _updateSwitchAmount: function (_amount) {
+    TimeBasedSwitch.updateSwitchAmount({ from: account, value: _amount }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
+
+  _updateSwitchUnlockTime: function (_timestamp) {
+    TimeBasedSwitch.updateSwitchUnlockTime(_timestamp, { from: account, value: 0 }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
+
+  _updateSwitchExecutor: function (_executor) {
+    TimeBasedSwitch.updateSwitchExecutor(_executor, { from: account, value: 0 }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
+
+  _updateSwitchBenefitor: function (_benefitor) {
+    TimeBasedSwitch.updateSwitchBenefitor(_benefitor, { from: account, value: 0 }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
+
+  _aprroveERC20: function(_tokenAddress, _spender, _amount) {
+    const token = web3.eth.contract(erc20abi).at(_tokenAddress);
+    token.approve(_spender, _amount, { from: account }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
+
+  _aprroveERC721: function(_tokenAddress, _spender, _tokenId) {
+    const collectible = web3.eth.contract(erc721abi).at(_tokenAddress);
+    collectible.approve(_spender, _tokenId, { from: account }, function(err, txHash) {
+      if(!err) return txHash;
+    })
   },
 
   openExternalWebsite: function (uri) {
@@ -310,7 +407,7 @@ window.App = {
 
     let receivedSwitchDiv = `
     <div class="received-switch">
-      <h1 class="title">Title</h1>
+      <h1 class="title">${web3.toAscii(_receivedSwitch.name)}</h1>
       <div class="content">
         <div class="upper-content">
           <div class="received-assets">
@@ -357,7 +454,7 @@ window.App = {
 
     let switchDiv = `
     <div class="switch">
-    <h1 class="title">Title</h1>
+    <h1 class="title">${web3.toAscii(_switch.name)}</h1>
     <div class="content">
       <div class="left-content">
         <div class="left-content-up">
@@ -403,10 +500,10 @@ window.App = {
     <div class="switch-buttons">
       <div class="edit-delete-buttons">
         <button class="button-terciary">Edit</button>
-        <button class="button-terciary">Delete</button>
+        <button class="button-terciary" onClick="App._terminateSwitchEarly()">Delete</button>
       </div>
       <div class="execute-button">
-        <button class="button-primary">Execute</button>
+        <button class="button-primary" onClick="App._tryExecuteSwitch(${_switch.id})">Execute</button>
       </div>
     </div>
   </div>
@@ -493,6 +590,8 @@ window.App = {
     createDiv.style.display = 'none';
     const overview = document.getElementById("swOverview");
     overview.style.display = "none";
+    const executorAddress = document.getElementById("executorAddress");
+    executorAddress.value = keeperRegistry;
     
     const changeClass = (element) => element.forEach(el => el.classList.remove("overview-wrapper"));
     changeClass( document.querySelectorAll(".central-wrapper"))
@@ -605,154 +704,6 @@ window.App = {
     document.getElementById(id).remove();
   },
 
-  // showCheck: function () {
-  //   var checkDiv = document.getElementById("checkSwitch");
-  //   if(checkDiv.style.display == "none"){
-  //     checkDiv.style.display = "block";
-  //   } else {
-  //     checkDiv.style.display = "none";
-  //   }
-  // },
-
-  // createSwitch: function () {
-  //   var self = this;
-  //   var tbs;
-  //   var timeleft_element = document.getElementById("timeleft");
-
-  //   TimeBasedSwitch.deployed().then(function(instance) {
-  //   tbs = instance;
-  //   return tbs.createSwitch.call();}).then(function(value) {
-  //    	var timeleft_element = document.getElementById("timeleft");
-  //     var d = new Date(value.valueOf()*1000);
-  //    	      timeleft_element.innerHTML = d.toString();
-  //    	}).catch(function(e){
-  //   console.log(e);
-  //   self.setStatus(e);
-  //   });
-  // },
-
-  // showCreatorOptions: function () {
-  //   var checkDiv = document.getElementById("creatorR");
-  //   if(checkDiv.style.display == "none"){
-  //     checkDiv.style.display = "block";
-  //   } else {
-  //     checkDiv.style.display = "none";
-  //   }
-  // },
-
-  // showExecutorsOptions: function () {
-  //   var checkDiv = document.getElementById("executorR");
-  //   if(checkDiv.style.display == "none"){
-  //     checkDiv.style.display = "block";
-  //   } else {
-  //     checkDiv.style.display = "none";
-  //   }
-  // },
-
-  // terminate: function () {
-  //   var self = this;
-  //   var TBS;
-  //   TimeBasedSwitch.deployed().then(function (instance) {
-  //     TBS = instance;
-  //     return TBS.tick({ from: account });
-  //   }).then(function () {
-  //     self.setStatus("Tick complete!");
-  //     self.refreshTimeLeft();
-  //   }).catch(function (e) {
-  //     console.log(e);
-  //     self.setStatus(e);
-  //   });
-  // },
-
-  // tryExecute: function () {
-  //   var self = this;
-
-  //   var TBS;
-  //   TimeBasedSwitch.deployed().then(function (instance) {
-  //     TBS = instance;
-  //     return TBS.kick( Date.now()/1000 + 30, {from: account});
-  //   }).then(function() {
-  //     self.setStatus("Kick complete!");
-  //     self.refreshTimeLeft();
-  //   }).catch(function (e) {
-  //     console.log(e);
-  //     self.setStatus(e);
-  //   });
-
-  // },
-
-  // updateAmount: function () {
-  //   var self = this;
-
-  //   var beneficiary = document.getElementById("beneficiary").value;
-  //   var data = document.getElementById("data").value;
-
-  //   var TBS;
-
-  //   TimeBasedSwitchh.deployed().then(function (instance) {
-  //     TBS = instance;
-  //     return TBS.CreateDeadAccountSwitch(beneficiary, data, Date.now()/1000, {from: account, gas: 3141592});
-  //   }).then(function() {
-  //     self.setStatus("Transaction complete!");
-
-  //   }).catch(function (e) {
-  //     console.log(e);
-  //     self.setStatus(e);
-  //   });
-  // },
-
-  // updateBenefitor: function () {
-  //   console.log("readmessage");
-  //   var self = this;
-  //   var sender = document.getElementById("sender").value;
-
-  //   self.getLastHeartbeat(sender);
-  //   self.getMessage(sender);
-
-  // },
-
-  // updateExecutor: function (sender) {
-  //   var self = this;
-  //   var TBS;
-  //   var message_element = document.getElementById("message");
-  //   console.log("getMessage for " + sender);
-  //   TimeBasedSwitch.deployed().then(function (instance) {
-  //     TBS = instance;
-  //     console.log("resolved contract instance getMessage");
-  //     return TBS.getDataFromAddress.call(sender, {from: account});
-  //   }).then(function (value) {
-  //     console.log("resolved getDataFromAddress");
-  //     message_element.innerHTML = web3.toAscii(value.valueOf());
-  //   }).catch(function (e) {
-  //     console.log("catch getDataFromAddress");
-  //     console.log(e);
-  //     self.setStatus(e);
-  //     message_element.innerHTML = "Your friend is not dead yet";
-  //   });
-  // },
-
-  // updateCooldown: function (sender) {
-  //   var self = this;
-  //   var TBS;
-  //   var heatbeat_time_element = document.getElementById("heartbeat");
-  //   console.log("getLastHeartbeat for " + sender);
-  //   TimeBasedSwitch.deployed().then(function (instance) {
-  //     console.log("getLastHeartbeat resolved contract instance");
-  //     TBS = instance;
-  //     return TBS.getExpirationTime.call(sender);
-  //   }).then(function (value) {
-  //     console.log("resolved getExpirationTime " + value);
-  //     var lastHeartbeat = new Date((value * 1000) - 30);
-  //     console.log("last heartbeat date value" + lastHeartbeat);
-  //     heatbeat_time_element.innerHTML = lastHeartbeat.toString();;
-  //   }).catch(function (e) {
-  //     heatbeat_time_element.innerHTML = "Entry not found";
-  //     console.log("catch getExpirationTime");
-  //     console.log(e);
-  //     self.setStatus(e);
-  //   });
-  // },
-
   initWeb3: function () {
     if (window.ethereum) {
       App.web3Provider = window.ethereum;
@@ -776,6 +727,12 @@ window.App = {
       );
     }
     web3 = new Web3(App.web3Provider);
+
+    if (web3.version.network !== '42') {
+      alert('Please connect to the Kovan network');
+    }
+
+   TimeBasedSwitch = web3.eth.contract(abi).at(timeBaseSwitchAddress);
   },
 };
 

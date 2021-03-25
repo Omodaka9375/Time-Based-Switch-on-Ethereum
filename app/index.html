@@ -6,7 +6,8 @@
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <!-- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> -->
   <link href='https://fonts.googleapis.com/css?family=Poppins:wght@500&display=swap' rel='stylesheet' type='text/css'>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.0/slimselect.min.css" rel="stylesheet"></link>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.0/slimselect.min.css" rel="stylesheet">
+  </link>
   <script src="./app.js"></script>
 </head>
 
@@ -55,18 +56,17 @@
         </p>
       </div>
       <div class="create-switch-button-box">
-        <button onclick="App.showCreatePage()" class="button-primary"
-          style="font-weight: 600;">+
+        <button onclick="App.showCreatePage()" class="button-primary" style="font-weight: 600;">+
           Create switch</button>
       </div>
     </div>
     <div class="switch-tabs" id="myTabs">
-       <div class="tabs">
-          <a id="tablinks-mySwitches" class="tablinks-nav blue-undeline" onclick="App.openMySwitch()">My Switches</a>
-          <a id="tablinks-receivedSwitches" class="tablinks-nav" onclick="App.receivedSwitches()">Received Switches</a>
-       </div>
-       <div id="mySwitchData"></div>
-       <div id="myReceivedSwitchData"></div>
+      <div class="tabs">
+        <a id="tablinks-mySwitches" class="tablinks-nav blue-undeline" onclick="App.openMySwitch()">My Switches</a>
+        <a id="tablinks-receivedSwitches" class="tablinks-nav" onclick="App.receivedSwitches()">Received Switches</a>
+      </div>
+      <div id="mySwitchData"></div>
+      <div id="myReceivedSwitchData"></div>
     </div>
   </div>
   <div class="overview" id="swOverview">
@@ -87,7 +87,7 @@
       <div class="form-box">
         <div class="form-element-header">Switch name</div>
         <div class="form-element-subheader">Give your switch a name of your choice</div>
-        <input type="text" id="name" value=""/>
+        <input type="text" id="name" value="" />
         <div class="form-element-header">Timeout period</div>
         <div class="form-element-subheader">Set up period after which Switch can be executed</div>
         <div class="select-wrapper">
@@ -96,7 +96,7 @@
             <option name="months" value="months">Months</option>
             <option name="years" value="years">Years</option>
           </select>
-          <input type="number" class="only-positive" min="1" style="width: 42%" id="periodTime"/>
+          <input type="number" class="only-positive" min="1" style="width: 42%" id="periodTime" />
         </div>
         <div class="expire-date">Your timeout
           will expire on<span></span> at <span></span></div>
@@ -116,33 +116,33 @@
     </div>
     <div class="right-wrapper">
       <div class="add-new-asset">
-      <div id="asset" class="form-box">
-        <div class="form-element-header">Select asset</div>
-        <select name="token" id="selectToken" class="select-element-tokens" style="width: 100%;" disabled="true">
-          <option name="days" value="ETH">
+        <div id="asset" class="form-box">
+          <div class="form-element-header">Select asset</div>
+          <select name="token" id="selectToken" class="select-element-tokens" style="width: 100%;" disabled="true">
+            <option name="days" value="ETH">
               Ethereum(ETH)
-            </div>
+        </div>
+        </option>
+        <optgroup label="ERC20">
+          <option value="BNB">
+            Binance Coin (BNB)
           </option>
-          <optgroup label="ERC20">
-            <option value="BNB">
-              Binance Coin (BNB)
-            </option>
-            <option value="UNI">
-              Uniswap (UNI)
-            </option>
-            <option value="USDT">
-              Tether (USDT)
-            </option>
-          </optgroup>
-          <option name="years" value="ERC-721">ERC721</option>
+          <option value="UNI">
+            Uniswap (UNI)
+          </option>
+          <option value="USDT">
+            Tether (USDT)
+          </option>
+        </optgroup>
+        <option name="years" value="ERC-721">ERC721</option>
         </select>
         <div class="form-element-header">Amount</div>
         <div class="form-element-subheader">Set up the amount that will be locked
           and sent once the
           switch expires</div>
         <div style="display: flex; justify-content: space-between;">
-          <input type="number" class="only-positive" id="tokenAmount" style="width: 42%" min="0"/>
-          <input style="width: 42%" id="tokenAmountCash" disabled value=""/>
+          <input type="number" class="only-positive" id="tokenAmount" style="width: 42%" min="0" />
+          <input style="width: 42%" id="tokenAmountCash" disabled value="" />
         </div>
         <div class="options-wrapper">
           <label class="container">
@@ -166,10 +166,10 @@
           ETH</button> -->
       </div>
     </div>
-      <div class="new-asset-button" onclick="App.addAsset()">
-        <h5>+ Add new asset</h5>
-      </div>
+    <div class="new-asset-button" onclick="App.addAsset()">
+      <h5>+ Add new asset</h5>
     </div>
+  </div>
   </div>
 
   <div id="execution" class="central-wrapper">
@@ -187,19 +187,24 @@
         <div class="form-element-header">Recepient</div>
         <div class="form-element-subheader">Once the switch is executed, assets
           will be sent to the following wallet address</div>
-        <input type="text" id="contractAddress" placeholder="Paste contract address" value=""/>
+        <input type="text" id="contractAddress" placeholder="Paste recepient address" value="" />
         <div class="form-element-header">Executor</div>
         <div class="form-element-subheader">Please paste the executor wallet
           address</div>
-        <select name="token" class="select-element-tokens" id="autoManual" style="width: 100%;">
+        <select name="token" class="select-element-tokens" id="autoManual" style="width: 100%;"
+          onchange="App.onExecutorOptionChange()">
           <option name="auto" value="Automatically">
-              Automatically
+            Automatically
           </option>
           <option name="manu" value="Manually">
-              Manually
+            Manually
           </option>
         </select>
-        <input type="text" id="executorAddress" placeholder="Paste executor address" value="" />
+        <input type="text" id="executorAddress" placeholder="Paste executor address" value="" style="display: none;" />
+        <div id="chainlinkBot" class="notification-message-box" style="background-color: #f0f0f0; margin-bottom: 10px;">
+          <img class="wallet-image" style="margin-right: 0;" src="chainlink.png" />
+          <div class="notification-box">Chainlink Keeper bot</div>
+        </div>
         <div class="notification-message-box">
           <i class="fas fa-info"></i>
           <div class="notification-box">
