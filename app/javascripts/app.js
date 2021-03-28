@@ -170,7 +170,7 @@ window.App = {
     })
       .then((res) => res.json())
       .then((res) => {
-        const resSwitch = res.data.switch;
+        const resSwitch = res.data.switches;
         console.log("RES",resSwitch)
         resSwitch.map(el=> {
           this.createSwitchPage(el);
@@ -284,6 +284,7 @@ window.App = {
       .then((res) => res.json())
       .then((res) => {
         let resData = res.data.switches
+        console.log(resData)
         resData.map(el => {
           this.createReceivedSwitchesPage(el)
         })
@@ -655,8 +656,10 @@ window.App = {
     <div id="asset${idNew}" class="form-box new-asset">
     <div class="form-element-header">Select asset</div>
     <select name="tokenOther" id="selectToken${idNew}" class="select-element-tokens" style="width: 100%;" onchange="App.selectChange(${idNew})">
-
+  
     </select>
+    <div id="test${idNew}">
+    <div id="${idNew}">
     <div class="form-element-header">Amount</div>
     <div class="form-element-subheader">Set up the amount that will be locked
       and sent once the
@@ -683,23 +686,7 @@ window.App = {
         <span class="checkmark">100%</span>
       </label>
     </div>
-    <div class="asset-buttons">
-      <button class="approve-asset-button">Approve</button>
-      <button class="delete-assets-button" onClick="App.deleteAssets('asset${idNew}')">Delete</button>
-      </div>
-  </div>
-    `;
-  let erc721Content = `
-    <div id="asset${idNew}" class="form-box new-asset">
-    <div class="form-element-header">Select asset</div>
-    <select name="tokenOther" id="selectToken${idNew}" class="select-element-tokens" style="width: 100%;">
-
-    </select>
-    <div class="form-element-header">Address & ID</div>
-    <div class="form-element-subheader">Please provide contract addreess and ID of NFT tocken you want to lock</div>
-    <div>
-      <input name="conAddress" type="text" style="width: 94%" id="contractAddressNFT" value="" placeholder="Contract address"/>
-      <input name="nftIdName" type="text" style="width: 94%"  id="nftId"  value="" placeholder="NFT ID"/>
+    </div>
     </div>
     <div class="asset-buttons">
       <button class="approve-asset-button">Approve</button>
@@ -712,7 +699,6 @@ window.App = {
 
     const myNewAsset = document.createRange().createContextualFragment(addAsssetContent);
     target.appendChild(myNewAsset);
-    const nftAsset = document.createRange().createContextualFragment(erc721Content);
     new SlimSelect({
       select: document.querySelector(`#selectToken${idNew}`),
       data: [
@@ -724,31 +710,7 @@ window.App = {
         ]
       },
       {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/generic/200" /> <span class="tok">ERC721</span></span>', text: 'ERC721', value: 'ERC-721'}
-      ],
-      onChange: (info) => {
-        if(info.value == "ERC-721") {
-          App.deleteAssets(`asset${idNew}`)
-          target.appendChild(nftAsset) 
-          new SlimSelect({
-            select: document.querySelector(`#selectToken${idNew}`),
-            data: [
-             { label: 'ERC20',
-              options: [
-              {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/bnb/200" /> <span class="tok">Binance Coin (BNB)</span></span>', text: 'Binance Coin (BNB)', value: 'BNB'},
-              {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/generic/200" /> <span class="tok">Uniswap (UNI)</span></span>', text: 'Uniswap (UNI)', value: 'UNI'},
-              {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/usdt/200" /> <span class="tok">Tether (USDT)</span></span>', text: 'Tether (USDT)', value: 'USDT'}
-              ]
-             },
-              {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/generic/200" /> <span class="tok">ERC721</span></span>', text: 'ERC721', value: 'ERC-721', selected: true}
-            ],
-            onChange: (info) => {
-              App.deleteAssets(`asset${idNew}`)
-              App.addAsset(info.value)
-              //bug to be fixed
-            }
-          }) 
-        } 
-      }
+      ]
     });
   },
   inputTokenValue: function(id) {
@@ -763,6 +725,57 @@ window.App = {
   }, 
   selectChange: function(id, x) {
     let valSelect = document.getElementById("selectToken"+id).value;
+    let erc721Content = `
+    <div id="${id}">
+    <div class="form-element-header">Address & ID</div>
+    <div class="form-element-subheader">Please provide contract addreess and ID of NFT tocken you want to lock</div>
+    <div>
+      <input name="conAddress" type="text" style="width: 94%" id="contractAddressNFT" value="" placeholder="Contract address"/>
+      <input name="nftIdName" type="text" style="width: 94%"  id="nftId"  value="" placeholder="NFT ID"/>
+    </div>
+    </div>
+    `;
+    let ercTokenContent = `
+    <div id="${id}">
+    <div class="form-element-header">Amount</div>
+    <div class="form-element-subheader">Set up the amount that will be locked
+      and sent once the
+      switch expires</div>
+    <div style="display: flex; justify-content: space-between;">
+      <input name="otherToken" class="only-positive" type="number" style="width: 42%" id="tokenAmount${idNew}" min="0" onkeyup="App.inputTokenValue(${idNew})"/>
+      <input style="width: 42%" id="tokenAmountCash${idNew}" disabled value="0$"/>
+    </div>
+    <div class="options-wrapper">
+      <label class="container">
+        <input type="radio" id="queter" class="option" name="gender" value="25%">
+        <span class="checkmark">25%</span>
+      </label>
+      <label class="container">
+        <input type="radio" id="half" class="option" name="gender" value="50%">
+        <span class="checkmark">50%</span>
+      </label>
+      <label class="container">
+        <input type="radio" id="tree-queters" class="option" name="gender" value="75%">
+        <span class="checkmark">75%</span>
+      </label>
+      <label class="container">
+        <input type="radio" id="full" class="option" name="gender" value="100%">
+        <span class="checkmark">100%</span>
+      </label>
+    </div>
+    </div>
+    `
+    const testTarget = document.querySelector(`#test${id}`);
+    const nftAsset = document.createRange().createContextualFragment(erc721Content);
+    const ercToken = document.createRange().createContextualFragment(ercTokenContent);
+    if(valSelect == "ERC-721") {
+      document.getElementById(id).remove()
+      testTarget.appendChild(nftAsset)
+    } else {
+      document.getElementById(id).remove()
+      testTarget.appendChild(ercToken)
+    }
+
     if (valSelect == "BNB"){
       dolar_val = 1
     }else if(valSelect == "UNI") {
@@ -770,6 +783,7 @@ window.App = {
     } else if (valSelect == "USDT") {
       dolar_val = 3
     }
+
    },
   deleteAssets: function (id) {
     document.getElementById(id).remove();
