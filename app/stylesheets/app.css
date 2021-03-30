@@ -546,7 +546,7 @@ scrollbar-width: none;
 }
 .left-content-up {
   display: flex;
-  height: 50%;
+  /* height: 50%; */
 }
 .assets, .expires-in {
   height: 100%;
@@ -668,3 +668,52 @@ scrollbar-width: none;
 .tok {
 padding-left: 5px;
 }
+
+.radio-checkmark, .radio-checkmark-rec {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 14px;
+  width: 30px;
+  background-color: lightgray;
+  border-radius: 10%;
+  font-size: 12px;
+  text-align: center;
+  padding: 5px 0;
+  line-height: 16px;
+  font-weight: bold;
+}
+
+ input[class*="radio-option"], input[class*="radio-option-rec"]{
+  border: 1px solid #AAA;
+  border-radius: 5px;
+  height: auto;
+  padding-left: 5%;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
+.box, .box-rec  {
+  display: block;
+  position: relative;
+  padding-left: 30px;
+  cursor: pointer;
+  font-size: 22px;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.radio-option, .radio-option-rec {
+  opacity: 0;
+  cursor: pointer;
+}
+
+.active {
+  background-color: #00ffae !important;
+}
+.totalCoinsValueClass, .timeBold {
+  font-weight: bold;
+}
+

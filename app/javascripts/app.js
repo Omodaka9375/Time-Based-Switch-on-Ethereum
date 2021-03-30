@@ -4,7 +4,8 @@ import "../stylesheets/app.css";
 // Import libraries we need.
 import { default as Web3 } from "web3";
 import { default as contract } from "truffle-contract";
-import SlimSelect from 'slim-select'
+import SlimSelect from 'slim-select';
+import ercTokens from "../ercTokens";
 
 import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.json'
 // import TimeBasedSwitch_artifacts from "web3";
@@ -35,7 +36,7 @@ window.App = {
     new SlimSelect({
       select: '#selectToken',
       data: [
-        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/eth/200" /> <span class="tok">Ethereum(ETH)</span></span>', text: 'Ethereum(ETH)', value: 'eth'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880" /> <span class="tok">Ethereum(ETH)</span></span>', text: 'Ethereum(ETH)', value: 'eth'},
       ]
     });
     firstPerodInput = new SlimSelect({
@@ -233,7 +234,7 @@ window.App = {
       .then((res) => res.json())
       .then((res) => {
         let resData = res.data.switches
-        console.log(resData)
+        console.log("ben",resData)
         resData.map(el => {
           this.createReceivedSwitchesPage(el)
         })
@@ -393,20 +394,20 @@ window.App = {
     if(period == "days") {
       timeoutPeriod = periodTime 
     } else if (period == "months") {
-      console.log(periodTime)
+      // console.log(periodTime)
        const oneDay = 24 * 60 * 60 * 1000;
        const secondDate = new Date(new Date(Date.now()).setMonth(new Date(Date.now()).getMonth()+Number(periodTime)));
        const diffDays = Math.round(Math.abs((today - secondDate) / oneDay));
        timeoutPeriod = diffDays
-       console.log(today)
-       console.log(secondDate)
+      //  console.log(today)
+      //  console.log(secondDate)
     } else if (period == "years"){
        const oneDay = 24 * 60 * 60 * 1000;
        const secondDateOfYear = new Date(new Date(Date.now()).setMonth(new Date(Date.now()).getMonth()+Number(periodTime*12)));
        const diffDaysOfYear = Math.round(Math.abs((today - secondDateOfYear) / oneDay));
        timeoutPeriod = diffDaysOfYear
-       console.log(today)
-       console.log(secondDateOfYear)
+      //  console.log(today)
+      //  console.log(secondDateOfYear)
     }
 
     let otherTokens=[];
@@ -424,7 +425,7 @@ window.App = {
             return item !== value
         });
         tokenName.forEach((el, i) => {
-          var obj = {};
+          let obj = {};
           obj.tokenName = el;
           obj.tokenAmount = amount[i];
           otherTokens.push(obj);
@@ -470,26 +471,45 @@ window.App = {
     const expiresIn = new Date((_receivedSwitch.unlockTimestamp)*1000).toString().slice(3,15)
 
     const ethLocked = web3.fromWei(_receivedSwitch.ethersLocked);
-    console.log(ethLocked);
+    // console.log(ethLocked);
+    const name = web3.toAscii(_receivedSwitch.name)
+    let ethObj={amountLocked: ethLocked, symbol: "ETH" }
+    let tokens = _receivedSwitch.tokensLocked;
+    let tokensArray = [];
+    if(tokens.length > 0) {
+      tokens.map(item => {
+      let obj={}
+      ercTokens.tokens.map(el =>{
+        if(item.tokenAddress == el.address) {
+          obj.amountLocked = item.amountLocked;
+          obj.symbol= el.symbol
+          tokensArray.push(obj)
+          console.log(tokensArray)
+        }
+      })
+    })
+  }
+    tokensArray.unshift(ethObj)
+    console.log("rrr",tokensArray)
 
     let receivedSwitchDiv = `
     <div class="received-switch">
-      <h1 class="title">${_receivedSwitch.name}</h1>
+      <h1 class="title">${name}</h1>
       <div class="content">
         <div class="upper-content">
-          <div class="received-assets">
+          <div class="received-assets" style="display:flex; flex-direction:column;">
             <p>ASSETS</p>
-            <span></span>
-            <span>${ethLocked}</span>
-            <span></span>
+            <div id="checkTokensRec${_receivedSwitch.id}" style="display:flex; flex-direction:row;"></div>
+            <span id="tokenValueRec${Number(_receivedSwitch.id)}">${ethLocked} ETH</span>
+            <span id="valueInUsdRec${Number(_receivedSwitch.id)}">${(ethLocked * dolar_val_eth).toFixed(2)} $</span>
           </div>
-          <div class="received-total-value">
+          <div class="received-total-value" >
             <p>TOTAL VALUE</p>
-            <span>${ethLocked}$</span>
+            <span id="totalCoinsValue${_receivedSwitch.id}" class="totalCoinsValueClass">${(ethLocked * dolar_val_eth).toFixed(2)} $</span>
           </div>
-          <div class="received-expires-in">
+          <div class="received-expires-in" style="display:flex; flex-direction:column;">
             <p>EXPIRES IN</p>
-            <span></span>
+            <span id="timeLeftRec${_receivedSwitch.id}" class="timeBold"></span>
             <span>${expiresIn}</span>
           </div>
         </div>
@@ -511,37 +531,104 @@ window.App = {
     `;
     const myReceivedSwitch = document.createRange().createContextualFragment(receivedSwitchDiv);
     myReceivedSwitchData.appendChild(myReceivedSwitch);
+
+    let checkboxOutput="";
+    tokensArray.map((item, index) => {
+      checkboxOutput +=`<label class="box-rec" ><input type="radio" onclick="App.checkValueRec(this,${item.symbol},${_receivedSwitch.id})" id=${item.symbol} class="radio-option-rec" name="${item.symbol}" value="${item.amountLocked}"><span class="radio-checkmark-rec" id="${index}" onclick="App.changeClassRec(${index})">${item.symbol}</span></label>`;
+      document.getElementById(`checkTokensRec${_receivedSwitch.id}`).innerHTML=checkboxOutput;
+    })
+    document.querySelectorAll(".radio-checkmark-rec")[0].classList.add("active");
+    let totalCoinsAmount;
+    tokensArray.map(el => {
+      tokensData.map(item => {
+        if (el.symbol == item.symbol.toUpperCase()){
+          totalCoinsAmount = el.amountLocked * item.price;
+        }
+      })
+    })
+    document.getElementById(`totalCoinsValue${_receivedSwitch.id}`).innerHTML= totalCoinsAmount.toFixed(2)+" $"
+
+    const date1 = new Date(Date.now());
+    const date2 = new Date((_receivedSwitch.unlockTimestamp*1000));
+    const diffTime = date2 - date1;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+    if(diffDays < 0) {
+      document.getElementById(`timeLeftRec${_receivedSwitch.id}`).innerHTML= "0 days"
+    } else {
+      document.getElementById(`timeLeftRec${_receivedSwitch.id}`).innerHTML= diffDays + " days"
+    }
   },
+// helper func
+checkValueRec:function(target, id, recSwitchID) {
+  tokensData.map(item => {
+    if (id.name == item.symbol.toUpperCase()){
+        dolar_val = item.price;
+        let inDolars = dolar_val * target.value
+        document.getElementById("tokenValue"+recSwitchID).innerHTML= target.value +" "+id.name
+        document.getElementById("valueInUsd"+recSwitchID).innerHTML= inDolars.toFixed(2)+" $"
+  }
+})
+ console.log(target.value, id.name, recSwitchID);
+},
+changeClassRec: function(id) {
+let elem = document.querySelectorAll(".radio-checkmark-rec")
+elem.forEach(el => {
+  el.classList.remove("active");
+})
+document.getElementById(id).classList.add("active");
+},
+
   createSwitchPage: function(_switch) {
     const mySwitchData = document.getElementById("mySwitchData");
+    const expiresIn = new Date((_switch.unlockTimestamp)*1000).toString().slice(3,15)
 
     // // ethLocked value is in WEI and needs to be converted to ETH
     const ethLocked = web3.fromWei(_switch.ethersLocked);
-    console.log(ethLocked);
-
-    const expiresIn = new Date((_switch.unlockTimestamp)*1000).toString().slice(3,15)
+    // console.log(ethLocked);
+    let ethObj={amountLocked: ethLocked, symbol: "ETH" }
+    const name = web3.toAscii(_switch.name)
+    let tokens = _switch.tokensLocked;
+    let tokensArray = [];
+    // console.log("yyy",tokens)
+    if(tokens.length > 0) {
+      tokens.map(item => {
+      let obj={}
+      ercTokens.tokens.map(el =>{
+        if(item.tokenAddress == el.address) {
+          obj.amountLocked = item.amountLocked;
+          obj.symbol= el.symbol
+          tokensArray.push(obj)
+          // console.log(tokensArray)
+        }
+      })
+    })
+  }
+    tokensArray.unshift(ethObj)
+    // console.log(tokensArray)
+    
 
     let switchDiv = `
     <div class="switch">
-    <h1 class="title">${_switch.name}</h1>
+    <h1 class="title">${name}</h1>
     <div class="content">
       <div class="left-content">
         <div class="left-content-up">
           <div class="assets" style="display:flex; flex-direction:column;">
             <p>ASSETS</p>
-            <span></span>
-            <span>${ethLocked}ETH</span>
-            <span>${ethLocked}$</span>
+            <div id="checkTokens${_switch.id}" style="display:flex; flex-direction:row;"></div>
+            <span id="tokenValue${Number(_switch.id)}">${ethLocked} ETH</span>
+            <span id="valueInUsd${Number(_switch.id)}">${(ethLocked * dolar_val_eth).toFixed(2)} $</span>
           </div>
-          <div class="expires-in">
+          <div class="expires-in" style="display:flex; flex-direction:column;">
             <p>EXPIRES IN</p>
-            <span></span>
+            <span id="timeLeft${_switch.id}" class="timeBold"></span>
             <span>${expiresIn}</span>
           </div>
         </div>
         <div class="total-value">
           <p>TOTAL VALUE</p>
-          <span></span>
+          <span id="totalCoinsValue${_switch.id}" class="totalCoinsValueClass"></span>
         </div>
       </div>
       <div class="right-content">
@@ -579,8 +666,55 @@ window.App = {
     `;
     const mySwitch = document.createRange().createContextualFragment(switchDiv);
     mySwitchData.appendChild(mySwitch);
+
+    let checkboxOutput="";
+    tokensArray.map((item, index) => {
+      checkboxOutput +=`<label class="box" ><input type="radio" onclick="App.checkValue(this,${item.symbol},${_switch.id})" id=${item.symbol} class="radio-option" name="${item.symbol}" value="${item.amountLocked}"><span class="radio-checkmark" id="${index}" onclick="App.changeClass(${index})">${item.symbol}</span></label>`;
+      document.getElementById(`checkTokens${_switch.id}`).innerHTML=checkboxOutput;
+    })
+    document.querySelectorAll(".radio-checkmark")[0].classList.add("active");
+    let totalCoinsAmount;
+    tokensArray.map(el => {
+      tokensData.map(item => {
+        if (el.symbol == item.symbol.toUpperCase()){
+          totalCoinsAmount = el.amountLocked * item.price;
+        }
+      })
+    })
+    document.getElementById(`totalCoinsValue${_switch.id}`).innerHTML= totalCoinsAmount.toFixed(2)+" $"
+
+    const date1 = new Date(Date.now());
+    const date2 = new Date((_switch.unlockTimestamp*1000));
+    const diffTime = date2 - date1;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+    if(diffDays < 0) {
+      document.getElementById(`timeLeft${_switch.id}`).innerHTML= "0 days"
+    } else {
+      document.getElementById(`timeLeft${_switch.id}`).innerHTML= diffDays + " days"
+    }
+  
   },
   //helper functions
+  checkValue:function(target, id, switchID) {
+    tokensData.map(item => {
+      if (id.name == item.symbol.toUpperCase()){
+          dolar_val = item.price;
+          let inDolars = dolar_val * target.value
+          document.getElementById("tokenValue"+switchID).innerHTML= target.value +" "+id.name
+          document.getElementById("valueInUsd"+switchID).innerHTML= inDolars.toFixed(2)+" $"
+    }
+  })
+   console.log(target.value, id.name, switchID);
+  },
+ changeClass: function(id) {
+  let elem = document.querySelectorAll(".radio-checkmark")
+  elem.forEach(el => {
+    el.classList.remove("active");
+  })
+  document.getElementById(id).classList.add("active");
+ },
+ 
   openMySwitch: function() {
     let mySwitch = document.getElementById("tablinks-mySwitches");
     let receivedSwitch = document.getElementById("tablinks-receivedSwitches");
