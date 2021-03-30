@@ -11,15 +11,17 @@ import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.jso
 var TimeBasedSwitch = contract(TimeBasedSwitch_artifacts);
 
 var accounts;
+let firstPerodInput;
+let autoManualFirst;
 let account;
 let idNew = 0;
-let dolarValues;//test
+let tokensData;//test
 let dolar_val;//test
-let dolar_val_eth=5;//test
+let dolar_val_eth;//test
 const keeperRegistry = `0xAaaD7966EBE0663b8C9C6f683FB9c3e66E03467F`;
 
 
-const dolarTokensValue = "http://api.coinlayer.com/api/live?access_key=579aba3dd8d9e499cc182b964bc311cc";//not functional api
+const dolarTokensValue = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum%2C%20binancecoin%2C%20uniswap%2C%20chainlink%2C%20aave%2C%20tether%2C%20dai%2C%20usd-coin%2C%20havven%2C%20sushi%2C%20enjincoin%2C%20celsius-degree-token%2C%20maker%2C%20compound-coin%2C%20matic-network%2C%20uma%2C%200x&order=market_cap_desc&per_page=100&page=1&sparkline=false";//not functional api
 const graphqlUri =
   "https://api.thegraph.com/subgraphs/name/andrejrakic/time-based-switch";
 
@@ -33,34 +35,36 @@ window.App = {
     new SlimSelect({
       select: '#selectToken',
       data: [
-        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/eth/200" /> <span class="tok">Ethereum(ETH)</span></span>', text: 'Ethereum(ETH)', value: 'ETH'},
-       { label: 'ERC20',
-        options: [
-        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/bnb/200" /> <span class="tok">Binance Coin (BNB)</span></span>', text: 'Binance Coin (BNB)', value: 'BNB'},
-        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/generic/200" /> <span class="tok">Uniswap (UNI)</span></span>', text: 'Uniswap (UNI)', value: 'UNI'},
-        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/usdt/200" /> <span class="tok">Tether (USDT)</span></span>', text: 'Tether (USDT)', value: 'USDT'}
-        ]
-      },
-      {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/generic/200" /> <span class="tok">ERC721</span></span>', text: 'ERC721', value: 'ERC-721'}
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/eth/200" /> <span class="tok">Ethereum(ETH)</span></span>', text: 'Ethereum(ETH)', value: 'eth'},
       ]
     });
-    new SlimSelect({
+    firstPerodInput = new SlimSelect({
       select: '#period',
       showSearch: false,
     });
-    new SlimSelect({
+    
+    autoManualFirst = new SlimSelect({
       select: '#autoManual',
       showSearch: false,
     });
   },
 
-  //not usable--api non functional
   getDolarValueOfTokens: async function() {
     await fetch(dolarTokensValue)
     .then((response) => response.json())
     .then((response) => {
-     dolarValues = response.rates;
-      console.log('success!', dolarValues);
+     dolar_val_eth = response[0].current_price;
+     dolar_val = response[1].current_price;
+     tokensData = response.map(item =>  {
+        return {
+          id: item.id,
+          name: item.name,
+          symbol: item.symbol,
+          price: item.current_price,
+          image: item.image
+        }
+     });
+      // console.log('success!', tokensData);
     }).catch((err) =>{
       console.warn('Something went wrong.', err)
     });  
@@ -319,6 +323,12 @@ window.App = {
       document.getElementById("nftId").disabled = true;
     }
     document.getElementById("assetButton").style.pointerEvents="none";
+    if (document.querySelectorAll(".delete-assets-button")) {
+     let deleteAssetButons = document.querySelectorAll(".delete-assets-button");
+     deleteAssetButons.forEach(el => {
+      el.style.pointerEvents="none"
+    })
+    }
     const executionDiv = document.getElementById('execution');
     executionDiv.classList.add("temporary-padding")
     executionDiv.style.display = "flex";
@@ -423,7 +433,34 @@ window.App = {
     console.log(otherTokens)
     console.log("switchName:",switchName,"period:",period,"periodTime:",periodTime,"selectTokenETH:",selectTokenETH,"tokenAmountETH:",tokenAmountETH,"contractAddress:",contractAddress,"executorAddress:",executorAddress,"contractAddressNFT:",contractAddressNFT,"NFTID:",NFTID, "timeoutPeriod", timeoutPeriod )
   },
-
+  timeExecutionLeft: function () {
+    let period = document.querySelector("#period").value; 
+    let periodTime = document.getElementById("periodTime").value;
+    let date;
+    function addMonths(date, months) {
+      date.setMonth(date.getMonth() + months);
+      return date;
+    }
+    if (period == "days") {
+     date = new Date(Date.now() + periodTime * 24 * 60 * 60 * 1000)
+     document.getElementById("date").innerHTML= date.toString().slice(3,15)
+     document.getElementById("time").innerHTML= date.toString().slice(16,21)
+    } else if (period == "months") {
+      date = addMonths(new Date(), Number(periodTime))
+      document.getElementById("date").innerHTML= date.toString().slice(3,15)
+      document.getElementById("time").innerHTML= date.toString().slice(16,21)
+    } else if (period == "years") {
+      date = new Date(new Date().setFullYear(new Date().getFullYear() + Number(periodTime)))
+      document.getElementById("date").innerHTML= date.toString().slice(3,15)
+      document.getElementById("time").innerHTML= date.toString().slice(16,21)
+    }
+  },
+  changePeriod: function() {
+      let date = new Date(Date.now());
+      document.getElementById("periodTime").value = ""
+      document.getElementById("date").innerHTML= date.toString().slice(3,15)
+      document.getElementById("time").innerHTML= date.toString().slice(16,21)
+  },
   openExternalWebsite: function (uri) {
     window.open(uri);
   },
@@ -572,6 +609,10 @@ window.App = {
     assetsFooter.style.display = "none";
     const assestsDiv = document.getElementById('assets');
     assestsDiv.style.display = "none";
+    let date = new Date(Date.now());
+      document.getElementById("periodTime").value = ""
+      document.getElementById("date").innerHTML= date.toString().slice(3,15)
+      document.getElementById("time").innerHTML= date.toString().slice(16,21)
   },
 
   reset: function () {
@@ -585,10 +626,30 @@ window.App = {
     assestsDiv.style.display = "none";
     const executionDiv = document.getElementById('execution');
     executionDiv.style.display = "none";
+    document.getElementById("name").value = "";
+    firstPerodInput.destroy();
+    firstPerodInput = new SlimSelect({
+      select: '#period',
+      showSearch: false,
+    })
+    firstPerodInput.set("days");
+
+    document.getElementById("periodTime").value = "";
     const removeElements = (element) => element.forEach(el => el.remove());
     removeElements( document.querySelectorAll(".new-asset"));
     const changeClass = (element) => element.forEach(el => el.classList.remove("overview-wrapper"));
-    changeClass( document.querySelectorAll(".central-wrapper"))
+    changeClass( document.querySelectorAll(".central-wrapper"));
+    document.getElementById("tokenAmount").value = "";
+    document.getElementById("tokenAmountCash").value = "0.00$";
+    document.getElementById("contractAddress").value = "";
+    autoManualFirst.destroy();
+    autoManualFirst = new SlimSelect({
+      select: "#autoManual",
+      showSearch: false,
+    });
+    autoManualFirst.set("Automatically");
+    document.getElementById("executorAddress").value = "";
+    
   },
 
   showAssetsPage: function() {
@@ -642,6 +703,12 @@ window.App = {
       document.getElementById("nftId").disabled = false;
     }
     document.getElementById("assetButton").style.pointerEvents="auto";
+    if (document.querySelectorAll(".delete-assets-button")) {
+     let deleteAssetButons = document.querySelectorAll(".delete-assets-button");
+     deleteAssetButons.forEach(el => {
+      el.style.pointerEvents="auto"
+    })
+    }
     document.getElementById("contractAddress").disabled = false;
     document.getElementById("autoManual").disabled = false;
     document.getElementById("executorAddress").disabled = false;
@@ -650,8 +717,6 @@ window.App = {
 
   addAsset: function (prop) {
     idNew = ++idNew;
-    dolar_val = 1;
-    
     let addAsssetContent = `
     <div id="asset${idNew}" class="form-box new-asset">
     <div class="form-element-header">Select asset</div>
@@ -666,7 +731,7 @@ window.App = {
       switch expires</div>
     <div style="display: flex; justify-content: space-between;">
       <input name="otherToken" class="only-positive" type="number" style="width: 42%" id="tokenAmount${idNew}" min="0" onkeyup="App.inputTokenValue(${idNew})"/>
-      <input style="width: 42%" id="tokenAmountCash${idNew}" disabled value="0$"/>
+      <input style="width: 42%" id="tokenAmountCash${idNew}" disabled value="0.00$"/>
     </div>
     <div class="options-wrapper">
       <label class="container">
@@ -704,24 +769,37 @@ window.App = {
       data: [
        { label: 'ERC20',
         options: [
-        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/bnb/200" /> <span class="tok">Binance Coin (BNB)</span></span>', text: 'Binance Coin (BNB)', value: 'BNB'},
-        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/generic/200" /> <span class="tok">Uniswap (UNI)</span></span>', text: 'Uniswap (UNI)', value: 'UNI'},
-        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/usdt/200" /> <span class="tok">Tether (USDT)</span></span>', text: 'Tether (USDT)', value: 'USDT'}
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/825/large/binance-coin-logo.png?1547034615" /> <span class="tok">Binance Coin (BNB)</span></span>', text: 'Binance Coin (BNB)', value: 'bnb'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/12504/large/uniswap-uni.png?1600306604" /> <span class="tok">Uniswap (UNI)</span></span>', text: 'Uniswap (UNI)', value: 'uni'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707" /> <span class="tok">Tether (USDT)</span></span>', text: 'Tether (USDT)', value: 'usdt'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389" /> <span class="tok">USD Coin (USDC)</span></span>', text: 'USD Coin (USDC)', value: 'usdc'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/12645/large/AAVE.png?1601374110" /> <span class="tok">Aave (AAVE)</span></span>', text: 'Aave (AAVE)', value: 'aave'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/9956/large/dai-multi-collateral-mcd.png?1574218774" /> <span class="tok">Dai Stablecoin (DAI)</span></span>', text: 'Dai Stablecoin (DAI)', value: 'dai'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/3406/large/SNX.png?1598631139" /> <span class="tok">Synthetix Network Token (SNX)</span></span>', text: 'Synthetix Network Token (SNX)', value: 'snx'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/1102/large/enjin-coin-logo.png?1547035078" /> <span class="tok">Enjin Coin (ENJ)</span></span>', text: 'Enjin Coin (ENJ)', value: 'enj'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/12271/large/512x512_Logo_no_chop.png?1606986688" /> <span class="tok">Sushi Token (SUSHI)</span></span>', text: 'Sushi Token (SUSHI)', value: 'sushi'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/4713/large/matic___polygon.jpg?1612939050" /> <span class="tok">Polygon (MATIC)</span></span>', text: 'Polygon (MATIC)', value: 'matic'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/1364/large/Mark_Maker.png?1585191826" /> <span class="tok">Maker (MKR)</span></span>', text: 'Maker (MKR)', value: 'mkr'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/3263/large/CEL_logo.png?1609598753" /> <span class="tok">Celsius Network (CEL)</span></span>', text: 'Celsius Network (CEL)', value: 'cel'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/10951/large/UMA.png?1586307916" /> <span class="tok">UMA Token (UMA)</span></span>', text: 'UMA Token (UMA)', value: 'uma'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/863/large/0x.png?1547034672" /> <span class="tok">0x Protocol Token (ZRX)</span></span>', text: '0x Protocol Token (ZRX)', value: 'zrx'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/3570/large/cropped-compoundcoin.png?1547038419" /> <span class="tok">Compound Coin (COMP)</span></span>', text: 'Compound Coin (COMP)', value: 'comp'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png?1547034700" /> <span class="tok">ChainLink (LINK)</span></span>', text: 'ChainLink (LINK)', value: 'link'}
         ]
       },
-      {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://cryptoicons.org/api/icon/generic/200" /> <span class="tok">ERC721</span></span>', text: 'ERC721', value: 'ERC-721'}
+      {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="../app/assets/NFT_Icon.png" /> <span class="tok">NFT (ERC-721)</span></span>', text: 'ERC-721', value: 'ERC-721'}
       ]
     });
   },
   inputTokenValue: function(id) {
     let dolarVal = dolar_val
     let valInput = document.getElementById("tokenAmount"+id).value;
-    document.getElementById("tokenAmountCash"+id).value = valInput*dolarVal+" $";
+    document.getElementById("tokenAmountCash"+id).value = (Number(valInput*dolarVal)).toFixed(2)+" $";
    },
   inputETHValue: function() {
     let dolarVal = dolar_val_eth
     let valInput = document.getElementById("tokenAmount").value;
-    document.getElementById("tokenAmountCash").value = valInput*dolarVal+" $";
+    document.getElementById("tokenAmountCash").value = (Number(valInput*dolarVal)).toFixed(2)+" $";
   }, 
   selectChange: function(id, x) {
     let valSelect = document.getElementById("selectToken"+id).value;
@@ -775,16 +853,12 @@ window.App = {
       document.getElementById(id).remove()
       testTarget.appendChild(ercToken)
     }
-
-    if (valSelect == "BNB"){
-      dolar_val = 1
-    }else if(valSelect == "UNI") {
-      dolar_val = 2
-    } else if (valSelect == "USDT") {
-      dolar_val = 3
+    tokensData.map(item => {
+      if (valSelect == item.symbol){
+       return  dolar_val = item.price
     }
-
-   },
+    })
+  },
   deleteAssets: function (id) {
     document.getElementById(id).remove();
   },

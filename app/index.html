@@ -95,15 +95,15 @@
         <div class="form-element-header">Timeout period</div>
         <div class="form-element-subheader">Set up period after which Switch can be executed</div>
         <div class="select-wrapper">
-          <select name="timestamp" class="select-element-tokens" id="period" value="days" >
+          <select name="timestamp" class="select-element-tokens" id="period" value="days" onchange="App.changePeriod()">
             <option name="days" value="days">Days</option>
             <option name="months" value="months">Months</option>
             <option name="years" value="years">Years</option>
           </select>
-          <input type="number" class="only-positive" min="1" style="width: 42%" id="periodTime"/>
+          <input type="number" class="only-positive" min="1" style="width: 42%" id="periodTime" onkeyup="App.timeExecutionLeft()"/>
         </div>
         <div class="expire-date">Your timeout
-          will expire on<span></span> at <span></span></div>
+          will expire on <span id="date"></span> at <span id="time"></span></div>
       </div>
     </div>
   </div>
@@ -131,7 +131,7 @@
           switch expires</div>
         <div style="display: flex; justify-content: space-between;">
           <input type="number" class="only-positive" id="tokenAmount" style="width: 42%" min="0" onkeyup="App.inputETHValue()"/>
-          <input style="width: 42%" id="tokenAmountCash" disabled value="0$"/>
+          <input style="width: 42%" id="tokenAmountCash" disabled value="0.00$"/>
         </div>
         <div class="options-wrapper">
           <label class="container">
