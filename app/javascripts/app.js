@@ -7,8 +7,8 @@ import { default as contract } from "truffle-contract";
 import SlimSelect from 'slim-select';
 import ercTokens from "../ercTokens";
 
-import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.json'
-// import TimeBasedSwitch_artifacts from "web3";
+// import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.json'
+import TimeBasedSwitch_artifacts from "web3";
 var TimeBasedSwitch = contract(TimeBasedSwitch_artifacts);
 
 var accounts;
@@ -109,26 +109,26 @@ window.App = {
   },
 
   fetchMySwitches: function (_account) {
-    const SWITCHES = `{
-      switch(id: "${_account}") {
-        id
-        name
-        executor
-        benefitor
-        unlockTimestamp
-        isExecuted
-        ethersLocked
-        tokensLocked {
-          id
-          amountLocked
-        }
-        collectiblesLocked {
-          id
-          collectibleId
-          benefitor
-        }
-      }
-    }`
+    // const SWITCHES = `{
+    //   switch(id: "${_account}") {
+    //     id
+    //     name
+    //     executor
+    //     benefitor
+    //     unlockTimestamp
+    //     isExecuted
+    //     ethersLocked
+    //     tokensLocked {
+    //       id
+    //       amountLocked
+    //     }
+    //     collectiblesLocked {
+    //       id
+    //       collectibleId
+    //       benefitor
+    //     }
+    //   }
+    // }`
     // const SWITCHES = `{
     //   switch(id: "0x80da8831a594327cd9e79e648402cc7c1863aafa") {
     //     id
@@ -149,25 +149,25 @@ window.App = {
     //     }
     //   }
     // }`;
-  //   const SWITCHES =`{switches(where: {id: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
-  //     id
-  //     name
-  //     unlockTimestamp
-  //     benefitor
-  //     executor
-  //     isExecuted
-  //     ethersLocked
-  //     tokensLocked {
-  //       tokenAddress
-  //       amountLocked
-  //     }
-  //     collectiblesLocked {
-  //       id
-  //       collectibleId
-  //       benefitor
-  //     }
-  //   }
-  // }`
+    const SWITCHES =`{switches(where: {id: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
+      id
+      name
+      unlockTimestamp
+      benefitor
+      executor
+      isExecuted
+      ethersLocked
+      tokensLocked {
+        tokenAddress
+        amountLocked
+      }
+      collectiblesLocked {
+        id
+        collectibleId
+        benefitor
+      }
+    }
+  }`
     fetch(graphqlUri, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -185,28 +185,8 @@ window.App = {
   },
 
   fetchReceivedSwitches: function (_account) {
-    const BENEFITOR_SWITCHES = `{
-      switches(where: {benefitor: "${_account}"}) {
-        id
-        name
-        unlockTimestamp
-        benefitor
-        executor
-        isExecuted
-        ethersLocked
-        tokensLocked {
-          id
-          amountLocked
-        }
-        collectiblesLocked {
-          id
-          collectibleId
-          benefitor
-        }
-      }
-    }`;
     // const BENEFITOR_SWITCHES = `{
-    //   switches(where: {benefitor: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
+    //   switches(where: {benefitor: "${_account}"}) {
     //     id
     //     name
     //     unlockTimestamp
@@ -225,24 +205,8 @@ window.App = {
     //     }
     //   }
     // }`;
-
-    fetch(graphqlUri, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: BENEFITOR_SWITCHES }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        let resData = res.data.switches
-        console.log("ben",resData)
-        resData.map(el => {
-          this.createReceivedSwitchesPage(el)
-        })
-        
-      }); 
-
-    const EXECUTOR_SWITCHES = `{
-      switches(where: {executor: "${_account}"}) {
+    const BENEFITOR_SWITCHES = `{
+      switches(where: {benefitor: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
         id
         name
         unlockTimestamp
@@ -260,7 +224,43 @@ window.App = {
           benefitor
         }
       }
-    }`
+    }`;
+
+    fetch(graphqlUri, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: BENEFITOR_SWITCHES }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let resData = res.data.switches
+        console.log("ben",resData)
+        resData.map(el => {
+          this.createReceivedSwitchesPage(el)
+        })
+        
+      }); 
+
+    //const EXECUTOR_SWITCHES = `{
+    //   switches(where: {executor: "${_account}"}) {
+    //     id
+    //     name
+    //     unlockTimestamp
+    //     benefitor
+    //     executor
+    //     isExecuted
+    //     ethersLocked
+    //     tokensLocked {
+    //       id
+    //       amountLocked
+    //     }
+    //     collectiblesLocked {
+    //       id
+    //       collectibleId
+    //       benefitor
+    //     }
+    //   }
+    // }`
     // const EXECUTOR_SWITCHES = `{
     //   switches(where: {executor: "0xaaad7966ebe0663b8c9c6f683fb9c3e66e03467f"}) {
     //     id
@@ -281,19 +281,19 @@ window.App = {
     //     }
     //   }
     // }`;
-    fetch(graphqlUri, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: EXECUTOR_SWITCHES }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        let resData = res.data.switches
-        console.log(resData)
-        resData.map(el => {
-          this.createReceivedSwitchesPage(el)
-        })
-      }); 
+    // fetch(graphqlUri, {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ query: EXECUTOR_SWITCHES }),
+    // })
+    //   .then((res) => res.json())
+    //   .then((res) => {
+    //     let resData = res.data.switches
+    //     console.log(resData)
+    //     resData.map(el => {
+    //       this.createReceivedSwitchesPage(el)
+    //     })
+    //   }); 
   },
 
   switchOverview: function() {
@@ -534,7 +534,7 @@ window.App = {
 
     let checkboxOutput="";
     tokensArray.map((item, index) => {
-      checkboxOutput +=`<label class="box-rec" ><input type="radio" onclick="App.checkValueRec(this,${item.symbol},${_receivedSwitch.id})" id=${item.symbol} class="radio-option-rec" name="${item.symbol}" value="${item.amountLocked}"><span class="radio-checkmark-rec" id="${index}" onclick="App.changeClassRec(${index})">${item.symbol}</span></label>`;
+      checkboxOutput +=`<label class="box-rec" ><input type="radio" onclick="App.checkValueRec(this,${item.symbol+_receivedSwitch.id},${_receivedSwitch.id})" id=${item.symbol+_receivedSwitch.id} class="radio-option-rec" name="${item.symbol}" value="${item.amountLocked}"><span class="radio-checkmark-rec" id="${index}" onclick="App.changeClassRec(${index})">${item.symbol}</span></label>`;
       document.getElementById(`checkTokensRec${_receivedSwitch.id}`).innerHTML=checkboxOutput;
     })
     document.querySelectorAll(".radio-checkmark-rec")[0].classList.add("active");
@@ -565,8 +565,8 @@ checkValueRec:function(target, id, recSwitchID) {
     if (id.name == item.symbol.toUpperCase()){
         dolar_val = item.price;
         let inDolars = dolar_val * target.value
-        document.getElementById("tokenValue"+recSwitchID).innerHTML= target.value +" "+id.name
-        document.getElementById("valueInUsd"+recSwitchID).innerHTML= inDolars.toFixed(2)+" $"
+        document.getElementById("tokenValueRec"+recSwitchID).innerHTML= target.value +" "+id.name;
+        document.getElementById("valueInUsdRec"+recSwitchID).innerHTML= inDolars.toFixed(2)+" $";
   }
 })
  console.log(target.value, id.name, recSwitchID);
@@ -605,7 +605,7 @@ document.getElementById(id).classList.add("active");
     })
   }
     tokensArray.unshift(ethObj)
-    // console.log(tokensArray)
+    console.log("arr",tokensArray)
     
 
     let switchDiv = `
@@ -669,7 +669,7 @@ document.getElementById(id).classList.add("active");
 
     let checkboxOutput="";
     tokensArray.map((item, index) => {
-      checkboxOutput +=`<label class="box" ><input type="radio" onclick="App.checkValue(this,${item.symbol},${_switch.id})" id=${item.symbol} class="radio-option" name="${item.symbol}" value="${item.amountLocked}"><span class="radio-checkmark" id="${index}" onclick="App.changeClass(${index})">${item.symbol}</span></label>`;
+      checkboxOutput +=`<label class="box" ><input type="radio" onclick="App.checkValue(this,${item.symbol+_switch.id},${_switch.id})" id=${item.symbol+_switch.id} class="radio-option" name="${item.symbol}" value="${item.amountLocked}"><span class="radio-checkmark" id="${index}" onclick="App.changeClass(${index})">${item.symbol}</span></label>`;
       document.getElementById(`checkTokens${_switch.id}`).innerHTML=checkboxOutput;
     })
     document.querySelectorAll(".radio-checkmark")[0].classList.add("active");
