@@ -7,8 +7,8 @@ import { default as contract } from "truffle-contract";
 import SlimSelect from 'slim-select';
 import ercTokens from "../ercTokens";
 
-// import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.json'
-import TimeBasedSwitch_artifacts from "web3";
+import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.json'
+// import TimeBasedSwitch_artifacts from "web3";
 var TimeBasedSwitch = contract(TimeBasedSwitch_artifacts);
 
 var accounts;
@@ -16,9 +16,13 @@ let firstPerodInput;
 let autoManualFirst;
 let account;
 let idNew = 0;
-let tokensData;//test
-let dolar_val;//test
-let dolar_val_eth;//test
+let tokensData;
+let dolar_val;
+let dolar_val_eth;
+let editSwitchId;
+let editSwitchName; 
+let editSwitchBenefitor;
+let editSwitchExecutor;
 const keeperRegistry = `0xAaaD7966EBE0663b8C9C6f683FB9c3e66E03467F`;
 
 
@@ -48,6 +52,34 @@ window.App = {
       select: '#autoManual',
       showSearch: false,
     });
+    let periodTime = document.getElementById('periodTime');
+    periodTime.onkeydown = function(e) {
+        if(!((e.keyCode > 95 && e.keyCode < 106)
+          || (e.keyCode > 47 && e.keyCode < 58) 
+          || e.keyCode == 8)) {
+            return false;
+        }
+    }
+    let tokenAmount = document.getElementById('tokenAmount');
+    tokenAmount.onkeydown = function(e) {
+        if(!((e.keyCode > 95 && e.keyCode < 106)
+          || (e.keyCode > 47 && e.keyCode < 58) 
+          || e.keyCode == 8 || e.keyCode == 110)) {
+            return false;
+        }
+    }
+    const burger = document.querySelector('.burger i');
+    const nav = document.querySelector('.nav');
+    // Defining a function
+    function toggleNav() {
+        burger.classList.toggle('fa-bars');
+        burger.classList.toggle('fa-times');
+        nav.classList.toggle('nav-active');
+    }
+    // Calling the function after click event occurs
+    burger.addEventListener('click', function() {
+        toggleNav();
+    });
   },
 
   getDolarValueOfTokens: async function() {
@@ -70,7 +102,6 @@ window.App = {
       console.warn('Something went wrong.', err)
     });  
   },
-  //
 
   connectMetamask: function () {
     // Get the initial account balance so it can be displayed.
@@ -109,26 +140,26 @@ window.App = {
   },
 
   fetchMySwitches: function (_account) {
-    // const SWITCHES = `{
-    //   switch(id: "${_account}") {
-    //     id
-    //     name
-    //     executor
-    //     benefitor
-    //     unlockTimestamp
-    //     isExecuted
-    //     ethersLocked
-    //     tokensLocked {
-    //       id
-    //       amountLocked
-    //     }
-    //     collectiblesLocked {
-    //       id
-    //       collectibleId
-    //       benefitor
-    //     }
-    //   }
-    // }`
+    const SWITCHES = `{
+      switch(id: "${_account}") {
+        id
+        name
+        executor
+        benefitor
+        unlockTimestamp
+        isExecuted
+        ethersLocked
+        tokensLocked {
+          id
+          amountLocked
+        }
+        collectiblesLocked {
+          id
+          collectibleId
+          benefitor
+        }
+      }
+    }`
     // const SWITCHES = `{
     //   switch(id: "0x80da8831a594327cd9e79e648402cc7c1863aafa") {
     //     id
@@ -149,25 +180,25 @@ window.App = {
     //     }
     //   }
     // }`;
-    const SWITCHES =`{switches(where: {id: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
-      id
-      name
-      unlockTimestamp
-      benefitor
-      executor
-      isExecuted
-      ethersLocked
-      tokensLocked {
-        tokenAddress
-        amountLocked
-      }
-      collectiblesLocked {
-        id
-        collectibleId
-        benefitor
-      }
-    }
-  }`
+  //   const SWITCHES =`{switches(where: {id: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
+  //     id
+  //     name
+  //     unlockTimestamp
+  //     benefitor
+  //     executor
+  //     isExecuted
+  //     ethersLocked
+  //     tokensLocked {
+  //       tokenAddress
+  //       amountLocked
+  //     }
+  //     collectiblesLocked {
+  //       id
+  //       collectibleId
+  //       benefitor
+  //     }
+  //   }
+  // }`
     fetch(graphqlUri, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -185,28 +216,8 @@ window.App = {
   },
 
   fetchReceivedSwitches: function (_account) {
-    // const BENEFITOR_SWITCHES = `{
-    //   switches(where: {benefitor: "${_account}"}) {
-    //     id
-    //     name
-    //     unlockTimestamp
-    //     benefitor
-    //     executor
-    //     isExecuted
-    //     ethersLocked
-    //     tokensLocked {
-    //       id
-    //       amountLocked
-    //     }
-    //     collectiblesLocked {
-    //       id
-    //       collectibleId
-    //       benefitor
-    //     }
-    //   }
-    // }`;
     const BENEFITOR_SWITCHES = `{
-      switches(where: {benefitor: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
+      switches(where: {benefitor: "${_account}"}) {
         id
         name
         unlockTimestamp
@@ -225,24 +236,8 @@ window.App = {
         }
       }
     }`;
-
-    fetch(graphqlUri, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: BENEFITOR_SWITCHES }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        let resData = res.data.switches
-        console.log("ben",resData)
-        resData.map(el => {
-          this.createReceivedSwitchesPage(el)
-        })
-        
-      }); 
-
-    //const EXECUTOR_SWITCHES = `{
-    //   switches(where: {executor: "${_account}"}) {
+    // const BENEFITOR_SWITCHES = `{
+    //   switches(where: {benefitor: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
     //     id
     //     name
     //     unlockTimestamp
@@ -260,7 +255,43 @@ window.App = {
     //       benefitor
     //     }
     //   }
-    // }`
+    // }`;
+
+    fetch(graphqlUri, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: BENEFITOR_SWITCHES }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let resData = res.data.switches
+        console.log("ben",resData)
+        resData.map(el => {
+          this.createReceivedSwitchesPage(el)
+        })
+        
+      }); 
+
+    const EXECUTOR_SWITCHES = `{
+      switches(where: {executor: "${_account}"}) {
+        id
+        name
+        unlockTimestamp
+        benefitor
+        executor
+        isExecuted
+        ethersLocked
+        tokensLocked {
+          id
+          amountLocked
+        }
+        collectiblesLocked {
+          id
+          collectibleId
+          benefitor
+        }
+      }
+    }`
     // const EXECUTOR_SWITCHES = `{
     //   switches(where: {executor: "0xaaad7966ebe0663b8c9c6f683fb9c3e66e03467f"}) {
     //     id
@@ -281,21 +312,21 @@ window.App = {
     //     }
     //   }
     // }`;
-    // fetch(graphqlUri, {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ query: EXECUTOR_SWITCHES }),
-    // })
-    //   .then((res) => res.json())
-    //   .then((res) => {
-    //     let resData = res.data.switches
-    //     console.log(resData)
-    //     resData.map(el => {
-    //       this.createReceivedSwitchesPage(el)
-    //     })
-    //   }); 
+    fetch(graphqlUri, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: EXECUTOR_SWITCHES }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let resData = res.data.switches
+        console.log(resData)
+        resData.map(el => {
+          this.createReceivedSwitchesPage(el)
+        })
+      }); 
   },
-
+  
   switchOverview: function() {
     const dashboardDiv = document.getElementById("dashboard");
     dashboardDiv.style.display = "none";
@@ -303,18 +334,26 @@ window.App = {
     changeClass( document.querySelectorAll(".central-wrapper"))
     const overview = document.getElementById("swOverview");
     overview.style.display = "block";
+
     const createDiv = document.getElementById("create");
     createDiv.style.display = "flex";
+    const createTextUpHeader = document.getElementById("createTextUpHeader");
+    createTextUpHeader.innerHTML= "01";
+    const createContentTitle = document.getElementById("createContentTitle");
+    createContentTitle.innerHTML= "Basic Information";
     document.getElementById("name").disabled = true;
     document.getElementById("period").disabled = true;
     let dropdowns= document.querySelectorAll(".ss-single-selected");
     dropdowns.forEach(el => el.style.pointerEvents="none")
     document.getElementById("periodTime").disabled = true;
+
     const assestsDiv = document.getElementById("assets");
     assestsDiv.style.display = "flex";
+    const assetsTextUpHeader = document.getElementById("assetsTextUpHeader");
+    assetsTextUpHeader.innerHTML = "02";
     document.getElementById("tokenAmount").disabled = true;
-    let valuesOfOtherTokens = document.querySelectorAll("input[name=otherToken]")
-    valuesOfOtherTokens.forEach(el => el.style.pointerEvents="none")
+    let valuesOfOtherTokens = document.querySelectorAll("input[name=otherToken]");
+    valuesOfOtherTokens.forEach(el => el.style.pointerEvents="none");
     document.getElementById("queter").disabled = true;
     document.getElementById("half").disabled = true;
     document.getElementById("tree-queters").disabled = true;
@@ -331,8 +370,10 @@ window.App = {
     })
     }
     const executionDiv = document.getElementById('execution');
-    executionDiv.classList.add("temporary-padding")
+    executionDiv.classList.add("temporary-padding");
     executionDiv.style.display = "flex";
+    const executionTextUpHeader = document.getElementById("executionTextUpHeader");
+    executionTextUpHeader.innerHTML = "03";
     document.getElementById("contractAddress").disabled = true;
     document.getElementById("autoManual").disabled = true;
     document.getElementById("executorAddress").disabled = true;
@@ -341,29 +382,259 @@ window.App = {
     const overviewFooter = document.getElementById("overviewFooter");
     overviewFooter.style.display = "flex";
   },
-
-  //started--not usable
-  singleSwitchOverviev: function() {
+  queterDefineAmount: function() {
+    let balance;
+    let dolarVal = dolar_val_eth
+    let valInput = document.getElementById("tokenAmount");
+    web3.eth.getBalance(account, function (err, result) {
+      balance = web3.fromWei(result.toString(), "ether").substring(0, 4);
+        valInput.value = (balance/4).toFixed(6);
+         document.getElementById("tokenAmountCash").value = (Number(valInput.value*dolarVal)).toFixed(2)+" $"
+        });      
+  },
+  halfDefineAmount: function() {
+    let balance;
+    let dolarVal = dolar_val_eth
+    let valInput = document.getElementById("tokenAmount");
+    web3.eth.getBalance(account, function (err, result) {
+      balance = web3.fromWei(result.toString(), "ether").substring(0, 4);
+        valInput.value = (balance/2).toFixed(6);
+         document.getElementById("tokenAmountCash").value = (Number(valInput.value*dolarVal)).toFixed(2)+" $"
+        });      
+  },
+  treequetersDefineAmount: function() {
+    let balance;
+    let dolarVal = dolar_val_eth
+    let valInput = document.getElementById("tokenAmount");
+    web3.eth.getBalance(account, function (err, result) {
+      balance = web3.fromWei(result.toString(), "ether").substring(0, 4);
+        valInput.value = (balance*3/4).toFixed(6);
+         document.getElementById("tokenAmountCash").value = (Number(valInput.value*dolarVal)).toFixed(2)+" $"
+        });      
+  },
+  fullDefineAmount: function() {
+    let balance;
+    let dolarVal = dolar_val_eth
+    let valInput = document.getElementById("tokenAmount");
+    web3.eth.getBalance(account, function (err, result) {
+      balance = web3.fromWei(result.toString(), "ether").substring(0, 4);
+        valInput.value = (balance);
+         document.getElementById("tokenAmountCash").value = (Number(valInput.value*dolarVal)).toFixed(2)+" $"
+        });      
+  },
+  
+  singleSwitchEdit: function(id, name, benef, execut, timePer) {
+    
+    const editName = web3.toAscii(name)
     const dashboardDiv = document.getElementById("dashboard");
     dashboardDiv.style.display = "none";
     const changeClass = (element) => element.forEach(el => el.classList.add("overview-wrapper"));
     changeClass( document.querySelectorAll(".central-wrapper"))
     const overview = document.getElementById("editOverview");
     overview.style.display = "block";
+
+    const switchNameView = document.getElementById("editSwitchName");
+    switchNameView.innerHTML= editName;
+
     const createDiv = document.getElementById("create");
     createDiv.style.display = "flex";
+    const createTextUpHeader = document.getElementById("createTextUpHeader");
+    createTextUpHeader.innerHTML= "01";
+    const createContentTitle = document.getElementById("createContentTitle");
+    createContentTitle.innerHTML= "Basic Information";
+    let switchEditName = document.getElementById("name")
+    switchEditName.value = editName
+    
+    const date1 = new Date(Date.now());
+    const date2 = new Date((timePer*1000));
+    const diffTime = date2 - date1;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+    if(diffDays < 0) {
+      document.getElementById("timeText").innerHTML= "Your timeout expired on";
+      document.getElementById("date").innerHTML= date2.toString().slice(3,15);
+      document.getElementById("time").innerHTML= date2.toString().slice(16,21);
+    } else {
+      document.getElementById("timeText").innerHTML= "Your timeout will expire on";
+      document.getElementById("date").innerHTML= date2.toString().slice(3,15);
+      document.getElementById("time").innerHTML= date2.toString().slice(16,21);
+    }
+
     const assestsDiv = document.getElementById("assets");
     assestsDiv.style.display = "flex";
+    const assetsTextUpHeader = document.getElementById("assetsTextUpHeader");
+    assetsTextUpHeader.innerHTML = "02"
+
     const executionDiv = document.getElementById('execution');
+    
+    const executionTextUpHeader = document.getElementById("executionTextUpHeader");
+    executionTextUpHeader.innerHTML = "03"
+    const contractAddressBenefitor = document.getElementById("contractAddress");
+    contractAddressBenefitor.value = benef;
+    const executorAddress = document.getElementById("executorAddress");
+    if(execut == keeperRegistry){
+    autoManualFirst.destroy();
+    autoManualFirst = new SlimSelect({
+      select: "#autoManual",
+      showSearch: false,
+    });
+    autoManualFirst.set("Automatically");
+    executorAddress.value = keeperRegistry;
+     } else {
+        autoManualFirst.destroy();
+        autoManualFirst = new SlimSelect({
+          select: "#autoManual",
+          showSearch: false,
+        });
+        autoManualFirst.set("Manually");
+        executorAddress.value = execut;
+    }
     executionDiv.classList.add("temporary-padding")
     executionDiv.style.display = "flex";
-    // const executionFooter = document.getElementById("executionFooter");
-    // executionFooter.style.display = "none";
     const overviewFooter = document.getElementById("editSwicthFooter");
     overviewFooter.style.display = "flex";
-  },
-//
 
+    editSwitchId = id;
+    editSwitchName = name; 
+    editSwitchBenefitor = benef;
+    editSwitchExecutor = execut;
+  },
+
+  saveEditedSwitch: function() {  
+    let newSwitchEditName;
+    let switchEditName = document.getElementById("name").value;
+    if (switchEditName !== editSwitchName) {
+      newSwitchEditName = document.getElementById("name").value;
+    } else {
+      newSwitchEditName = ""
+    }
+    let period = document.querySelector("#period").value;
+    let periodTime = document.getElementById("periodTime").value;
+    let timeoutPeriod;
+    
+    if (periodTime !== ""){
+    const today = new Date(Date.now());
+    const oneDay = 24 * 60 * 60 * 1000;
+    if(period == "days") {
+      timeoutPeriod = periodTime 
+    } else if (period == "months") {
+       const secondDate = new Date(new Date(Date.now()).setMonth(new Date(Date.now()).getMonth()+Number(periodTime)));
+       const diffDays = Math.round(Math.abs((today - secondDate) / oneDay));
+       timeoutPeriod = diffDays
+    } else if (period == "years"){
+       const secondDateOfYear = new Date(new Date(Date.now()).setMonth(new Date(Date.now()).getMonth()+Number(periodTime*12)));
+       const diffDaysOfYear = Math.round(Math.abs((today - secondDateOfYear) / oneDay));
+       timeoutPeriod = diffDaysOfYear
+     }
+    }  else {
+      timeoutPeriod = ""
+      }
+    let selectTokenETH = document.querySelector("#selectToken").value;
+    let tokenAmountETH = document.getElementById("tokenAmount").value;
+    let tokenAmountOther = document.querySelectorAll("input[name=otherToken]")
+    let selectedTokenOtehr = document.querySelectorAll("select[name=tokenOther]")
+
+    let contractAddressNFT;
+    let NFTID;
+    if (document.getElementById("contractAddressNFT") && document.getElementById("nftId")) {
+      contractAddressNFT = document.getElementById("contractAddressNFT").value || "";
+      NFTID = document.getElementById("nftId").value || "";
+    } else {
+      contractAddressNFT = "";
+      NFTID = "";
+    }
+    let otherTokens=[];
+    let tokenName=[];
+    let amount=[];
+    if(tokenAmountOther.length > 0) {
+      tokenAmountOther.forEach((el, index) => {
+        amount.push(window["amountOther" + index] = el.value); 
+        })
+        selectedTokenOtehr.forEach((elem, index) => {
+          tokenName.push(window["tokenNameOther" + index] = elem.value)
+        });
+        let value = "ERC-721";
+          tokenName = tokenName.filter(item => {
+            return item !== value
+        });
+        tokenName.forEach((el, i) => {
+          let obj = {};
+          obj.tokenName = el;
+          obj.tokenAmount = amount[i];
+          otherTokens.push(obj);
+        })
+    }
+    let newContractAddress;
+    let contractAddress = document.getElementById("contractAddress").value;
+    if (contractAddress !== editSwitchBenefitor) {
+      newContractAddress = document.getElementById("contractAddress").value
+    } else {
+      newContractAddress = ""
+    }
+    let executorAddress;
+    let newExecutorAddress;
+    if(document.getElementById("autoManual").value == "Manually"){
+      executorAddress = document.getElementById("executorAddress").value;
+      if(executorAddress !== editSwitchExecutor){
+        newExecutorAddress = document.getElementById("executorAddress").value;
+      } else {
+        newExecutorAddress = ""
+      }
+    } else {
+      executorAddress = keeperRegistry;
+    }
+     
+
+    console.log(otherTokens)
+    console.log("switchId",editSwitchId,"switchName:",newSwitchEditName,"selectTokenETH:",selectTokenETH,"tokenAmountETH:",tokenAmountETH,"contractAddress:",newContractAddress,"executorAddress:",newExecutorAddress,"contractAddressNFT:",contractAddressNFT,"NFTID:",NFTID, "timeoutPeriod", timeoutPeriod );
+  },
+  discardEditSwitch: function() {
+    const dashboardDiv = document.getElementById("dashboard");
+    dashboardDiv.style.display = "block";
+    const changeClass = (element) => element.forEach(el => el.classList.remove("overview-wrapper"));
+    changeClass( document.querySelectorAll(".central-wrapper"));
+    const overview = document.getElementById("editOverview");
+    overview.style.display = "none";
+
+    const createDiv = document.getElementById("create");
+    createDiv.style.display = "none";
+    const createTextUpHeader = document.getElementById("createTextUpHeader");
+    createTextUpHeader.innerHTML= "CREATE NEW SWITCH";
+    const createContentTitle = document.getElementById("createContentTitle");
+    createContentTitle.innerHTML= "Define the basics";
+    let switchEditName = document.getElementById("name")
+    switchEditName.value = ""
+    firstPerodInput.destroy();
+    firstPerodInput = new SlimSelect({
+      select: '#period',
+      showSearch: false,
+    })
+    firstPerodInput.set("days");
+    const assestsDiv = document.getElementById("assets");
+    assestsDiv.style.display = "none";
+    const assetsTextUpHeader = document.getElementById("assetsTextUpHeader");
+    assetsTextUpHeader.innerHTML = "CREATE NEW SWITCH"
+    const removeElements = (element) => element.forEach(el => el.remove());
+    removeElements( document.querySelectorAll(".new-asset"));
+    document.getElementById("tokenAmount").value = "";
+    document.getElementById("tokenAmountCash").value = "0.00$";
+
+    const executionDiv = document.getElementById('execution');
+    executionDiv.style.display = "none";
+    const executionTextUpHeader = document.getElementById("executionTextUpHeader");
+    executionTextUpHeader.innerHTML = "CREATE NEW SWITCH"
+    executionDiv.classList.remove("temporary-padding");
+    const contractAddressBenefitor = document.getElementById("contractAddress");
+    contractAddressBenefitor.value = "";
+    autoManualFirst.destroy();
+    autoManualFirst = new SlimSelect({
+      select: "#autoManual",
+      showSearch: false,
+    });
+    autoManualFirst.set("Automatically");
+    const overviewFooter = document.getElementById("editSwicthFooter");
+    overviewFooter.style.display = "none";
+  },
   createSwitch: function() {
     let switchName = document.getElementById("name").value;
     let period = document.querySelector("#period").value; 
@@ -381,7 +652,7 @@ window.App = {
     }
      
     let contractAddressNFT;
-    let NFTID
+    let NFTID;
     if (document.getElementById("contractAddressNFT") && document.getElementById("nftId")) {
       contractAddressNFT = document.getElementById("contractAddressNFT").value || "";
       NFTID = document.getElementById("nftId").value || "";
@@ -444,14 +715,17 @@ window.App = {
     }
     if (period == "days") {
      date = new Date(Date.now() + periodTime * 24 * 60 * 60 * 1000)
+     document.getElementById("timeText").innerHTML= "Your timeout will expire on";
      document.getElementById("date").innerHTML= date.toString().slice(3,15)
      document.getElementById("time").innerHTML= date.toString().slice(16,21)
     } else if (period == "months") {
       date = addMonths(new Date(), Number(periodTime))
+      document.getElementById("timeText").innerHTML= "Your timeout will expire on";
       document.getElementById("date").innerHTML= date.toString().slice(3,15)
       document.getElementById("time").innerHTML= date.toString().slice(16,21)
     } else if (period == "years") {
       date = new Date(new Date().setFullYear(new Date().getFullYear() + Number(periodTime)))
+      document.getElementById("timeText").innerHTML= "Your timeout will expire on";
       document.getElementById("date").innerHTML= date.toString().slice(3,15)
       document.getElementById("time").innerHTML= date.toString().slice(16,21)
     }
@@ -534,7 +808,7 @@ window.App = {
 
     let checkboxOutput="";
     tokensArray.map((item, index) => {
-      checkboxOutput +=`<label class="box-rec" ><input type="radio" onclick="App.checkValueRec(this,${item.symbol+_receivedSwitch.id},${_receivedSwitch.id})" id=${item.symbol+_receivedSwitch.id} class="radio-option-rec" name="${item.symbol}" value="${item.amountLocked}"><span class="radio-checkmark-rec" id="${index}" onclick="App.changeClassRec(${index})">${item.symbol}</span></label>`;
+      checkboxOutput +=`<label class="box-rec" ><input type="radio" onclick="App.checkValueRec(this,${item.symbol+_receivedSwitch.id},${_receivedSwitch.id})" id=${item.symbol+_receivedSwitch.id} class="radio-option-rec" name="${item.symbol}" value="${item.amountLocked}"><span class="radio-checkmark-rec" id="${'rec'+index}" onclick="App.changeClassRec(${'rec'+index})">${item.symbol}</span></label>`;
       document.getElementById(`checkTokensRec${_receivedSwitch.id}`).innerHTML=checkboxOutput;
     })
     document.querySelectorAll(".radio-checkmark-rec")[0].classList.add("active");
@@ -559,8 +833,8 @@ window.App = {
       document.getElementById(`timeLeftRec${_receivedSwitch.id}`).innerHTML= diffDays + " days"
     }
   },
-// helper func
-checkValueRec:function(target, id, recSwitchID) {
+// helper function
+  checkValueRec:function(target, id, recSwitchID) {
   tokensData.map(item => {
     if (id.name == item.symbol.toUpperCase()){
         dolar_val = item.price;
@@ -569,14 +843,15 @@ checkValueRec:function(target, id, recSwitchID) {
         document.getElementById("valueInUsdRec"+recSwitchID).innerHTML= inDolars.toFixed(2)+" $";
   }
 })
- console.log(target.value, id.name, recSwitchID);
+//  console.log(target.value, id.name, recSwitchID);
 },
-changeClassRec: function(id) {
+  changeClassRec: function(id) {
 let elem = document.querySelectorAll(".radio-checkmark-rec")
 elem.forEach(el => {
   el.classList.remove("active");
 })
-document.getElementById(id).classList.add("active");
+document.getElementById(id.id).classList.add("active");
+// console.log(id.id, elem)
 },
 
   createSwitchPage: function(_switch) {
@@ -604,9 +879,15 @@ document.getElementById(id).classList.add("active");
       })
     })
   }
-    tokensArray.unshift(ethObj)
-    console.log("arr",tokensArray)
-    
+    tokensArray.unshift(ethObj);
+    console.log("arr",tokensArray);
+
+    let switch_id = _switch.id;
+    let benefitor = _switch.benefitor;
+    let executor = _switch.executor;
+    let timeoutSwitchPeriod = _switch.unlockTimestamp;
+
+    console.log(switch_id,benefitor,executor,timeoutSwitchPeriod,name);
 
     let switchDiv = `
     <div class="switch">
@@ -655,11 +936,11 @@ document.getElementById(id).classList.add("active");
     <hr />
     <div class="switch-buttons">
       <div class="edit-delete-buttons">
-        <button class="button-terciary" onClick="App.singleSwitchOverviev()">Edit</button>
+        <button class="button-terciary" onClick="App.singleSwitchEdit('${switch_id}', '${_switch.name}', '${benefitor}', '${executor}', ${timeoutSwitchPeriod})">Edit</button>
         <button class="button-terciary">Delete</button>
       </div>
       <div class="execute-button">
-        <button class="button-primary">Execute</button>
+        <button class="button-primary" id="mySwichExe">Execute</button>
       </div>
     </div>
   </div>
@@ -669,7 +950,7 @@ document.getElementById(id).classList.add("active");
 
     let checkboxOutput="";
     tokensArray.map((item, index) => {
-      checkboxOutput +=`<label class="box" ><input type="radio" onclick="App.checkValue(this,${item.symbol+_switch.id},${_switch.id})" id=${item.symbol+_switch.id} class="radio-option" name="${item.symbol}" value="${item.amountLocked}"><span class="radio-checkmark" id="${index}" onclick="App.changeClass(${index})">${item.symbol}</span></label>`;
+      checkboxOutput +=`<label class="box" ><input type="radio" onclick="App.checkValue(this,${item.symbol+_switch.id},${_switch.id})" id=${item.symbol+_switch.id} class="radio-option" name="${item.symbol}" value="${item.amountLocked}"><span class="radio-checkmark" id="${index+_switch.id}" onclick="App.changeClass('${index+_switch.id}')">${item.symbol}</span></label>`;
       document.getElementById(`checkTokens${_switch.id}`).innerHTML=checkboxOutput;
     })
     document.querySelectorAll(".radio-checkmark")[0].classList.add("active");
@@ -705,14 +986,15 @@ document.getElementById(id).classList.add("active");
           document.getElementById("valueInUsd"+switchID).innerHTML= inDolars.toFixed(2)+" $"
     }
   })
-   console.log(target.value, id.name, switchID);
+  //  console.log(target.value, id.name, switchID);
   },
- changeClass: function(id) {
+  changeClass: function(id) {
   let elem = document.querySelectorAll(".radio-checkmark")
   elem.forEach(el => {
     el.classList.remove("active");
   })
   document.getElementById(id).classList.add("active");
+  // console.log(id, document.getElementById(id))
  },
  
   openMySwitch: function() {
@@ -846,6 +1128,14 @@ document.getElementById(id).classList.add("active");
     document.getElementById("contractAddress").disabled = false;
     document.getElementById("autoManual").disabled = false;
     document.getElementById("executorAddress").disabled = false;
+    const createTextUpHeader = document.getElementById("createTextUpHeader");
+    createTextUpHeader.innerHTML= "CREATE NEW SWITCH";
+    const createContentTitle = document.getElementById("createContentTitle");
+    createContentTitle.innerHTML= "Define the basics";
+    const assetsTextUpHeader = document.getElementById("assetsTextUpHeader");
+    assetsTextUpHeader.innerHTML = "CREATE NEW SWITCH";
+    const executionTextUpHeader = document.getElementById("executionTextUpHeader");
+    executionTextUpHeader.innerHTML = "CREATE NEW SWITCH";
     
   },
 
@@ -866,24 +1156,6 @@ document.getElementById(id).classList.add("active");
     <div style="display: flex; justify-content: space-between;">
       <input name="otherToken" class="only-positive" type="number" style="width: 42%" id="tokenAmount${idNew}" min="0" onkeyup="App.inputTokenValue(${idNew})"/>
       <input style="width: 42%" id="tokenAmountCash${idNew}" disabled value="0.00$"/>
-    </div>
-    <div class="options-wrapper">
-      <label class="container">
-        <input type="radio" id="queter" class="option" name="gender" value="25%">
-        <span class="checkmark">25%</span>
-      </label>
-      <label class="container">
-        <input type="radio" id="half" class="option" name="gender" value="50%">
-        <span class="checkmark">50%</span>
-      </label>
-      <label class="container">
-        <input type="radio" id="tree-queters" class="option" name="gender" value="75%">
-        <span class="checkmark">75%</span>
-      </label>
-      <label class="container">
-        <input type="radio" id="full" class="option" name="gender" value="100%">
-        <span class="checkmark">100%</span>
-      </label>
     </div>
     </div>
     </div>
@@ -935,7 +1207,7 @@ document.getElementById(id).classList.add("active");
     let valInput = document.getElementById("tokenAmount").value;
     document.getElementById("tokenAmountCash").value = (Number(valInput*dolarVal)).toFixed(2)+" $";
   }, 
-  selectChange: function(id, x) {
+  selectChange: function(id) {
     let valSelect = document.getElementById("selectToken"+id).value;
     let erc721Content = `
     <div id="${id}">
@@ -955,7 +1227,7 @@ document.getElementById(id).classList.add("active");
       switch expires</div>
     <div style="display: flex; justify-content: space-between;">
       <input name="otherToken" class="only-positive" type="number" style="width: 42%" id="tokenAmount${idNew}" min="0" onkeyup="App.inputTokenValue(${idNew})"/>
-      <input style="width: 42%" id="tokenAmountCash${idNew}" disabled value="0$"/>
+      <input style="width: 42%" id="tokenAmountCash${idNew}" disabled value="0.00$"/>
     </div>
     <div class="options-wrapper">
       <label class="container">
