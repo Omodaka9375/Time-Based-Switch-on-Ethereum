@@ -34,7 +34,8 @@ window.App = {
   start: function () {
     var self = this;
     TimeBasedSwitch.setProvider(web3.currentProvider);
-    this.connectMetamask();
+    // this.connectMetamask();
+    App.initWeb3();
     document.getElementById("myReceivedSwitchData").style.display="none";
     
     new SlimSelect({
@@ -102,7 +103,12 @@ window.App = {
       console.warn('Something went wrong.', err)
     });  
   },
-
+  onOverlay: function() {
+  document.getElementById("overlay").style.display = "flex";
+  },
+  offOverlay: function() {
+  document.getElementById("overlay").style.display = "none";
+  },
   connectMetamask: function () {
     // Get the initial account balance so it can be displayed.
     web3.eth.getAccounts(function (err, accs) {
@@ -127,9 +133,13 @@ window.App = {
           const balance = web3.fromWei(result.toString(), "ether");
           walletBalance.innerHTML = `${balance.substring(0, 4)} ETH`;
         });
-
+        App.offOverlay();
         App.fetchMySwitches(account);
         App.fetchReceivedSwitches(account);
+        gtag('event', 'connect-metamask', {
+           'event_category' : 'conect-metamask',
+              'event_label' : 'connect-metamask'
+             });
       } else {
         console.error(
           "Couldn't get any accounts! Make sure your Ethereum client is configured correctly."
@@ -137,6 +147,7 @@ window.App = {
         return;
       }
     });
+    
   },
 
   fetchMySwitches: function (_account) {
@@ -198,7 +209,7 @@ window.App = {
   //       benefitor
   //     }
   //   }
-  // }`
+  //  }`
     fetch(graphqlUri, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -211,6 +222,11 @@ window.App = {
         resSwitch.map(el=> {
           this.createSwitchPage(el);
         })
+        if(resSwitch.length > 0) {
+          document.getElementById("numOfActiveSwitches").innerHTML = `You currently have ${resSwitch.length} active switches`
+        } else {
+           document.getElementById("numOfActiveSwitches").innerHTML = "You currently have no active switches"
+        }
       });
       this.getDolarValueOfTokens();
   },
@@ -693,6 +709,7 @@ window.App = {
         });
         let value = "ERC-721";
           tokenName = tokenName.filter(item => {
+            
             return item !== value
         });
         tokenName.forEach((el, i) => {
@@ -704,6 +721,24 @@ window.App = {
     }
     console.log(otherTokens)
     console.log("switchName:",switchName,"period:",period,"periodTime:",periodTime,"selectTokenETH:",selectTokenETH,"tokenAmountETH:",tokenAmountETH,"contractAddress:",contractAddress,"executorAddress:",executorAddress,"contractAddressNFT:",contractAddressNFT,"NFTID:",NFTID, "timeoutPeriod", timeoutPeriod )
+    otherTokens.map(e => {
+        if (e.tokenName == "link"){
+          gtag('event', 'chainlink', {
+           'event_category' : 'added',
+              'event_label' : 'chainlink'
+         });
+        }
+    });
+    if(contractAddressNFT !== "" && NFTID !== ""){
+      gtag('event', 'nft', {
+           'event_category' : 'nft-added',
+              'event_label' : 'nft'
+         });
+       }
+     gtag('event', 'create-switch', {
+           'event_category' : 'create-switch',
+              'event_label' : 'create-switch'
+         });
   },
   timeExecutionLeft: function () {
     let period = document.querySelector("#period").value; 
@@ -762,7 +797,7 @@ window.App = {
         }
       })
     })
-  }
+   }
     tokensArray.unshift(ethObj)
     console.log("rrr",tokensArray)
 
@@ -834,24 +869,24 @@ window.App = {
     }
   },
 // helper function
-  checkValueRec:function(target, id, recSwitchID) {
-  tokensData.map(item => {
-    if (id.name == item.symbol.toUpperCase()){
-        dolar_val = item.price;
-        let inDolars = dolar_val * target.value
-        document.getElementById("tokenValueRec"+recSwitchID).innerHTML= target.value +" "+id.name;
-        document.getElementById("valueInUsdRec"+recSwitchID).innerHTML= inDolars.toFixed(2)+" $";
-  }
-})
-//  console.log(target.value, id.name, recSwitchID);
+checkValueRec:function(target, id, recSwitchID) {
+    tokensData.map(item => {
+      if (id.name == item.symbol.toUpperCase()){
+          dolar_val = item.price;
+          let inDolars = dolar_val * target.value
+          document.getElementById("tokenValueRec"+recSwitchID).innerHTML= target.value +" "+id.name;
+          document.getElementById("valueInUsdRec"+recSwitchID).innerHTML= inDolars.toFixed(2)+" $";
+        }
+    })
+        //  console.log(target.value, id.name, recSwitchID);
 },
   changeClassRec: function(id) {
-let elem = document.querySelectorAll(".radio-checkmark-rec")
-elem.forEach(el => {
-  el.classList.remove("active");
-})
-document.getElementById(id.id).classList.add("active");
-// console.log(id.id, elem)
+      let elem = document.querySelectorAll(".radio-checkmark-rec")
+        elem.forEach(el => {
+          el.classList.remove("active");
+          })
+      document.getElementById(id.id).classList.add("active");
+      // console.log(id.id, elem)
 },
 
   createSwitchPage: function(_switch) {
@@ -878,7 +913,7 @@ document.getElementById(id.id).classList.add("active");
         }
       })
     })
-  }
+   }
     tokensArray.unshift(ethObj);
     console.log("arr",tokensArray);
 
@@ -889,7 +924,7 @@ document.getElementById(id.id).classList.add("active");
 
     console.log(switch_id,benefitor,executor,timeoutSwitchPeriod,name);
 
-    let switchDiv = `
+   let switchDiv = `
     <div class="switch">
     <h1 class="title">${name}</h1>
     <div class="content">
@@ -943,7 +978,7 @@ document.getElementById(id.id).classList.add("active");
         <button class="button-primary" id="mySwichExe">Execute</button>
       </div>
     </div>
-  </div>
+   </div>
     `;
     const mySwitch = document.createRange().createContextualFragment(switchDiv);
     mySwitchData.appendChild(mySwitch);
@@ -984,17 +1019,17 @@ document.getElementById(id.id).classList.add("active");
           let inDolars = dolar_val * target.value
           document.getElementById("tokenValue"+switchID).innerHTML= target.value +" "+id.name
           document.getElementById("valueInUsd"+switchID).innerHTML= inDolars.toFixed(2)+" $"
-    }
-  })
-  //  console.log(target.value, id.name, switchID);
+      }
+     })
+    //  console.log(target.value, id.name, switchID);
   },
   changeClass: function(id) {
-  let elem = document.querySelectorAll(".radio-checkmark")
-  elem.forEach(el => {
+    let elem = document.querySelectorAll(".radio-checkmark")
+     elem.forEach(el => {
     el.classList.remove("active");
-  })
-  document.getElementById(id).classList.add("active");
-  // console.log(id, document.getElementById(id))
+    })
+     document.getElementById(id).classList.add("active");
+     // console.log(id, document.getElementById(id))
  },
  
   openMySwitch: function() {
@@ -1163,7 +1198,7 @@ document.getElementById(id.id).classList.add("active");
       <button class="approve-asset-button">Approve</button>
       <button class="delete-assets-button" onClick="App.deleteAssets('asset${idNew}')">Delete</button>
       </div>
-  </div>
+   </div>
     `;
 
     let target = document.querySelector(".add-new-asset");
@@ -1277,7 +1312,7 @@ document.getElementById(id.id).classList.add("active");
     }
 
   },
-  // showCheck: function () {
+// showCheck: function () {
   //   var checkDiv = document.getElementById("checkSwitch");
   //   if(checkDiv.style.display == "none"){
   //     checkDiv.style.display = "block";
@@ -1423,17 +1458,21 @@ document.getElementById(id.id).classList.add("active");
   //     console.log(e);
   //     self.setStatus(e);
   //   });
-  // },
+// },
 
-  initWeb3: function () {
+initWeb3: function () {
     if (window.ethereum) {
       App.web3Provider = window.ethereum;
+      App.onOverlay();
       // Request account access
       window.ethereum
         .enable()
-        .then(function () {})
+        .then(function () {
+          App.connectMetamask()
+          })
         .catch(function (e) {
           // User denied account access...
+          App.offOverlay();
           console.error("User denied account access");
         });
     }
@@ -1466,7 +1505,7 @@ window.addEventListener("load", function () {
   }   */
 
   // Modern dapp browsers...
-  App.initWeb3();
+  // App.initWeb3();
 
   App.start();
 });

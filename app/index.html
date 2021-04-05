@@ -43,7 +43,7 @@
     </div>
 
     <div class="metamask-wrapper">
-      <div id="connectMetamask" class="connect-metamask-box" onclick="App.connectMetamask();">
+      <div id="connectMetamask" class="connect-metamask-box" onclick="App.initWeb3();">
         <img class="metamask-image" src="metamask.png" />
         <div class="metamask-button-text">Connect Wallet</div>
       </div>
@@ -61,8 +61,8 @@
       <div class="welcome-text">
         <p class="nice-text-class">Nice to see
           you!</p>
-        <p class="active-switches-class">
-          You currently have no active switches
+        <p class="active-switches-class" id="numOfActiveSwitches">
+           You currently have no active switches
         </p>
       </div>
       <div class="create-switch-button-box">
@@ -88,6 +88,24 @@
     <h1 id="editSwitchName">Name</h1>
     <hr>
   </div>
+  
+  <div id="overlay">
+    <div id="overlayBox">
+      <div class="overlay-box-head"> 
+        <img class="metamask-image" src="metamask.png" />
+        <h4>MetaMask</h4> 
+      </div>
+	    <div id="maessageBox">
+        <div class="loader"></div>
+        <div class="loader-text">
+          <div class="upper-text">Waiting for MetaMask...</div>
+          <div class="down-text">Please connect your wallet trought MetaMask extension </div>
+        </div>
+      </div>
+    </div>
+ </div>
+
+
   <div id="create" class="central-wrapper">
     <div class="left-wrapper">
       <div class="text-up-header" id="createTextUpHeader">CREATE NEW SWITCH</div>
