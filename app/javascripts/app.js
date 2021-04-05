@@ -7,8 +7,8 @@ import { default as contract } from "truffle-contract";
 import SlimSelect from 'slim-select';
 import ercTokens from "../ercTokens";
 
-import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.json'
-// import TimeBasedSwitch_artifacts from "web3";
+// import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.json'
+import TimeBasedSwitch_artifacts from "web3";
 var TimeBasedSwitch = contract(TimeBasedSwitch_artifacts);
 
 var accounts;
@@ -136,9 +136,9 @@ window.App = {
         App.offOverlay();
         App.fetchMySwitches(account);
         App.fetchReceivedSwitches(account);
-        gtag('event', 'connect-metamask', {
-           'event_category' : 'conect-metamask',
-              'event_label' : 'connect-metamask'
+        gtag('event', 'connect_metamask', {
+           'event_category' : 'conect_metamask',
+              'event_label' : 'connect_metamask'
              });
       } else {
         console.error(
@@ -151,26 +151,26 @@ window.App = {
   },
 
   fetchMySwitches: function (_account) {
-    const SWITCHES = `{
-      switch(id: "${_account}") {
-        id
-        name
-        executor
-        benefitor
-        unlockTimestamp
-        isExecuted
-        ethersLocked
-        tokensLocked {
-          id
-          amountLocked
-        }
-        collectiblesLocked {
-          id
-          collectibleId
-          benefitor
-        }
-      }
-    }`
+    // const SWITCHES = `{
+    //   switch(id: "${_account}") {
+    //     id
+    //     name
+    //     executor
+    //     benefitor
+    //     unlockTimestamp
+    //     isExecuted
+    //     ethersLocked
+    //     tokensLocked {
+    //       id
+    //       amountLocked
+    //     }
+    //     collectiblesLocked {
+    //       id
+    //       collectibleId
+    //       benefitor
+    //     }
+    //   }
+    // }`
     // const SWITCHES = `{
     //   switch(id: "0x80da8831a594327cd9e79e648402cc7c1863aafa") {
     //     id
@@ -191,25 +191,25 @@ window.App = {
     //     }
     //   }
     // }`;
-  //   const SWITCHES =`{switches(where: {id: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
-  //     id
-  //     name
-  //     unlockTimestamp
-  //     benefitor
-  //     executor
-  //     isExecuted
-  //     ethersLocked
-  //     tokensLocked {
-  //       tokenAddress
-  //       amountLocked
-  //     }
-  //     collectiblesLocked {
-  //       id
-  //       collectibleId
-  //       benefitor
-  //     }
-  //   }
-  //  }`
+    const SWITCHES =`{switches(where: {id: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
+      id
+      name
+      unlockTimestamp
+      benefitor
+      executor
+      isExecuted
+      ethersLocked
+      tokensLocked {
+        tokenAddress
+        amountLocked
+      }
+      collectiblesLocked {
+        id
+        collectibleId
+        benefitor
+      }
+    }
+   }`
     fetch(graphqlUri, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -232,28 +232,8 @@ window.App = {
   },
 
   fetchReceivedSwitches: function (_account) {
-    const BENEFITOR_SWITCHES = `{
-      switches(where: {benefitor: "${_account}"}) {
-        id
-        name
-        unlockTimestamp
-        benefitor
-        executor
-        isExecuted
-        ethersLocked
-        tokensLocked {
-          id
-          amountLocked
-        }
-        collectiblesLocked {
-          id
-          collectibleId
-          benefitor
-        }
-      }
-    }`;
     // const BENEFITOR_SWITCHES = `{
-    //   switches(where: {benefitor: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
+    //   switches(where: {benefitor: "${_account}"}) {
     //     id
     //     name
     //     unlockTimestamp
@@ -272,24 +252,8 @@ window.App = {
     //     }
     //   }
     // }`;
-
-    fetch(graphqlUri, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: BENEFITOR_SWITCHES }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        let resData = res.data.switches
-        console.log("ben",resData)
-        resData.map(el => {
-          this.createReceivedSwitchesPage(el)
-        })
-        
-      }); 
-
-    const EXECUTOR_SWITCHES = `{
-      switches(where: {executor: "${_account}"}) {
+    const BENEFITOR_SWITCHES = `{
+      switches(where: {benefitor: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
         id
         name
         unlockTimestamp
@@ -307,7 +271,43 @@ window.App = {
           benefitor
         }
       }
-    }`
+    }`;
+
+    fetch(graphqlUri, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: BENEFITOR_SWITCHES }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let resData = res.data.switches
+        console.log("ben",resData)
+        resData.map(el => {
+          this.createReceivedSwitchesPage(el)
+        })
+        
+      }); 
+
+    // const EXECUTOR_SWITCHES = `{
+    //   switches(where: {executor: "${_account}"}) {
+    //     id
+    //     name
+    //     unlockTimestamp
+    //     benefitor
+    //     executor
+    //     isExecuted
+    //     ethersLocked
+    //     tokensLocked {
+    //       id
+    //       amountLocked
+    //     }
+    //     collectiblesLocked {
+    //       id
+    //       collectibleId
+    //       benefitor
+    //     }
+    //   }
+    // }`
     // const EXECUTOR_SWITCHES = `{
     //   switches(where: {executor: "0xaaad7966ebe0663b8c9c6f683fb9c3e66e03467f"}) {
     //     id
@@ -328,19 +328,19 @@ window.App = {
     //     }
     //   }
     // }`;
-    fetch(graphqlUri, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: EXECUTOR_SWITCHES }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        let resData = res.data.switches
-        console.log(resData)
-        resData.map(el => {
-          this.createReceivedSwitchesPage(el)
-        })
-      }); 
+    // fetch(graphqlUri, {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ query: EXECUTOR_SWITCHES }),
+    // })
+    //   .then((res) => res.json())
+    //   .then((res) => {
+    //     let resData = res.data.switches
+    //     console.log(resData)
+    //     resData.map(el => {
+    //       this.createReceivedSwitchesPage(el)
+    //     })
+    //   }); 
   },
   
   switchOverview: function() {
@@ -731,13 +731,13 @@ window.App = {
     });
     if(contractAddressNFT !== "" && NFTID !== ""){
       gtag('event', 'nft', {
-           'event_category' : 'nft-added',
+           'event_category' : 'nft_added',
               'event_label' : 'nft'
          });
        }
-     gtag('event', 'create-switch', {
-           'event_category' : 'create-switch',
-              'event_label' : 'create-switch'
+      gtag('event', 'create_switch', {
+           'event_category' : 'create_switch',
+              'event_label' : 'create_switch'
          });
   },
   timeExecutionLeft: function () {
@@ -869,7 +869,7 @@ window.App = {
     }
   },
 // helper function
-checkValueRec:function(target, id, recSwitchID) {
+ checkValueRec:function(target, id, recSwitchID) {
     tokensData.map(item => {
       if (id.name == item.symbol.toUpperCase()){
           dolar_val = item.price;
@@ -877,9 +877,9 @@ checkValueRec:function(target, id, recSwitchID) {
           document.getElementById("tokenValueRec"+recSwitchID).innerHTML= target.value +" "+id.name;
           document.getElementById("valueInUsdRec"+recSwitchID).innerHTML= inDolars.toFixed(2)+" $";
         }
-    })
+      })
         //  console.log(target.value, id.name, recSwitchID);
-},
+  },
   changeClassRec: function(id) {
       let elem = document.querySelectorAll(".radio-checkmark-rec")
         elem.forEach(el => {
@@ -888,7 +888,6 @@ checkValueRec:function(target, id, recSwitchID) {
       document.getElementById(id.id).classList.add("active");
       // console.log(id.id, elem)
 },
-
   createSwitchPage: function(_switch) {
     const mySwitchData = document.getElementById("mySwitchData");
     const expiresIn = new Date((_switch.unlockTimestamp)*1000).toString().slice(3,15)
