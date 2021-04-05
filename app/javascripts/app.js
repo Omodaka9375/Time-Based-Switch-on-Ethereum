@@ -724,14 +724,14 @@ window.App = {
     otherTokens.map(e => {
         if (e.tokenName == "link"){
           gtag('event', 'chainlink', {
-           'event_category' : 'added',
+           'event_category' : 'chainlink',
               'event_label' : 'chainlink'
          });
         }
     });
     if(contractAddressNFT !== "" && NFTID !== ""){
       gtag('event', 'nft', {
-           'event_category' : 'nft_added',
+           'event_category' : 'nft',
               'event_label' : 'nft'
          });
        }
