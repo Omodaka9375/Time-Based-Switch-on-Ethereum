@@ -1188,7 +1188,7 @@ window.App = {
       and sent once the
       switch expires</div>
     <div style="display: flex; justify-content: space-between;">
-      <input name="otherToken" class="only-positive" type="number" style="width: 42%" id="tokenAmount${idNew}" min="0" onkeyup="App.inputTokenValue(${idNew})"/>
+      <input name="otherToken" class="only-positive" type="number" style="width: 42%" id="tokenAmount${idNew}" min="0" oninput="App.inputTokenValue(${idNew})"/>
       <input style="width: 42%" id="tokenAmountCash${idNew}" disabled value="0.00$"/>
     </div>
     </div>
@@ -1260,7 +1260,7 @@ window.App = {
       and sent once the
       switch expires</div>
     <div style="display: flex; justify-content: space-between;">
-      <input name="otherToken" class="only-positive" type="number" style="width: 42%" id="tokenAmount${idNew}" min="0" onkeyup="App.inputTokenValue(${idNew})"/>
+      <input name="otherToken" class="only-positive" type="number" style="width: 42%" id="tokenAmount${idNew}" min="0" oninput="App.inputTokenValue(${idNew})"/>
       <input style="width: 42%" id="tokenAmountCash${idNew}" disabled value="0.00$"/>
     </div>
     <div class="options-wrapper">
