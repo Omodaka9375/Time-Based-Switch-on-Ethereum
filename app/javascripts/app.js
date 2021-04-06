@@ -7,8 +7,8 @@ import { default as contract } from "truffle-contract";
 import SlimSelect from 'slim-select';
 import ercTokens from "../ercTokens";
 
-// import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.json'
-import TimeBasedSwitch_artifacts from "web3";
+import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.json'
+// import TimeBasedSwitch_artifacts from "web3";
 var TimeBasedSwitch = contract(TimeBasedSwitch_artifacts);
 
 var accounts;
@@ -35,6 +35,7 @@ window.App = {
     var self = this;
     TimeBasedSwitch.setProvider(web3.currentProvider);
     // this.connectMetamask();
+    this.getDolarValueOfTokens();
     App.initWeb3();
     document.getElementById("myReceivedSwitchData").style.display="none";
     
@@ -71,13 +72,13 @@ window.App = {
     }
     const burger = document.querySelector('.burger i');
     const nav = document.querySelector('.nav');
-    // Defining a function
+    
     function toggleNav() {
         burger.classList.toggle('fa-bars');
         burger.classList.toggle('fa-times');
         nav.classList.toggle('nav-active');
     }
-    // Calling the function after click event occurs
+   
     burger.addEventListener('click', function() {
         toggleNav();
     });
@@ -151,25 +152,25 @@ window.App = {
   },
 
   fetchMySwitches: function (_account) {
-    // const SWITCHES = `{
-    //   switch(id: "${_account}") {
-    //     id
-    //     name
-    //     executor
-    //     benefitor
-    //     unlockTimestamp
-    //     isExecuted
-    //     ethersLocked
-    //     tokensLocked {
-    //       id
-    //       amountLocked
-    //     }
-    //     collectiblesLocked {
-    //       id
-    //       collectibleId
-    //       benefitor
-    //     }
-    //   }
+    const SWITCHES = `{
+      switch(id: "${_account}") {
+        id
+        name
+        executor
+        benefitor
+        unlockTimestamp
+        isExecuted
+        ethersLocked
+        tokensLocked {
+          id
+          amountLocked
+        }
+        collectiblesLocked {
+          id
+          collectibleId
+          benefitor
+        }
+      }
     // }`
     // const SWITCHES = `{
     //   switch(id: "0x80da8831a594327cd9e79e648402cc7c1863aafa") {
@@ -191,25 +192,25 @@ window.App = {
     //     }
     //   }
     // }`;
-    const SWITCHES =`{switches(where: {id: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
-      id
-      name
-      unlockTimestamp
-      benefitor
-      executor
-      isExecuted
-      ethersLocked
-      tokensLocked {
-        tokenAddress
-        amountLocked
-      }
-      collectiblesLocked {
-        id
-        collectibleId
-        benefitor
-      }
-    }
-   }`
+  //   const SWITCHES =`{switches(where: {id: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
+  //     id
+  //     name
+  //     unlockTimestamp
+  //     benefitor
+  //     executor
+  //     isExecuted
+  //     ethersLocked
+  //     tokensLocked {
+  //       tokenAddress
+  //       amountLocked
+  //     }
+  //     collectiblesLocked {
+  //       id
+  //       collectibleId
+  //       benefitor
+  //     }
+  //   }
+  //  }`
     fetch(graphqlUri, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -228,32 +229,12 @@ window.App = {
            document.getElementById("numOfActiveSwitches").innerHTML = "You currently have no active switches"
         }
       });
-      this.getDolarValueOfTokens();
+      // this.getDolarValueOfTokens();
   },
 
   fetchReceivedSwitches: function (_account) {
-    // const BENEFITOR_SWITCHES = `{
-    //   switches(where: {benefitor: "${_account}"}) {
-    //     id
-    //     name
-    //     unlockTimestamp
-    //     benefitor
-    //     executor
-    //     isExecuted
-    //     ethersLocked
-    //     tokensLocked {
-    //       id
-    //       amountLocked
-    //     }
-    //     collectiblesLocked {
-    //       id
-    //       collectibleId
-    //       benefitor
-    //     }
-    //   }
-    // }`;
     const BENEFITOR_SWITCHES = `{
-      switches(where: {benefitor: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
+      switches(where: {benefitor: "${_account}"}) {
         id
         name
         unlockTimestamp
@@ -272,24 +253,8 @@ window.App = {
         }
       }
     }`;
-
-    fetch(graphqlUri, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: BENEFITOR_SWITCHES }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        let resData = res.data.switches
-        console.log("ben",resData)
-        resData.map(el => {
-          this.createReceivedSwitchesPage(el)
-        })
-        
-      }); 
-
-    // const EXECUTOR_SWITCHES = `{
-    //   switches(where: {executor: "${_account}"}) {
+    // const BENEFITOR_SWITCHES = `{
+    //   switches(where: {benefitor: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
     //     id
     //     name
     //     unlockTimestamp
@@ -307,7 +272,43 @@ window.App = {
     //       benefitor
     //     }
     //   }
-    // }`
+    // }`;
+
+    fetch(graphqlUri, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: BENEFITOR_SWITCHES }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let resData = res.data.switches
+        console.log("ben",resData)
+        resData.map(el => {
+          this.createReceivedSwitchesPage(el)
+        })
+        
+      }); 
+
+    const EXECUTOR_SWITCHES = `{
+      switches(where: {executor: "${_account}"}) {
+        id
+        name
+        unlockTimestamp
+        benefitor
+        executor
+        isExecuted
+        ethersLocked
+        tokensLocked {
+          id
+          amountLocked
+        }
+        collectiblesLocked {
+          id
+          collectibleId
+          benefitor
+        }
+      }
+    }`
     // const EXECUTOR_SWITCHES = `{
     //   switches(where: {executor: "0xaaad7966ebe0663b8c9c6f683fb9c3e66e03467f"}) {
     //     id
@@ -328,19 +329,19 @@ window.App = {
     //     }
     //   }
     // }`;
-    // fetch(graphqlUri, {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ query: EXECUTOR_SWITCHES }),
-    // })
-    //   .then((res) => res.json())
-    //   .then((res) => {
-    //     let resData = res.data.switches
-    //     console.log(resData)
-    //     resData.map(el => {
-    //       this.createReceivedSwitchesPage(el)
-    //     })
-    //   }); 
+    fetch(graphqlUri, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: EXECUTOR_SWITCHES }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let resData = res.data.switches
+        console.log(resData)
+        resData.map(el => {
+          this.createReceivedSwitchesPage(el)
+        })
+      }); 
   },
   
   switchOverview: function() {
@@ -833,7 +834,7 @@ window.App = {
           </div>
         </div>
         <div class="execute-button-received">
-          <button class="button-primary">Execute</button>
+          <button class="button-primary" id="recivedSwitchExe">Execute</button>
         </div>
       </div>
     </div>
@@ -863,9 +864,11 @@ window.App = {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
     if(diffDays < 0) {
-      document.getElementById(`timeLeftRec${_receivedSwitch.id}`).innerHTML= "0 days"
+      document.getElementById(`timeLeftRec${_receivedSwitch.id}`).innerHTML= "0 days";
+      document.getElementById("recivedSwitchExe").disabled = false;
     } else {
-      document.getElementById(`timeLeftRec${_receivedSwitch.id}`).innerHTML= diffDays + " days"
+      document.getElementById(`timeLeftRec${_receivedSwitch.id}`).innerHTML= diffDays + " days";
+      document.getElementById("recivedSwitchExe").disabled = true;
     }
   },
 // helper function
@@ -1004,9 +1007,11 @@ window.App = {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
     if(diffDays < 0) {
-      document.getElementById(`timeLeft${_switch.id}`).innerHTML= "0 days"
+      document.getElementById(`timeLeft${_switch.id}`).innerHTML = "0 days"
+      document.getElementById("mySwichExe").disabled = false;
     } else {
-      document.getElementById(`timeLeft${_switch.id}`).innerHTML= diffDays + " days"
+      document.getElementById(`timeLeft${_switch.id}`).innerHTML = diffDays + " days"
+      document.getElementById("mySwichExe").disabled = true;
     }
   
   },
