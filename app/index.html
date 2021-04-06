@@ -6,18 +6,19 @@
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link href='https://fonts.googleapis.com/css?family=Poppins:wght@500&display=swap' rel='stylesheet' type='text/css'>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.0/slimselect.min.css" rel="stylesheet"></link>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.0/slimselect.min.css" rel="stylesheet">
+  </link>
   <script src="./app.js"></script>
 
- <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-PLF6S4L48R"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PLF6S4L48R"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
 
-  gtag('config', 'G-PLF6S4L48R');
-</script>
+    gtag('config', 'G-PLF6S4L48R');
+  </script>
 </head>
 
 <body>
@@ -34,7 +35,8 @@
     <ul class="nav-menu-items nav">
       <li class="menu-item nav-link"><a href="" target="_blank">How it works?</a></li>
       <li class="menu-item nav-link">
-        <a href="https://github.com/Omodaka9375/Time-Based-Switch-on-Ethereum" target="_blank">GitHub</a></li>
+        <a href="https://github.com/Omodaka9375/Time-Based-Switch-on-Ethereum" target="_blank">GitHub</a>
+      </li>
       <li class="menu-item nav-link"><a href="https://discord.com/invite/ZWZ9Jk77vt" target="_blank">Discord</a>
       </li>
     </ul>
@@ -62,22 +64,21 @@
         <p class="nice-text-class">Nice to see
           you!</p>
         <p class="active-switches-class" id="numOfActiveSwitches">
-           You currently have no active switches
+          You currently have no active switches
         </p>
       </div>
       <div class="create-switch-button-box">
-        <button onclick="App.showCreatePage()" class="button-primary"
-          style="font-weight: 600;">+
+        <button onclick="App.showCreatePage()" class="button-primary" style="font-weight: 600;">+
           Create switch</button>
       </div>
     </div>
     <div class="switch-tabs" id="myTabs">
-       <div class="tabs">
-          <a id="tablinks-mySwitches" class="tablinks-nav blue-undeline" onclick="App.openMySwitch()">My Switches</a>
-          <a id="tablinks-receivedSwitches" class="tablinks-nav" onclick="App.receivedSwitches()">Received Switches</a>
-       </div>
-       <div id="mySwitchData"></div>
-       <div id="myReceivedSwitchData"></div>
+      <div class="tabs">
+        <a id="tablinks-mySwitches" class="tablinks-nav blue-undeline" onclick="App.openMySwitch()">My Switches</a>
+        <a id="tablinks-receivedSwitches" class="tablinks-nav" onclick="App.receivedSwitches()">Received Switches</a>
+      </div>
+      <div id="mySwitchData"></div>
+      <div id="myReceivedSwitchData"></div>
     </div>
   </div>
   <div class="overview" id="swOverview">
@@ -88,14 +89,14 @@
     <h1 id="editSwitchName">Name</h1>
     <hr>
   </div>
-  
+
   <div id="overlay">
     <div id="overlayBox">
-      <div class="overlay-box-head"> 
+      <div class="overlay-box-head">
         <img class="metamask-image" src="metamask.png" />
-        <h4>MetaMask</h4> 
+        <h4>MetaMask</h4>
       </div>
-	    <div id="maessageBox">
+      <div id="maessageBox">
         <div class="loader"></div>
         <div class="loader-text">
           <div class="upper-text">Waiting for MetaMask...</div>
@@ -103,7 +104,7 @@
         </div>
       </div>
     </div>
- </div>
+  </div>
 
 
   <div id="create" class="central-wrapper">
@@ -120,7 +121,7 @@
       <div class="form-box">
         <div class="form-element-header">Switch name</div>
         <div class="form-element-subheader">Give your switch a name of your choice</div>
-        <input type="text" id="name" value=""/>
+        <input type="text" id="name" value="" />
         <div class="form-element-header">Timeout period</div>
         <div class="form-element-subheader">Set up period after which Switch can be executed</div>
         <div class="select-wrapper">
@@ -129,10 +130,11 @@
             <option name="months" value="months">Months</option>
             <option name="years" value="years">Years</option>
           </select>
-          <input type="number" class="only-positive" min="1" style="width: 42%" id="periodTime"  oninput="App.timeExecutionLeft()"/>
+          <input type="number" class="only-positive" min="1" style="width: 42%" id="periodTime"
+            oninput="App.timeExecutionLeft()" />
         </div>
         <div class="expire-date"><span id="timeText">Your timeout
-          will expire on</span><span id="date"></span> at <span id="time"></span></div>
+            will expire on</span><span id="date"></span> at <span id="time"></span></div>
       </div>
     </div>
   </div>
@@ -149,39 +151,42 @@
     </div>
     <div class="right-wrapper">
       <div class="add-new-asset">
-      <div id="asset" class="form-box">
-        <div class="form-element-header">Select asset</div>
-        <select name="token" id="selectToken" class="select-element-tokens" style="width: 100%;" disabled="true">
-         
-        </select>
-        <div class="form-element-header">Amount</div>
-        <div class="form-element-subheader">Set up the amount that will be locked
-          and sent once the
-          switch expires</div>
-        <div style="display: flex; justify-content: space-between;">
-          <input type="number" class="only-positive" id="tokenAmount" style="width: 42%" min="0" oninput="App.inputETHValue()" />
-          <input style="width: 42%" id="tokenAmountCash" disabled value="0.00$"/>
-        </div>
-        <div class="options-wrapper">
-          <label class="container">
-            <input type="radio" id="queter" class="option" name="gender" value="25%" onclick="App.queterDefineAmount()">
-            <span class="checkmark">25%</span>
-          </label>
-          <label class="container">
-            <input type="radio" id="half" class="option" name="gender" value="50%" onclick="App.halfDefineAmount()">
-            <span class="checkmark">50%</span>
-          </label>
-          <label class="container">
-            <input type="radio" id="tree-queters" class="option" name="gender" value="75%" onclick="App.treequetersDefineAmount()">
-            <span class="checkmark">75%</span>
-          </label>
-          <label class="container">
-            <input type="radio" id="full" class="option" name="gender" value="100%" onclick="App.fullDefineAmount()">
-            <span class="checkmark">100%</span>
-          </label>
+        <div id="asset" class="form-box">
+          <div class="form-element-header">Select asset</div>
+          <select name="token" id="selectToken" class="select-element-tokens" style="width: 100%;" disabled="true">
+
+          </select>
+          <div class="form-element-header">Amount</div>
+          <div class="form-element-subheader">Set up the amount that will be locked
+            and sent once the
+            switch expires</div>
+          <div style="display: flex; justify-content: space-between;">
+            <input type="number" class="only-positive" id="tokenAmount" style="width: 42%" min="0"
+              oninput="App.inputETHValue()" />
+            <input style="width: 42%" id="tokenAmountCash" disabled value="0.00$" />
+          </div>
+          <div class="options-wrapper">
+            <label class="container">
+              <input type="radio" id="queter" class="option" name="gender" value="25%"
+                onclick="App.queterDefineAmount()">
+              <span class="checkmark">25%</span>
+            </label>
+            <label class="container">
+              <input type="radio" id="half" class="option" name="gender" value="50%" onclick="App.halfDefineAmount()">
+              <span class="checkmark">50%</span>
+            </label>
+            <label class="container">
+              <input type="radio" id="tree-queters" class="option" name="gender" value="75%"
+                onclick="App.treequetersDefineAmount()">
+              <span class="checkmark">75%</span>
+            </label>
+            <label class="container">
+              <input type="radio" id="full" class="option" name="gender" value="100%" onclick="App.fullDefineAmount()">
+              <span class="checkmark">100%</span>
+            </label>
+          </div>
         </div>
       </div>
-    </div>
       <div class="new-asset-button" onclick="App.addAsset()" id="assetButton">
         <h5>+ Add new asset</h5>
       </div>
@@ -203,19 +208,24 @@
         <div class="form-element-header">Recepient</div>
         <div class="form-element-subheader">Once the switch is executed, assets
           will be sent to the following wallet address</div>
-        <input type="text" id="contractAddress" placeholder="Paste contract address" value=""/>
+        <input type="text" id="contractAddress" placeholder="Paste contract address" value="" />
         <div class="form-element-header">Executor</div>
         <div class="form-element-subheader">Please paste the executor wallet
           address</div>
-        <select name="token" class="select-element-tokens" id="autoManual" style="width: 100%;" onchange="App.autoManuallInput()">
+        <select name="token" class="select-element-tokens" id="autoManual" style="width: 100%;"
+          onchange="App.onExecutorOptionChange()">
           <option name="auto" value="Automatically">
-              Automatically
+            Automatically
           </option>
           <option name="manu" value="Manually">
-              Manually
+            Manually
           </option>
         </select>
-        <input type="text" id="executorAddress" placeholder="Paste executor address" value="" style="display: none;"/>
+        <input type="text" id="executorAddress" placeholder="Paste executor address" value="" style="display: none;" />
+        <div id="chainlinkBot" class="notification-message-box" style="background-color: #f0f0f0; margin-bottom: 10px;">
+          <img class="wallet-image" style="margin-right: 0;" src="chainlink.png" />
+          <div class="notification-box">Chainlink Keeper bot</div>
+        </div>
         <div class="notification-message-box">
           <i class="fas fa-info"></i>
           <div class="notification-box">
@@ -227,57 +237,6 @@
       </div>
     </div>
   </div>
-
-  <!-- <div id="creat" style="display: none;">
-    <br>
-    <label for="amountC">Set amount in <i>ether</i> to be locked in smart contract:</label>
-    <br>
-    <input id="amountC" type="number" min="0" />
-    <br><br>
-    <label for="timeC">Set time in days for this payment to be locked:</label><br>
-    <input id="timeC" type="number" min="0" />
-    <br><br>
-    <label for="executorC">Set executor for this switch:</label><br>
-    <input id="executorC" type="text" />
-    <br><br>
-    <label for="benefitorC">Set time in days for this payment to be locked:</label><br>
-    <input id="benefitorC" type="text" />
-    <br><br>
-    <input id="bttn" type="button" value="Create Switch" onclick="App.createSwitch();" />
-  </div>
-  <div id="checkSwitch" style="display: none;">
-    <p id="checkStatus"></p>
-    <div id="checkRole">
-      <h2>Are You The <a href="#" onclick="App.showCreatorOptions();">Creator</a> Or The <a href="#"
-          onclick="App.showExecutorsOptions();">Executor</a> Of This Switch?</h2>
-      <div id="executorR" style="display: none;">
-        <br><br>
-        <input id="tryExecute" type="button" value="Try Execute" onclick="App.tryExecute();" />
-      </div>
-      <div id="creatorR" style="display: none;">
-        <br><br>
-        <input id="terminate" type="button" value="Terminate Early" onclick="App.terminate();" />
-        <br><br>
-        <label for="updateAmount">Update amount (in ether):</label><br>
-        <input id="updateAmount" type="number" /><br>
-        <input id="bttn" type="button" value="Update amount" onclick="App.updateAmount();" /><br><br>
-
-        <label for="updateBenefitor">Update benefitor address:</label><br>
-        <input id="updateBenefitor" type="text" /><br>
-        <input id="bttn" type="button" value="Update benefitor" onclick="App.updateBenefitor();" /><br><br>
-
-        <label for="updateExecutor">Update executor address:</label><br>
-        <input id="updateExecutor" type="text" /><br>
-        <input id="bttn" type="button" value="Update executor" onclick="App.updateExecutor();" /><br><br>
-
-        <label for="updateCooldown">Update cooldown (in days):</label><br>
-        <input id="updateCooldown" type="number" /><br>
-        <input id="bttn" type="button" value="Update cooldown" onclick="App.updateCooldown();" /><br><br>
-
-      </div>
-    </div>
-
-  </div> -->
 
 
   <div id="createFooter">

@@ -6,10 +6,19 @@ import { default as Web3 } from "web3";
 import { default as contract } from "truffle-contract";
 import SlimSelect from 'slim-select';
 import ercTokens from "../ercTokens";
+import abi from '../abis/tbs.abi.json';
+import erc20abi from '../abis/erc20.abi.json';
+import erc721abi from '../abis/erc721abi.json';
 
 // import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.json'
-import TimeBasedSwitch_artifacts from "web3";
-var TimeBasedSwitch = contract(TimeBasedSwitch_artifacts);
+// import TimeBasedSwitch_artifacts from "web3";
+
+const timeBaseSwitchAddress = `0x0e179683C05b430487e88ca0baa6080Ac00fc03D`; // kovan network
+const graphqlUri = "https://api.thegraph.com/subgraphs/name/andrejrakic/time-based-switch";
+const keeperRegistry = `0xAaaD7966EBE0663b8C9C6f683FB9c3e66E03467F`;
+const dolarTokensValue = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum%2C%20binancecoin%2C%20uniswap%2C%20chainlink%2C%20aave%2C%20tether%2C%20dai%2C%20usd-coin%2C%20havven%2C%20sushi%2C%20enjincoin%2C%20celsius-degree-token%2C%20maker%2C%20compound-coin%2C%20matic-network%2C%20uma%2C%200x&order=market_cap_desc&per_page=100&page=1&sparkline=false";//not functional api
+
+var TimeBasedSwitch;
 
 var accounts;
 let firstPerodInput;
@@ -23,20 +32,18 @@ let editSwitchId;
 let editSwitchName; 
 let editSwitchBenefitor;
 let editSwitchExecutor;
-const keeperRegistry = `0xAaaD7966EBE0663b8C9C6f683FB9c3e66E03467F`;
 
 
-const dolarTokensValue = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum%2C%20binancecoin%2C%20uniswap%2C%20chainlink%2C%20aave%2C%20tether%2C%20dai%2C%20usd-coin%2C%20havven%2C%20sushi%2C%20enjincoin%2C%20celsius-degree-token%2C%20maker%2C%20compound-coin%2C%20matic-network%2C%20uma%2C%200x&order=market_cap_desc&per_page=100&page=1&sparkline=false";//not functional api
-const graphqlUri =
-  "https://api.thegraph.com/subgraphs/name/andrejrakic/time-based-switch";
 
 window.App = {
-  start: function () {
+  start: async function () {
     var self = this;
-    TimeBasedSwitch.setProvider(web3.currentProvider);
+    // TimeBasedSwitch.setProvider(web3.currentProvider);
     // this.connectMetamask();
     App.initWeb3();
     document.getElementById("myReceivedSwitchData").style.display="none";
+
+    TimeBasedSwitch = web3.eth.contract(abi).at(timeBaseSwitchAddress);
     
     new SlimSelect({
       select: '#selectToken',
@@ -151,65 +158,27 @@ window.App = {
   },
 
   fetchMySwitches: function (_account) {
-    // const SWITCHES = `{
-    //   switch(id: "${_account}") {
-    //     id
-    //     name
-    //     executor
-    //     benefitor
-    //     unlockTimestamp
-    //     isExecuted
-    //     ethersLocked
-    //     tokensLocked {
-    //       id
-    //       amountLocked
-    //     }
-    //     collectiblesLocked {
-    //       id
-    //       collectibleId
-    //       benefitor
-    //     }
-    //   }
-    // }`
-    // const SWITCHES = `{
-    //   switch(id: "0x80da8831a594327cd9e79e648402cc7c1863aafa") {
-    //     id
-    //     name
-    //     executor
-    //     benefitor
-    //     unlockTimestamp
-    //     isExecuted
-    //     ethersLocked
-    //     tokensLocked {
-    //       id
-    //       amountLocked
-    //     }
-    //     collectiblesLocked {
-    //       id
-    //       collectibleId
-    //       benefitor
-    //     }
-    //   }
-    // }`;
-    const SWITCHES =`{switches(where: {id: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
-      id
-      name
-      unlockTimestamp
-      benefitor
-      executor
-      isExecuted
-      ethersLocked
-      tokensLocked {
-        tokenAddress
-        amountLocked
-      }
-      collectiblesLocked {
+    const SWITCHES = `{
+      switch(where: {id: "${_account}"}) {
         id
-        collectibleId
+        name
+        executor
         benefitor
+        unlockTimestamp
+        isExecuted
+        ethersLocked
+        tokensLocked {
+          id
+          amountLocked
+        }
+        collectiblesLocked {
+          id
+          collectibleId
+          benefitor
+        }
       }
-    }
-   }`
+    }`
+
     fetch(graphqlUri, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -218,7 +187,7 @@ window.App = {
       .then((res) => res.json())
       .then((res) => {
         const resSwitch = res.data.switches;
-        console.log("RES",resSwitch)
+
         resSwitch.map(el=> {
           this.createSwitchPage(el);
         })
@@ -232,28 +201,8 @@ window.App = {
   },
 
   fetchReceivedSwitches: function (_account) {
-    // const BENEFITOR_SWITCHES = `{
-    //   switches(where: {benefitor: "${_account}"}) {
-    //     id
-    //     name
-    //     unlockTimestamp
-    //     benefitor
-    //     executor
-    //     isExecuted
-    //     ethersLocked
-    //     tokensLocked {
-    //       id
-    //       amountLocked
-    //     }
-    //     collectiblesLocked {
-    //       id
-    //       collectibleId
-    //       benefitor
-    //     }
-    //   }
-    // }`;
     const BENEFITOR_SWITCHES = `{
-      switches(where: {benefitor: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
+      switches(where: {benefitor: "${_account}"}) {
         id
         name
         unlockTimestamp
@@ -281,66 +230,46 @@ window.App = {
       .then((res) => res.json())
       .then((res) => {
         let resData = res.data.switches
-        console.log("ben",resData)
+
         resData.map(el => {
           this.createReceivedSwitchesPage(el)
         })
         
       }); 
 
-    // const EXECUTOR_SWITCHES = `{
-    //   switches(where: {executor: "${_account}"}) {
-    //     id
-    //     name
-    //     unlockTimestamp
-    //     benefitor
-    //     executor
-    //     isExecuted
-    //     ethersLocked
-    //     tokensLocked {
-    //       id
-    //       amountLocked
-    //     }
-    //     collectiblesLocked {
-    //       id
-    //       collectibleId
-    //       benefitor
-    //     }
-    //   }
-    // }`
-    // const EXECUTOR_SWITCHES = `{
-    //   switches(where: {executor: "0xaaad7966ebe0663b8c9c6f683fb9c3e66e03467f"}) {
-    //     id
-    //     name
-    //     unlockTimestamp
-    //     benefitor
-    //     executor
-    //     isExecuted
-    //     ethersLocked
-    //     tokensLocked {
-    //       id
-    //       amountLocked
-    //     }
-    //     collectiblesLocked {
-    //       id
-    //       collectibleId
-    //       benefitor
-    //     }
-    //   }
-    // }`;
-    // fetch(graphqlUri, {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ query: EXECUTOR_SWITCHES }),
-    // })
-    //   .then((res) => res.json())
-    //   .then((res) => {
-    //     let resData = res.data.switches
-    //     console.log(resData)
-    //     resData.map(el => {
-    //       this.createReceivedSwitchesPage(el)
-    //     })
-    //   }); 
+    const EXECUTOR_SWITCHES = `{
+      switches(where: {executor: "${_account}"}) {
+        id
+        name
+        unlockTimestamp
+        benefitor
+        executor
+        isExecuted
+        ethersLocked
+        tokensLocked {
+          id
+          amountLocked
+        }
+        collectiblesLocked {
+          id
+          collectibleId
+          benefitor
+        }
+      }
+    }`
+    fetch(graphqlUri, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: EXECUTOR_SWITCHES }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let resData = res.data.switches
+
+        resData.map(el => {
+          this.createReceivedSwitchesPage(el)
+        })
+      }); 
   },
   
   switchOverview: function() {
@@ -651,7 +580,7 @@ window.App = {
     const overviewFooter = document.getElementById("editSwicthFooter");
     overviewFooter.style.display = "none";
   },
-  createSwitch: function() {
+  createSwitch: async function() {
     let switchName = document.getElementById("name").value;
     let period = document.querySelector("#period").value; 
     let periodTime = document.getElementById("periodTime").value;
@@ -734,11 +663,21 @@ window.App = {
            'event_category' : 'nft',
               'event_label' : 'nft'
          });
-       }
+    }
       gtag('event', 'create_switch', {
            'event_category' : 'create_switch',
               'event_label' : 'create_switch'
-         });
+      });
+    
+
+    const day = 86400000;
+    timeoutPeriod *= day;
+    timeoutPeriod += Date.now();
+
+    const _amount = web3.toWei(tokenAmountETH, 'ether');
+
+    this._createSwitch(switchName, timeoutPeriod, _amount, executorAddress, contractAddress);
+
   },
   timeExecutionLeft: function () {
     let period = document.querySelector("#period").value; 
@@ -799,7 +738,6 @@ window.App = {
     })
    }
     tokensArray.unshift(ethObj)
-    console.log("rrr",tokensArray)
 
     let receivedSwitchDiv = `
     <div class="received-switch">
@@ -833,7 +771,7 @@ window.App = {
           </div>
         </div>
         <div class="execute-button-received">
-          <button class="button-primary">Execute</button>
+          <button class="button-primary" onClick="App._tryExecuteSwitch('${_receivedSwitch.id}')">Execute</button>
         </div>
       </div>
     </div>
@@ -971,10 +909,10 @@ window.App = {
     <div class="switch-buttons">
       <div class="edit-delete-buttons">
         <button class="button-terciary" onClick="App.singleSwitchEdit('${switch_id}', '${_switch.name}', '${benefitor}', '${executor}', ${timeoutSwitchPeriod})">Edit</button>
-        <button class="button-terciary">Delete</button>
+        <button class="button-terciary" onClick="App.deleteSwitch()">Delete</button>
       </div>
       <div class="execute-button">
-        <button class="button-primary" id="mySwichExe">Execute</button>
+        <button class="button-primary" id="mySwichExe" onClick="App._tryExecuteSwitch('${switch_id}')">Execute</button>
       </div>
     </div>
    </div>
@@ -1194,7 +1132,7 @@ window.App = {
     </div>
     </div>
     <div class="asset-buttons">
-      <button class="approve-asset-button">Approve</button>
+      <button class="approve-asset-button" onClick="App.approve(${idNew})">Approve</button>
       <button class="delete-assets-button" onClick="App.deleteAssets('asset${idNew}')">Delete</button>
       </div>
    </div>
@@ -1223,7 +1161,7 @@ window.App = {
         {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/3263/large/CEL_logo.png?1609598753" /> <span class="tok">Celsius Network (CEL)</span></span>', text: 'Celsius Network (CEL)', value: 'cel'},
         {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/10951/large/UMA.png?1586307916" /> <span class="tok">UMA Token (UMA)</span></span>', text: 'UMA Token (UMA)', value: 'uma'},
         {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/863/large/0x.png?1547034672" /> <span class="tok">0x Protocol Token (ZRX)</span></span>', text: '0x Protocol Token (ZRX)', value: 'zrx'},
-        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/3570/large/cropped-compoundcoin.png?1547038419" /> <span class="tok">Compound Coin (COMP)</span></span>', text: 'Compound Coin (COMP)', value: 'comp'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/10775/large/COMP.png?1592625425" /> <span class="tok">Compound Coin (COMP)</span></span>', text: 'Compound Coin (COMP)', value: 'comp'},
         {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png?1547034700" /> <span class="tok">ChainLink (LINK)</span></span>', text: 'ChainLink (LINK)', value: 'link'}
         ]
       },
@@ -1248,8 +1186,8 @@ window.App = {
     <div class="form-element-header">Address & ID</div>
     <div class="form-element-subheader">Please provide contract addreess and ID of NFT tocken you want to lock</div>
     <div>
-      <input name="conAddress" type="text" style="width: 94%" id="contractAddressNFT" value="" placeholder="Contract address"/>
-      <input name="nftIdName" type="text" style="width: 94%"  id="nftId"  value="" placeholder="NFT ID"/>
+      <input name="conAddress" type="text" style="width: 94%" id="contractAddressNFT${idNew}" value="" placeholder="Contract address"/>
+      <input name="nftIdName" type="text" style="width: 94%"  id="nftId${idNew}"  value="" placeholder="NFT ID"/>
     </div>
     </div>
     `;
@@ -1302,162 +1240,116 @@ window.App = {
   deleteAssets: function (id) {
     document.getElementById(id).remove();
   },
-  autoManuallInput: function() {
-    let val = document.getElementById("autoManual").value;
-    if(val == "Automatically") {
-      document.getElementById("executorAddress").style.display="none"
+  approve: function (id) {
+    const valSelect = document.getElementById("selectToken"+id).value;
+
+    if(valSelect == "ERC-721") {
+      const _tokenAddress = document.getElementById('contractAddressNFT'+id).value;
+      const _tokenId = document.getElementById('nftId'+id).value;
+
+      this._approveERC721(_tokenAddress, timeBaseSwitchAddress, _tokenId);
     } else {
-      document.getElementById("executorAddress").style.display="block"
+      const selectedToken = ercTokens.tokens.find(token => token.symbol == valSelect.toUpperCase());
+      const _tokenAddress = selectedToken.address;
+      const inputAmount = document.getElementById("tokenAmount"+id).value;
+      const _decimals = selectedToken.decimals;
+      const _amount = inputAmount * Math.pow(10, _decimals);
+
+      this._approveERC20(_tokenAddress, timeBaseSwitchAddress, _amount);
     }
-
   },
-// showCheck: function () {
-  //   var checkDiv = document.getElementById("checkSwitch");
-  //   if(checkDiv.style.display == "none"){
-  //     checkDiv.style.display = "block";
-  //   } else {
-  //     checkDiv.style.display = "none";
-  //   }
-  // },
+  onExecutorOptionChange: function() {
+    const selectedMethod = document.getElementById("autoManual").value;
+    const executorAddressInput = document.getElementById("executorAddress");
+    const chainlinkBotBanner = document.getElementById("chainlinkBot");
 
-  // createSwitch: function () {
-  //   var self = this;
-  //   var tbs;
-  //   var timeleft_element = document.getElementById("timeleft");
+    if (selectedMethod === "Manually") {
+      executorAddressInput.value = "";
+      executorAddressInput.style.display = "flex";
+      chainlinkBotBanner.style.display = "none";
+    } else {
+      // automatically
+      executorAddressInput.value = keeperRegistry;
+      executorAddressInput.style.display = "none";
+      chainlinkBotBanner.style.display = "flex";
+    }
+  },
+  deleteSwitch: function () {
+    gtag('event', 'delete_switch', {
+      'event_category' : 'delete_switch',
+      'event_label' : 'delete_switch'
+    });
+    this._terminateSwitchEarly();
+  },
 
-  //   TimeBasedSwitch.deployed().then(function(instance) {
-  //   tbs = instance;
-  //   return tbs.createSwitch.call();}).then(function(value) {
-  //    	var timeleft_element = document.getElementById("timeleft");
-  //     var d = new Date(value.valueOf()*1000);
-  //    	      timeleft_element.innerHTML = d.toString();
-  //    	}).catch(function(e){
-  //   console.log(e);
-  //   self.setStatus(e);
-  //   });
-  // },
+  _createSwitch: function (_switchName, _time, _amount, _executor, _benefitor) {
+    const _name = web3.fromAscii(_switchName);
+    TimeBasedSwitch.createSwitch(_name, _time, _amount, _executor, _benefitor, { from: account, value: _amount }, function(err, txHash) {
+      if(!err) console.log(txHash);
+    })
+  },
 
-  // showCreatorOptions: function () {
-  //   var checkDiv = document.getElementById("creatorR");
-  //   if(checkDiv.style.display == "none"){
-  //     checkDiv.style.display = "block";
-  //   } else {
-  //     checkDiv.style.display = "none";
-  //   }
-  // },
+  _lockCollectible: function (_tokenAddress, _tokenId) {
+    TimeBasedSwitch.lockCollectible(_tokenAddress, _tokenId, { from: account, value: 0 }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
 
-  // showExecutorsOptions: function () {
-  //   var checkDiv = document.getElementById("executorR");
-  //   if(checkDiv.style.display == "none"){
-  //     checkDiv.style.display = "block";
-  //   } else {
-  //     checkDiv.style.display = "none";
-  //   }
-  // },
+  _lockToken: function (_tokenAddress, _amount) {
+    TimeBasedSwitch.lockToken(_tokenAddress, _amount, { from: account, value: 0 }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
 
-  // terminate: function () {
-  //   var self = this;
-  //   var TBS;
-  //   TimeBasedSwitch.deployed().then(function (instance) {
-  //     TBS = instance;
-  //     return TBS.tick({ from: account });
-  //   }).then(function () {
-  //     self.setStatus("Tick complete!");
-  //     self.refreshTimeLeft();
-  //   }).catch(function (e) {
-  //     console.log(e);
-  //     self.setStatus(e);
-  //   });
-  // },
+  _terminateSwitchEarly: function () {
+    TimeBasedSwitch.terminateSwitchEarly({ from: account, value: 0 }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
 
-  // tryExecute: function () {
-  //   var self = this;
+  _tryExecuteSwitch: function (_account) {
+    TimeBasedSwitch.tryExecuteSwitch(_account, { from: account, value: 0 }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
 
-  //   var TBS;
-  //   TimeBasedSwitch.deployed().then(function (instance) {
-  //     TBS = instance;
-  //     return TBS.kick( Date.now()/1000 + 30, {from: account});
-  //   }).then(function() {
-  //     self.setStatus("Kick complete!");
-  //     self.refreshTimeLeft();
-  //   }).catch(function (e) {
-  //     console.log(e);
-  //     self.setStatus(e);
-  //   });
+  _updateSwitchAmount: function (_amount) {
+    TimeBasedSwitch.updateSwitchAmount({ from: account, value: _amount }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
 
-  // },
+  _updateSwitchUnlockTime: function (_timestamp) {
+    TimeBasedSwitch.updateSwitchUnlockTime(_timestamp, { from: account, value: 0 }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
 
-  // updateAmount: function () {
-  //   var self = this;
+  _updateSwitchExecutor: function (_executor) {
+    TimeBasedSwitch.updateSwitchExecutor(_executor, { from: account, value: 0 }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
 
-  //   var beneficiary = document.getElementById("beneficiary").value;
-  //   var data = document.getElementById("data").value;
+  _updateSwitchBenefitor: function (_benefitor) {
+    TimeBasedSwitch.updateSwitchBenefitor(_benefitor, { from: account, value: 0 }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
 
-  //   var TBS;
+  _approveERC20: function(_tokenAddress, _spender, _amount) {
+    const token = web3.eth.contract(erc20abi).at(_tokenAddress);
+    token.approve(_spender, _amount, { from: account }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
 
-  //   TimeBasedSwitchh.deployed().then(function (instance) {
-  //     TBS = instance;
-  //     return TBS.CreateDeadAccountSwitch(beneficiary, data, Date.now()/1000, {from: account, gas: 3141592});
-  //   }).then(function() {
-  //     self.setStatus("Transaction complete!");
-
-  //   }).catch(function (e) {
-  //     console.log(e);
-  //     self.setStatus(e);
-  //   });
-  // },
-
-  // updateBenefitor: function () {
-  //   console.log("readmessage");
-  //   var self = this;
-  //   var sender = document.getElementById("sender").value;
-
-  //   self.getLastHeartbeat(sender);
-  //   self.getMessage(sender);
-
-  // },
-
-  // updateExecutor: function (sender) {
-  //   var self = this;
-  //   var TBS;
-  //   var message_element = document.getElementById("message");
-  //   console.log("getMessage for " + sender);
-  //   TimeBasedSwitch.deployed().then(function (instance) {
-  //     TBS = instance;
-  //     console.log("resolved contract instance getMessage");
-  //     return TBS.getDataFromAddress.call(sender, {from: account});
-  //   }).then(function (value) {
-  //     console.log("resolved getDataFromAddress");
-  //     message_element.innerHTML = web3.toAscii(value.valueOf());
-  //   }).catch(function (e) {
-  //     console.log("catch getDataFromAddress");
-  //     console.log(e);
-  //     self.setStatus(e);
-  //     message_element.innerHTML = "Your friend is not dead yet";
-  //   });
-  // },
-
-  // updateCooldown: function (sender) {
-  //   var self = this;
-  //   var TBS;
-  //   var heatbeat_time_element = document.getElementById("heartbeat");
-  //   console.log("getLastHeartbeat for " + sender);
-  //   TimeBasedSwitch.deployed().then(function (instance) {
-  //     console.log("getLastHeartbeat resolved contract instance");
-  //     TBS = instance;
-  //     return TBS.getExpirationTime.call(sender);
-  //   }).then(function (value) {
-  //     console.log("resolved getExpirationTime " + value);
-  //     var lastHeartbeat = new Date((value * 1000) - 30);
-  //     console.log("last heartbeat date value" + lastHeartbeat);
-  //     heatbeat_time_element.innerHTML = lastHeartbeat.toString();;
-  //   }).catch(function (e) {
-  //     heatbeat_time_element.innerHTML = "Entry not found";
-  //     console.log("catch getExpirationTime");
-  //     console.log(e);
-  //     self.setStatus(e);
-  //   });
-// },
+  _approveERC721: function(_tokenAddress, _spender, _tokenId) {
+    const collectible = web3.eth.contract(erc721abi).at(_tokenAddress);
+    collectible.approve(_spender, _tokenId, { from: account }, function(err, txHash) {
+      if(!err) return txHash;
+    })
+  },
 
 initWeb3: function () {
     if (window.ethereum) {
@@ -1486,6 +1378,10 @@ initWeb3: function () {
       );
     }
     web3 = new Web3(App.web3Provider);
+
+    if (web3.version.network !== '42') {
+      alert('Please connect to the Kovan network');
+    }
   },
 };
 

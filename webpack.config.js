@@ -16,7 +16,8 @@ module.exports = {
       { from: './app/assets/cryptotimer-logo.svg', to: "cryptotimer-logo.svg" },
       { from: './app/assets/bg.png', to: "bg.png" },
       { from: './app/assets/metamask.png', to: "metamask.png" },
-      { from: './app/assets/random-avatar-1.png', to: "avatar1.png" }
+      { from: './app/assets/random-avatar-1.png', to: "avatar1.png" },
+      { from: './app/assets/chainlink.png', to: "chainlink.png" }
     ])
   ],
   module: {
