@@ -35,7 +35,6 @@ window.App = {
     var self = this;
     TimeBasedSwitch.setProvider(web3.currentProvider);
     // this.connectMetamask();
-    this.getDolarValueOfTokens();
     App.initWeb3();
     document.getElementById("myReceivedSwitchData").style.display="none";
     
@@ -72,13 +71,13 @@ window.App = {
     }
     const burger = document.querySelector('.burger i');
     const nav = document.querySelector('.nav');
-    
+  
     function toggleNav() {
         burger.classList.toggle('fa-bars');
         burger.classList.toggle('fa-times');
         nav.classList.toggle('nav-active');
     }
-   
+  
     burger.addEventListener('click', function() {
         toggleNav();
     });
@@ -99,7 +98,7 @@ window.App = {
           image: item.image
         }
      });
-      // console.log('success!', tokensData);
+      console.log('success!', tokensData);
     }).catch((err) =>{
       console.warn('Something went wrong.', err)
     });  
@@ -171,7 +170,7 @@ window.App = {
           benefitor
         }
       }
-    // }`
+    }`
     // const SWITCHES = `{
     //   switch(id: "0x80da8831a594327cd9e79e648402cc7c1863aafa") {
     //     id
@@ -1510,6 +1509,6 @@ window.addEventListener("load", function () {
 
   // Modern dapp browsers...
   // App.initWeb3();
-
+  App.getDolarValueOfTokens();
   App.start();
 });
