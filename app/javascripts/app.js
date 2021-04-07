@@ -158,7 +158,7 @@ window.App = {
 
   fetchMySwitches: function (_account) {
     const SWITCHES = `{
-      switch(id: "${_account}") {
+      switches(where: {id: "${_account}"}) {
         id
         name
         executor
@@ -176,46 +176,8 @@ window.App = {
           benefitor
         }
       }
-    }`
-    // const SWITCHES = `{
-    //   switch(id: "0x80da8831a594327cd9e79e648402cc7c1863aafa") {
-    //     id
-    //     name
-    //     executor
-    //     benefitor
-    //     unlockTimestamp
-    //     isExecuted
-    //     ethersLocked
-    //     tokensLocked {
-    //       id
-    //       amountLocked
-    //     }
-    //     collectiblesLocked {
-    //       id
-    //       collectibleId
-    //       benefitor
-    //     }
-    //   }
-    // }`;
-  //   const SWITCHES =`{switches(where: {id: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
-  //     id
-  //     name
-  //     unlockTimestamp
-  //     benefitor
-  //     executor
-  //     isExecuted
-  //     ethersLocked
-  //     tokensLocked {
-  //       tokenAddress
-  //       amountLocked
-  //     }
-  //     collectiblesLocked {
-  //       id
-  //       collectibleId
-  //       benefitor
-  //     }
-  //   }
-  //  }`
+    }`;
+
     fetch(graphqlUri, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -258,26 +220,6 @@ window.App = {
         }
       }
     }`;
-    // const BENEFITOR_SWITCHES = `{
-    //   switches(where: {benefitor: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
-    //     id
-    //     name
-    //     unlockTimestamp
-    //     benefitor
-    //     executor
-    //     isExecuted
-    //     ethersLocked
-    //     tokensLocked {
-    //       id
-    //       amountLocked
-    //     }
-    //     collectiblesLocked {
-    //       id
-    //       collectibleId
-    //       benefitor
-    //     }
-    //   }
-    // }`;
 
     fetch(graphqlUri, {
       method: "POST",
@@ -313,26 +255,6 @@ window.App = {
         }
       }
     }`
-    // const EXECUTOR_SWITCHES = `{
-    //   switches(where: {executor: "0xaaad7966ebe0663b8c9c6f683fb9c3e66e03467f"}) {
-    //     id
-    //     name
-    //     unlockTimestamp
-    //     benefitor
-    //     executor
-    //     isExecuted
-    //     ethersLocked
-    //     tokensLocked {
-    //       id
-    //       amountLocked
-    //     }
-    //     collectiblesLocked {
-    //       id
-    //       collectibleId
-    //       benefitor
-    //     }
-    //   }
-    // }`;
     fetch(graphqlUri, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -685,20 +607,15 @@ window.App = {
     if(period == "days") {
       timeoutPeriod = periodTime 
     } else if (period == "months") {
-      // console.log(periodTime)
        const oneDay = 24 * 60 * 60 * 1000;
        const secondDate = new Date(new Date(Date.now()).setMonth(new Date(Date.now()).getMonth()+Number(periodTime)));
        const diffDays = Math.round(Math.abs((today - secondDate) / oneDay));
        timeoutPeriod = diffDays
-      //  console.log(today)
-      //  console.log(secondDate)
     } else if (period == "years"){
        const oneDay = 24 * 60 * 60 * 1000;
        const secondDateOfYear = new Date(new Date(Date.now()).setMonth(new Date(Date.now()).getMonth()+Number(periodTime*12)));
        const diffDaysOfYear = Math.round(Math.abs((today - secondDateOfYear) / oneDay));
        timeoutPeriod = diffDaysOfYear
-      //  console.log(today)
-      //  console.log(secondDateOfYear)
     }
 
     let otherTokens=[];
