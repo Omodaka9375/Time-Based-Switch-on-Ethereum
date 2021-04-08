@@ -177,7 +177,46 @@ window.App = {
         }
       }
     }`;
-
+    // const SWITCHES = `{
+    //   switch(id: "0x80da8831a594327cd9e79e648402cc7c1863aafa") {
+    //     id
+    //     name
+    //     executor
+    //     benefitor
+    //     unlockTimestamp
+    //     isExecuted
+    //     ethersLocked
+    //     tokensLocked {
+    //       id
+    //       amountLocked
+    //     }
+    //     collectiblesLocked {
+    //       id
+    //       collectibleId
+    //       benefitor
+    //     }
+    //   }
+    // }`
+    // const SWITCHES = `{
+    //   switches(where: {id: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
+    //     id
+    //     name
+    //     unlockTimestamp
+    //     benefitor
+    //     executor
+    //     isExecuted
+    //     ethersLocked
+    //     tokensLocked {
+    //       tokenAddress
+    //       amountLocked
+    //     }
+    //     collectiblesLocked {
+    //       id
+    //       collectibleId
+    //       benefitor
+    //     }
+    //   }
+    // }`;
     fetch(graphqlUri, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -220,6 +259,26 @@ window.App = {
         }
       }
     }`;
+    // const BENEFITOR_SWITCHES = `{
+    //   switches(where: {benefitor: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
+    //     id
+    //     name
+    //     unlockTimestamp
+    //     benefitor
+    //     executor
+    //     isExecuted
+    //     ethersLocked
+    //     tokensLocked {
+    //       id
+    //       amountLocked
+    //     }
+    //     collectiblesLocked {
+    //       id
+    //       collectibleId
+    //       benefitor
+    //     }
+    //   }
+    // }`;
 
     fetch(graphqlUri, {
       method: "POST",
@@ -254,7 +313,28 @@ window.App = {
           benefitor
         }
       }
-    }`
+    }`;
+    // const EXECUTOR_SWITCHES = `{
+    //   switches(where: {executor: "0xaaad7966ebe0663b8c9c6f683fb9c3e66e03467f"}) {
+    //     id
+    //     name
+    //     unlockTimestamp
+    //     benefitor
+    //     executor
+    //     isExecuted
+    //     ethersLocked
+    //     tokensLocked {
+    //       id
+    //       amountLocked
+    //     }
+    //     collectiblesLocked {
+    //       id
+    //       collectibleId
+    //       benefitor
+    //     }
+    //   }
+    // }`;
+
     fetch(graphqlUri, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -592,16 +672,28 @@ window.App = {
     } else {
       executorAddress = keeperRegistry;
     }
-     
-    let contractAddressNFT;
-    let NFTID;
-    if (document.getElementById("contractAddressNFT") && document.getElementById("nftId")) {
-      contractAddressNFT = document.getElementById("contractAddressNFT").value || "";
-      NFTID = document.getElementById("nftId").value || "";
-    } else {
-      contractAddressNFT = "";
-      NFTID = "";
-    }
+
+    let nftTokens = [];
+    let nftAddress = [];
+    let nftID = [];
+     let contractAddressNFT = document.querySelectorAll("input[name=conAddress]")
+     let NFTID =  document.querySelectorAll("input[name=nftIdName]")
+       if (contractAddressNFT.length > 0 && NFTID.length > 0) {
+          contractAddressNFT.forEach(el => {
+            nftAddress.push(el.value)
+          });
+          NFTID.forEach(el => {
+            nftID.push(el.value)
+          });
+          
+          nftAddress.forEach((el, i) => {
+            let nftObj = {};
+            nftObj.nftAddress = el;
+            nftObj.nftId = nftID[i];
+            nftTokens.push(nftObj);
+          });
+       }
+
     let timeoutPeriod;
     const today = new Date(Date.now());
     if(period == "days") {
@@ -640,8 +732,8 @@ window.App = {
           otherTokens.push(obj);
         })
     }
-    console.log(otherTokens)
-    console.log("switchName:",switchName,"period:",period,"periodTime:",periodTime,"selectTokenETH:",selectTokenETH,"tokenAmountETH:",tokenAmountETH,"contractAddress:",contractAddress,"executorAddress:",executorAddress,"contractAddressNFT:",contractAddressNFT,"NFTID:",NFTID, "timeoutPeriod", timeoutPeriod )
+    console.log(otherTokens, nftTokens)
+    console.log("switchName:",switchName,"period:",period,"periodTime:",periodTime,"selectTokenETH:",selectTokenETH,"tokenAmountETH:",tokenAmountETH,"contractAddress:",contractAddress,"executorAddress:",executorAddress,"timeoutPeriod", timeoutPeriod )
     otherTokens.map(e => {
         if (e.tokenName == "link"){
           gtag('event', 'chainlink', {
@@ -1109,6 +1201,7 @@ window.App = {
 
   addAsset: function (prop) {
     idNew = ++idNew;
+    dolar_val = tokensData[1].price;
     let addAsssetContent = `
     <div id="asset${idNew}" class="form-box new-asset">
     <div class="form-element-header">Select asset</div>
@@ -1196,24 +1289,6 @@ window.App = {
     <div style="display: flex; justify-content: space-between;">
       <input name="otherToken" class="only-positive" type="number" style="width: 42%" id="tokenAmount${idNew}" min="0" oninput="App.inputTokenValue(${idNew})"/>
       <input style="width: 42%" id="tokenAmountCash${idNew}" disabled value="0.00$"/>
-    </div>
-    <div class="options-wrapper">
-      <label class="container">
-        <input type="radio" id="queter" class="option" name="gender" value="25%">
-        <span class="checkmark">25%</span>
-      </label>
-      <label class="container">
-        <input type="radio" id="half" class="option" name="gender" value="50%">
-        <span class="checkmark">50%</span>
-      </label>
-      <label class="container">
-        <input type="radio" id="tree-queters" class="option" name="gender" value="75%">
-        <span class="checkmark">75%</span>
-      </label>
-      <label class="container">
-        <input type="radio" id="full" class="option" name="gender" value="100%">
-        <span class="checkmark">100%</span>
-      </label>
     </div>
     </div>
     `
