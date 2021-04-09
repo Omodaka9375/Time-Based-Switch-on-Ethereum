@@ -586,22 +586,45 @@ window.App = {
     let tokenAmountOther = document.querySelectorAll("input[name=otherToken]")
     let selectedTokenOtehr = document.querySelectorAll("select[name=tokenOther]")
     let contractAddress = document.getElementById("contractAddress").value;
-    let executorAddress;
-    if(document.getElementById("autoManual").value == "Manually"){
-      executorAddress = document.getElementById("executorAddress").value;
-    } else {
-      executorAddress = keeperRegistry;
-    }
+    let executorAddress = document.getElementById("executorAddress").value;
+    //if(document.getElementById("autoManual").value == "Manually"){
+    // executorAddress = document.getElementById("executorAddress").value;
+    //} else {
+      //executorAddress = keeperRegistry;
+    //}
      
-    let contractAddressNFT;
-    let NFTID;
-    if (document.getElementById("contractAddressNFT") && document.getElementById("nftId")) {
-      contractAddressNFT = document.getElementById("contractAddressNFT").value || "";
-      NFTID = document.getElementById("nftId").value || "";
-    } else {
-      contractAddressNFT = "";
-      NFTID = "";
+    // let contractAddressNFT;
+    // let NFTID;
+    // if (document.getElementById("contractAddressNFT") && document.getElementById("nftId")) {
+    //   contractAddressNFT = document.getElementById("contractAddressNFT").value || "";
+    //   NFTID = document.getElementById("nftId").value || "";
+    // } else {
+    //   contractAddressNFT = "";
+    //   NFTID = "";
+    // }
+
+    let nftTokens = [];
+    let nftAddress = [];
+    let nftID = [];
+    let contractAddressNFT = document.querySelectorAll("input[name=conAddress]")
+    let NFTID =  document.querySelectorAll("input[name=nftIdName]")
+       if (contractAddressNFT.length > 0 && NFTID.length > 0) {
+          contractAddressNFT.forEach(el => {
+            nftAddress.push(el.value)
+          });
+          NFTID.forEach(el => {
+            nftID.push(el.value)
+          });
+
+          nftAddress.forEach((el, i) => {
+            let nftObj = {};
+            nftObj.nftAddress = el;
+            nftObj.nftId = nftID[i];
+            nftTokens.push(nftObj);
+          });
     }
+
+
     let timeoutPeriod;
     const today = new Date(Date.now());
     if(period == "days") {
@@ -640,8 +663,8 @@ window.App = {
           otherTokens.push(obj);
         })
     }
-    console.log(otherTokens)
-    console.log("switchName:",switchName,"period:",period,"periodTime:",periodTime,"selectTokenETH:",selectTokenETH,"tokenAmountETH:",tokenAmountETH,"contractAddress:",contractAddress,"executorAddress:",executorAddress,"contractAddressNFT:",contractAddressNFT,"NFTID:",NFTID, "timeoutPeriod", timeoutPeriod )
+    console.log(otherTokens, nftTokens)
+    console.log("switchName:",switchName,"period:",period,"periodTime:",periodTime,"selectTokenETH:",selectTokenETH,"tokenAmountETH:",tokenAmountETH,"contractAddress:",contractAddress,"executorAddress:",executorAddress, "timeoutPeriod", timeoutPeriod )
     otherTokens.map(e => {
         if (e.tokenName == "link"){
           gtag('event', 'chainlink', {
@@ -668,7 +691,21 @@ window.App = {
 
     const _amount = web3.toWei(tokenAmountETH, 'ether');
 
+    // BREAKS HERE
     this._createSwitch(switchName, timeoutPeriod, _amount, executorAddress, contractAddress);
+
+    // AFTER SWITCH IS CREATED, TOKENS NEED TO BE LOCKED IN ASYNC WAY
+
+    // otherTokens.forEach(token => {
+    //   const currentToken = ercTokens.tokens.find(erc => erc.symbol == token.tokenName.toUpperCase());
+    //   const amount = token.tokenAmount * Math.pow(10, currentToken.decimals);
+    //   this._lockToken(currentToken.address, amount);
+    // });
+
+    // nftTokens.forEach(token => {
+    //   this._lockCollectible(token.nftAddress, token.nftId);
+    //   console.log(token.nftAddress, token.nftId);
+    // })
 
   },
   timeExecutionLeft: function () {
@@ -1109,6 +1146,7 @@ window.App = {
 
   addAsset: function (prop) {
     idNew = ++idNew;
+    dolar_val = tokensData[1].price;
     let addAsssetContent = `
     <div id="asset${idNew}" class="form-box new-asset">
     <div class="form-element-header">Select asset</div>
