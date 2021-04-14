@@ -43,7 +43,7 @@ window.App = {
     App.initWeb3();
     document.getElementById("myReceivedSwitchData").style.display="none";
 
-    TimeBasedSwitch = web3.eth.contract(abi).at(timeBaseSwitchAddress);
+    TimeBasedSwitch = new web3.eth.Contract(abi, timeBaseSwitchAddress);
     
     new SlimSelect({
       select: '#selectToken',
@@ -136,7 +136,7 @@ window.App = {
         )}...${account.substring(38)}`;
         web3.eth.getBalance(account, function (err, result) {
           const walletBalance = document.getElementById("walletBalance");
-          const balance = web3.fromWei(result.toString(), "ether");
+          const balance = web3.utils.fromWei(result.toString(), "ether");
           walletBalance.innerHTML = `${balance.substring(0, 4)} ETH`;
         });
         App.offOverlay();
@@ -689,7 +689,7 @@ window.App = {
     timeoutPeriod *= day;
     timeoutPeriod += Date.now();
 
-    const _amount = web3.toWei(tokenAmountETH, 'ether');
+    const _amount = web3.utils.toWei(tokenAmountETH, 'ether');
 
     // BREAKS HERE
     this._createSwitch(switchName, timeoutPeriod, _amount, executorAddress, contractAddress);
@@ -1317,8 +1317,8 @@ window.App = {
   },
 
   _createSwitch: function (_switchName, _time, _amount, _executor, _benefitor) {
-    const _name = web3.fromAscii(_switchName);
-    TimeBasedSwitch.createSwitch(_name, _time, _amount, _executor, _benefitor, { from: account, value: _amount }, function(err, txHash) {
+    const _name = web3.utils.fromAscii(_switchName);
+    TimeBasedSwitch.methods.createSwitch(_name, _time, _amount, _executor, _benefitor).send({ from: account, value: _amount }, function(err, txHash) {
       if(!err) console.log(txHash);
     })
   },
@@ -1372,14 +1372,14 @@ window.App = {
   },
 
   _approveERC20: function(_tokenAddress, _spender, _amount) {
-    const token = web3.eth.contract(erc20abi).at(_tokenAddress);
+    const token = new web3.eth.Contract(erc20abi,_tokenAddress);
     token.approve(_spender, _amount, { from: account }, function(err, txHash) {
       if(!err) return txHash;
     })
   },
 
   _approveERC721: function(_tokenAddress, _spender, _tokenId) {
-    const collectible = web3.eth.contract(erc721abi).at(_tokenAddress);
+    const collectible = new web3.eth.Contract(erc721abi,_tokenAddress);
     collectible.approve(_spender, _tokenId, { from: account }, function(err, txHash) {
       if(!err) return txHash;
     })

@@ -25,15 +25,13 @@ module.exports = {
       {
        test: /\.css$/,
        use: [ 'style-loader', 'css-loader' ]
-      }
-    ],
-    loaders: [
+      },
       { test: /\.json$/, use: 'json-loader' },
       {
         test: /\.js$/,
         exclude: /(node_modules|bower_components)/,
         loader: 'babel-loader',
-        query: {
+        options: {
           presets: ['es2015'],
           plugins: ['transform-runtime']
         }
