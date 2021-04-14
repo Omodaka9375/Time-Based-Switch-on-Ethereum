@@ -3,7 +3,7 @@ import "../stylesheets/app.css";
 
 // Import libraries we need.
 import { default as Web3 } from "web3";
-import { default as contract } from "truffle-contract";
+// import { default as contract } from "truffle-contract";
 import SlimSelect from 'slim-select';
 import ercTokens from "../ercTokens";
 import abi from '../abis/tbs.abi.json';
@@ -329,7 +329,7 @@ window.App = {
     let dolarVal = dolar_val_eth
     let valInput = document.getElementById("tokenAmount");
     web3.eth.getBalance(account, function (err, result) {
-      balance = web3.fromWei(result.toString(), "ether").substring(0, 4);
+      balance = web3.utils.fromWei(result.toString(), "ether").substring(0, 4);
         valInput.value = (balance/4).toFixed(6);
          document.getElementById("tokenAmountCash").value = (Number(valInput.value*dolarVal)).toFixed(2)+" $"
         });      
@@ -339,7 +339,7 @@ window.App = {
     let dolarVal = dolar_val_eth
     let valInput = document.getElementById("tokenAmount");
     web3.eth.getBalance(account, function (err, result) {
-      balance = web3.fromWei(result.toString(), "ether").substring(0, 4);
+      balance = web3.utils.fromWei(result.toString(), "ether").substring(0, 4);
         valInput.value = (balance/2).toFixed(6);
          document.getElementById("tokenAmountCash").value = (Number(valInput.value*dolarVal)).toFixed(2)+" $"
         });      
@@ -349,7 +349,7 @@ window.App = {
     let dolarVal = dolar_val_eth
     let valInput = document.getElementById("tokenAmount");
     web3.eth.getBalance(account, function (err, result) {
-      balance = web3.fromWei(result.toString(), "ether").substring(0, 4);
+      balance = web3.utils.fromWei(result.toString(), "ether").substring(0, 4);
         valInput.value = (balance*3/4).toFixed(6);
          document.getElementById("tokenAmountCash").value = (Number(valInput.value*dolarVal)).toFixed(2)+" $"
         });      
@@ -359,7 +359,7 @@ window.App = {
     let dolarVal = dolar_val_eth
     let valInput = document.getElementById("tokenAmount");
     web3.eth.getBalance(account, function (err, result) {
-      balance = web3.fromWei(result.toString(), "ether").substring(0, 4);
+      balance = web3.utils.fromWei(result.toString(), "ether").substring(0, 4);
         valInput.value = (balance);
          document.getElementById("tokenAmountCash").value = (Number(valInput.value*dolarVal)).toFixed(2)+" $"
         });      
@@ -367,7 +367,7 @@ window.App = {
   
   singleSwitchEdit: function(id, name, benef, execut, timePer) {
     
-    const editName = web3.toAscii(name)
+    const editName = web3.utils.toAscii(name)
     const dashboardDiv = document.getElementById("dashboard");
     dashboardDiv.style.display = "none";
     const changeClass = (element) => element.forEach(el => el.classList.add("overview-wrapper"));
@@ -585,23 +585,13 @@ window.App = {
     let tokenAmountETH = document.getElementById("tokenAmount").value;
     let tokenAmountOther = document.querySelectorAll("input[name=otherToken]")
     let selectedTokenOtehr = document.querySelectorAll("select[name=tokenOther]")
-    let contractAddress = document.getElementById("contractAddress").value;
+    let benefitorAddress = document.getElementById("contractAddress").value;
     let executorAddress = document.getElementById("executorAddress").value;
-    //if(document.getElementById("autoManual").value == "Manually"){
-    // executorAddress = document.getElementById("executorAddress").value;
-    //} else {
-      //executorAddress = keeperRegistry;
-    //}
-     
-    // let contractAddressNFT;
-    // let NFTID;
-    // if (document.getElementById("contractAddressNFT") && document.getElementById("nftId")) {
-    //   contractAddressNFT = document.getElementById("contractAddressNFT").value || "";
-    //   NFTID = document.getElementById("nftId").value || "";
-    // } else {
-    //   contractAddressNFT = "";
-    //   NFTID = "";
-    // }
+    if(document.getElementById("autoManual").value == "Manually"){
+    executorAddress = document.getElementById("executorAddress").value;
+    } else {
+      executorAddress = keeperRegistry;
+    }
 
     let nftTokens = [];
     let nftAddress = [];
@@ -663,8 +653,8 @@ window.App = {
           otherTokens.push(obj);
         })
     }
-    console.log(otherTokens, nftTokens)
-    console.log("switchName:",switchName,"period:",period,"periodTime:",periodTime,"selectTokenETH:",selectTokenETH,"tokenAmountETH:",tokenAmountETH,"contractAddress:",contractAddress,"executorAddress:",executorAddress, "timeoutPeriod", timeoutPeriod )
+    // console.log(otherTokens, nftTokens)
+    // console.log("switchName:",switchName,"period:",period,"periodTime:",periodTime,"selectTokenETH:",selectTokenETH,"tokenAmountETH:",tokenAmountETH,"benefitorAddress:",benefitorAddress,"executorAddress:",executorAddress, "timeoutPeriod", timeoutPeriod )
     otherTokens.map(e => {
         if (e.tokenName == "link"){
           gtag('event', 'chainlink', {
@@ -691,22 +681,22 @@ window.App = {
 
     const _amount = web3.utils.toWei(tokenAmountETH, 'ether');
 
-    // BREAKS HERE
-    this._createSwitch(switchName, timeoutPeriod, _amount, executorAddress, contractAddress);
+    // const tx = await this._createSwitch(switchName, timeoutPeriod, _amount, executorAddress, contractAddress);
 
-    // AFTER SWITCH IS CREATED, TOKENS NEED TO BE LOCKED IN ASYNC WAY
+    const _name = web3.utils.fromAscii(switchName);
+    TimeBasedSwitch.methods.createSwitch(_name, timeoutPeriod, _amount, executorAddress, benefitorAddress).send({ from: account, value: _amount }, function(err, txHash) {
+      if(!err){
+        console.log(txHash);
 
-    // otherTokens.forEach(token => {
-    //   const currentToken = ercTokens.tokens.find(erc => erc.symbol == token.tokenName.toUpperCase());
-    //   const amount = token.tokenAmount * Math.pow(10, currentToken.decimals);
-    //   this._lockToken(currentToken.address, amount);
-    // });
-
-    // nftTokens.forEach(token => {
-    //   this._lockCollectible(token.nftAddress, token.nftId);
-    //   console.log(token.nftAddress, token.nftId);
-    // })
-
+        otherTokens.forEach(token => {
+          const currentToken = ercTokens.tokens.find(erc => erc.symbol == token.tokenName.toUpperCase());
+          const amount = token.tokenAmount * Math.pow(10, currentToken.decimals);
+          this._lockToken(currentToken.address, `${amount}`);
+        });
+    
+        nftTokens.forEach(token => this._lockCollectible(token.nftAddress, token.nftId));
+      }
+    });
   },
   timeExecutionLeft: function () {
     let period = document.querySelector("#period").value; 
@@ -747,9 +737,9 @@ window.App = {
 
     const expiresIn = new Date((_receivedSwitch.unlockTimestamp)*1000).toString().slice(3,15)
 
-    const ethLocked = web3.fromWei(_receivedSwitch.ethersLocked);
+    const ethLocked = web3.utils.fromWei(_receivedSwitch.ethersLocked);
     // console.log(ethLocked);
-    const name = web3.toAscii(_receivedSwitch.name)
+    const name = web3.utils.toAscii(_receivedSwitch.name)
     let ethObj={amountLocked: ethLocked, symbol: "ETH" }
     let tokens = _receivedSwitch.tokensLocked;
     let tokensArray = [];
@@ -862,10 +852,10 @@ window.App = {
     const expiresIn = new Date((_switch.unlockTimestamp)*1000).toString().slice(3,15)
 
     // // ethLocked value is in WEI and needs to be converted to ETH
-    const ethLocked = web3.fromWei(_switch.ethersLocked);
+    const ethLocked = web3.utils.fromWei(_switch.ethersLocked);
     // console.log(ethLocked);
     let ethObj={amountLocked: ethLocked, symbol: "ETH" }
-    const name = web3.toAscii(_switch.name)
+    const name = web3.utils.toAscii(_switch.name)
     let tokens = _switch.tokensLocked;
     let tokensArray = [];
     // console.log("yyy",tokens)
@@ -1181,22 +1171,22 @@ window.App = {
       data: [
        { label: 'ERC20',
         options: [
-        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/825/large/binance-coin-logo.png?1547034615" /> <span class="tok">Binance Coin (BNB)</span></span>', text: 'Binance Coin (BNB)', value: 'bnb'},
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png?1547034700" /> <span class="tok">ChainLink (LINK)</span></span>', text: 'ChainLink (LINK)', value: 'link'},
+        // {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/825/large/binance-coin-logo.png?1547034615" /> <span class="tok">Binance Coin (BNB)</span></span>', text: 'Binance Coin (BNB)', value: 'bnb'},
         {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/12504/large/uniswap-uni.png?1600306604" /> <span class="tok">Uniswap (UNI)</span></span>', text: 'Uniswap (UNI)', value: 'uni'},
         {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707" /> <span class="tok">Tether (USDT)</span></span>', text: 'Tether (USDT)', value: 'usdt'},
         {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389" /> <span class="tok">USD Coin (USDC)</span></span>', text: 'USD Coin (USDC)', value: 'usdc'},
-        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/12645/large/AAVE.png?1601374110" /> <span class="tok">Aave (AAVE)</span></span>', text: 'Aave (AAVE)', value: 'aave'},
+        // {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/12645/large/AAVE.png?1601374110" /> <span class="tok">Aave (AAVE)</span></span>', text: 'Aave (AAVE)', value: 'aave'},
         {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/9956/large/dai-multi-collateral-mcd.png?1574218774" /> <span class="tok">Dai Stablecoin (DAI)</span></span>', text: 'Dai Stablecoin (DAI)', value: 'dai'},
         {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/3406/large/SNX.png?1598631139" /> <span class="tok">Synthetix Network Token (SNX)</span></span>', text: 'Synthetix Network Token (SNX)', value: 'snx'},
         {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/1102/large/enjin-coin-logo.png?1547035078" /> <span class="tok">Enjin Coin (ENJ)</span></span>', text: 'Enjin Coin (ENJ)', value: 'enj'},
-        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/12271/large/512x512_Logo_no_chop.png?1606986688" /> <span class="tok">Sushi Token (SUSHI)</span></span>', text: 'Sushi Token (SUSHI)', value: 'sushi'},
+        // {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/12271/large/512x512_Logo_no_chop.png?1606986688" /> <span class="tok">Sushi Token (SUSHI)</span></span>', text: 'Sushi Token (SUSHI)', value: 'sushi'},
         {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/4713/large/matic___polygon.jpg?1612939050" /> <span class="tok">Polygon (MATIC)</span></span>', text: 'Polygon (MATIC)', value: 'matic'},
-        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/1364/large/Mark_Maker.png?1585191826" /> <span class="tok">Maker (MKR)</span></span>', text: 'Maker (MKR)', value: 'mkr'},
+        // {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/1364/large/Mark_Maker.png?1585191826" /> <span class="tok">Maker (MKR)</span></span>', text: 'Maker (MKR)', value: 'mkr'},
         {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/3263/large/CEL_logo.png?1609598753" /> <span class="tok">Celsius Network (CEL)</span></span>', text: 'Celsius Network (CEL)', value: 'cel'},
-        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/10951/large/UMA.png?1586307916" /> <span class="tok">UMA Token (UMA)</span></span>', text: 'UMA Token (UMA)', value: 'uma'},
+        // {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/10951/large/UMA.png?1586307916" /> <span class="tok">UMA Token (UMA)</span></span>', text: 'UMA Token (UMA)', value: 'uma'},
         {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/863/large/0x.png?1547034672" /> <span class="tok">0x Protocol Token (ZRX)</span></span>', text: '0x Protocol Token (ZRX)', value: 'zrx'},
-        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/10775/large/COMP.png?1592625425" /> <span class="tok">Compound Coin (COMP)</span></span>', text: 'Compound Coin (COMP)', value: 'comp'},
-        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png?1547034700" /> <span class="tok">ChainLink (LINK)</span></span>', text: 'ChainLink (LINK)', value: 'link'}
+        {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="https://assets.coingecko.com/coins/images/10775/large/COMP.png?1592625425" /> <span class="tok">Compound Coin (COMP)</span></span>', text: 'Compound Coin (COMP)', value: 'comp'}
         ]
       },
       {innerHTML: '<span style="display:flex; flex-direction:row;"><img height="20" width="20" src="../app/assets/NFT_Icon.png" /> <span class="tok">NFT (ERC-721)</span></span>', text: 'ERC-721', value: 'ERC-721'}
@@ -1319,68 +1309,69 @@ window.App = {
   _createSwitch: function (_switchName, _time, _amount, _executor, _benefitor) {
     const _name = web3.utils.fromAscii(_switchName);
     TimeBasedSwitch.methods.createSwitch(_name, _time, _amount, _executor, _benefitor).send({ from: account, value: _amount }, function(err, txHash) {
-      if(!err) console.log(txHash);
+      if(!err) return txHash;
     })
   },
 
   _lockCollectible: function (_tokenAddress, _tokenId) {
-    TimeBasedSwitch.lockCollectible(_tokenAddress, _tokenId, { from: account, value: 0 }, function(err, txHash) {
+    TimeBasedSwitch.methods.lockCollectible(_tokenAddress, _tokenId).send({ from: account, value: 0 }, function(err, txHash) {
       if(!err) return txHash;
     })
   },
 
   _lockToken: function (_tokenAddress, _amount) {
-    TimeBasedSwitch.lockToken(_tokenAddress, _amount, { from: account, value: 0 }, function(err, txHash) {
+    TimeBasedSwitch.methods.lockToken(_tokenAddress, _amount).send({ from: account, value: 0 }, function(err, txHash) {
       if(!err) return txHash;
     })
   },
 
   _terminateSwitchEarly: function () {
-    TimeBasedSwitch.terminateSwitchEarly({ from: account, value: 0 }, function(err, txHash) {
+    TimeBasedSwitch.methdos.terminateSwitchEarly().send({ from: account, value: 0 }, function(err, txHash) {
       if(!err) return txHash;
     })
   },
 
   _tryExecuteSwitch: function (_account) {
-    TimeBasedSwitch.tryExecuteSwitch(_account, { from: account, value: 0 }, function(err, txHash) {
+    TimeBasedSwitch.methods.tryExecuteSwitch(_account).send({ from: account, value: 0 }, function(err, txHash) {
       if(!err) return txHash;
     })
   },
 
   _updateSwitchAmount: function (_amount) {
-    TimeBasedSwitch.updateSwitchAmount({ from: account, value: _amount }, function(err, txHash) {
+    TimeBasedSwitch.methods.updateSwitchAmount().send({ from: account, value: _amount }, function(err, txHash) {
       if(!err) return txHash;
     })
   },
 
   _updateSwitchUnlockTime: function (_timestamp) {
-    TimeBasedSwitch.updateSwitchUnlockTime(_timestamp, { from: account, value: 0 }, function(err, txHash) {
+    TimeBasedSwitch.methods.updateSwitchUnlockTime(_timestamp).send({ from: account, value: 0 }, function(err, txHash) {
       if(!err) return txHash;
     })
   },
 
   _updateSwitchExecutor: function (_executor) {
-    TimeBasedSwitch.updateSwitchExecutor(_executor, { from: account, value: 0 }, function(err, txHash) {
+    TimeBasedSwitch.methods.updateSwitchExecutor(_executor).send({ from: account, value: 0 }, function(err, txHash) {
       if(!err) return txHash;
     })
   },
 
   _updateSwitchBenefitor: function (_benefitor) {
-    TimeBasedSwitch.updateSwitchBenefitor(_benefitor, { from: account, value: 0 }, function(err, txHash) {
+    TimeBasedSwitch.methods.updateSwitchBenefitor(_benefitor).send({ from: account, value: 0 }, function(err, txHash) {
       if(!err) return txHash;
     })
   },
 
   _approveERC20: function(_tokenAddress, _spender, _amount) {
+    console.log(`${_amount}`);
     const token = new web3.eth.Contract(erc20abi,_tokenAddress);
-    token.approve(_spender, _amount, { from: account }, function(err, txHash) {
+    token.methods.approve(_spender, `${_amount}`).send({ from: account }, function(err, txHash) {
       if(!err) return txHash;
     })
   },
 
   _approveERC721: function(_tokenAddress, _spender, _tokenId) {
     const collectible = new web3.eth.Contract(erc721abi,_tokenAddress);
-    collectible.approve(_spender, _tokenId, { from: account }, function(err, txHash) {
+    collectible.methods.approve(_spender, _tokenId).send({ from: account }, function(err, txHash) {
       if(!err) return txHash;
     })
   },
