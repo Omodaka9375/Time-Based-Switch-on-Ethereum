@@ -1,6 +1,7 @@
 // Allows us to use ES6 in our migrations and tests.
 require('babel-register')
 const HDWalletProvider = require('@truffle/hdwallet-provider');
+require('dotenv').config();
 
 const providerId = process.env.INFURA_ID;
 const privateKey = process.env.PRIVATE_KEY;
