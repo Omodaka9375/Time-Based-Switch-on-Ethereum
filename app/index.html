@@ -196,7 +196,7 @@
       <div class="central-text" id="executionCentralText">
         Choose an account to transfer your assets to.<br>
         Choose <i>Manually</i>  to allow a predefined account to execute the switch.<br>
-        Choose <i>Automatically</i>  for automatic executon upon exiration.
+        Choose <i>Automatically</i>  for automatic execution upon expiration.
       </div>
     </div>
     <div class="right-wrapper">
@@ -204,10 +204,9 @@
         <div class="form-element-header">Recepient</div>
         <div class="form-element-subheader">Once the switch is executed, assets
           will be sent to the following wallet address</div>
-        <input type="text" id="contractAddress" placeholder="Paste contract address" value="" />
+        <input type="text" id="contractAddress" placeholder="Paste receiver address" value="" />
         <div class="form-element-header">Executor</div>
-        <div class="form-element-subheader">Please paste the executor wallet
-          address</div>
+        <!-- <div class="form-element-subheader">Please paste the executor wallet address</div> -->
         <select name="token" class="select-element-tokens" id="autoManual" style="width: 100%;"
           onchange="App.onExecutorOptionChange()">
           <option name="auto" value="Automatically">
