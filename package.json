@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "eslint ./",
     "build": "webpack",
-    "start": "webpack serve"
+    "start": "webpack-dev-server"
   },
   "author": "Branislav Đalić",
   "license": "MIT",
