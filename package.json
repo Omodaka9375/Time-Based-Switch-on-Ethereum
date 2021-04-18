@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "eslint ./",
     "build": "webpack",
-    "start": "webpack serve --env mode=dev --config ./webpack.config.js"
+    "start": "webpack serve"
   },
   "author": "Branislav Đalić",
   "license": "MIT",
