@@ -6,7 +6,7 @@
     "lint": "eslint ./",
     "heroku-prebuild": "npm install --dev",
     "build": "webpack  --mode=development",
-    "dev": "webpack serve"
+    "start": "webpack-dev-server"
   },
   "author": "Branislav Đalić",
   "license": "MIT",
@@ -37,7 +37,7 @@
     "web3": "^1.2.9",
     "webpack": "^4.3.1",
     "webpack-cli": "^4.6.0",
-    "webpack-dev-server": "^3.7.1"
+    "webpack-dev-server": "^2.12.5"
   },
   "dependencies":{
     "@openzeppelin/contracts": "^3.3.0",
