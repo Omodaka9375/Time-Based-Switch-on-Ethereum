@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "eslint ./",
     "heroku-prebuild": "npm install --dev",
-    "build": "webpack",
+    "heroku-postbuild": "webpack",
     "start": "webpack serve"
   },
   "author": "Branislav Đalić",
