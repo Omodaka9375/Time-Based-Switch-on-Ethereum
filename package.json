@@ -4,9 +4,9 @@
   "description": "UI for TimeBasedSwitch smart contract",
   "scripts": {
     "lint": "eslint ./",
-    "heroku-prebuild": "yarn && yarn install --dev",
-    "heroku-postbuild": "webpack",
-    "dev": "webpack-dev-server"
+    "heroku-prebuild": "yarn install --dev",
+    "build": "webpack",
+    "dev": "webpack serve"
   },
   "author": "Branislav Đalić",
   "license": "MIT",
