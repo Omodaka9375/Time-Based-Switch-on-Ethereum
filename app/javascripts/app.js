@@ -158,7 +158,7 @@ window.App = {
 
   fetchMySwitches: function (_account) {
     const SWITCHES = `{
-      switches(where: {id: "${_account}"}) {
+      switches(where: {id: "${_account.toLowerCase()}"}) {
         id
         name
         executor
@@ -201,7 +201,7 @@ window.App = {
 
   fetchReceivedSwitches: function (_account) {
     const BENEFITOR_SWITCHES = `{
-      switches(where: {benefitor: "${_account}"}) {
+      switches(where: {benefitor: "${_account.toLowerCase()}"}) {
         id
         name
         unlockTimestamp
@@ -236,7 +236,7 @@ window.App = {
       }); 
 
     const EXECUTOR_SWITCHES = `{
-      switches(where: {executor: "${_account}"}) {
+      switches(where: {executor: "${_account.toLowerCase()}"}) {
         id
         name
         unlockTimestamp
