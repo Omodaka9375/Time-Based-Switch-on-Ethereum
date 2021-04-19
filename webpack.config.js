@@ -40,6 +40,6 @@ module.exports = {
   },
   devServer: {
     port: process.env.PORT,
-    host: '*'
+    host: 'https://cryptotimer-eu.herokuapp.com'
   },
 }
