@@ -5,8 +5,8 @@
   "scripts": {
     "lint": "eslint ./",
     "heroku-prebuild": "npm install --dev",
-    "build": "webpack --mode=development",
-    "start": "webpack serve --port $PORT"
+    "build": "webpack",
+    "start": "webpack serve"
   },
   "author": "Branislav Đalić",
   "license": "MIT",
