@@ -4,7 +4,7 @@
   "description": "UI for TimeBasedSwitch smart contract",
   "scripts": {
     "lint": "eslint ./",
-    "heroku-prebuild": "npm install --dev",
+    "heroku-prebuild": "yarn && yarn install --dev",
     "heroku-postbuild": "webpack",
     "dev": "webpack-dev-server"
   },
