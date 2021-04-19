@@ -41,8 +41,8 @@ module.exports = {
   devServer: {
     port: process.env.PORT,
     host: '0.0.0.0',
-    allowedHosts: ['cryptotimer-eu.herokuapp.com','0.0.0.0'],
-    lazy:true,
+    allowedHosts: ['cryptotimer-eu.herokuapp.com'],
+    lazy:false,
     inline: true
   },
 }
