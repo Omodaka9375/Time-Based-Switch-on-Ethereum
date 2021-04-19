@@ -735,7 +735,7 @@ window.App = {
   createReceivedSwitchesPage: function(_receivedSwitch) {
     const myReceivedSwitchData = document.getElementById("myReceivedSwitchData");
 
-    const expiresIn = new Date((_receivedSwitch.unlockTimestamp)*1000).toString().slice(3,15)
+    const expiresIn = new Date(parseInt(_receivedSwitch.unlockTimestamp)).toString().slice(3,15)
 
     const ethLocked = web3.utils.fromWei(_receivedSwitch.ethersLocked);
     // console.log(ethLocked);
@@ -815,7 +815,7 @@ window.App = {
     document.getElementById(`totalCoinsValue${_receivedSwitch.id}`).innerHTML= totalCoinsAmount.toFixed(2)+" $"
 
     const date1 = new Date(Date.now());
-    const date2 = new Date((_receivedSwitch.unlockTimestamp*1000));
+    const date2 = new Date(parseInt(_receivedSwitch.unlockTimestamp));
     const diffTime = date2 - date1;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
@@ -849,7 +849,7 @@ window.App = {
 },
   createSwitchPage: function(_switch) {
     const mySwitchData = document.getElementById("mySwitchData");
-    const expiresIn = new Date((_switch.unlockTimestamp)*1000).toString().slice(3,15)
+    const expiresIn = new Date(parseInt(_switch.unlockTimestamp)).toString().slice(3,15)
 
     // // ethLocked value is in WEI and needs to be converted to ETH
     const ethLocked = web3.utils.fromWei(_switch.ethersLocked);
@@ -958,7 +958,7 @@ window.App = {
     document.getElementById(`totalCoinsValue${_switch.id}`).innerHTML= totalCoinsAmount.toFixed(2)+" $"
 
     const date1 = new Date(Date.now());
-    const date2 = new Date((_switch.unlockTimestamp*1000));
+    const date2 = new Date(parseInt(_switch.unlockTimestamp));
     const diffTime = date2 - date1;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
