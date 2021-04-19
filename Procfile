@@ -1,1 +1,1 @@
-web: yarn run dev -p $PORT
+web: npm start -p $PORT
