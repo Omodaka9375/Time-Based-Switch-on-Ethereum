@@ -104,7 +104,8 @@ window.App = {
           price: item.current_price,
           image: item.image
         }
-     });
+     }); 
+     console.log(tokensData)
     }).catch((err) =>{
       console.warn('Something went wrong.', err)
     });  
@@ -139,6 +140,14 @@ window.App = {
           const balance = web3.fromWei(result.toString(), "ether");
           walletBalance.innerHTML = `${balance.substring(0, 4)} ETH`;
         });
+        document.getElementById("dashboard").style.display="block";
+        const welcomeMess = document.getElementById("welcome");
+        welcomeMess.innerHTML = "Welcome"
+        const userAddress = document.getElementById("hash");
+        userAddress.innerHTML = `${account.substring(
+          0,
+          6
+        )}...${account.substring(38)}`;
         App.offOverlay();
         App.fetchMySwitches(account);
         App.fetchReceivedSwitches(account);
@@ -157,26 +166,26 @@ window.App = {
   },
 
   fetchMySwitches: function (_account) {
-    const SWITCHES = `{
-      switches(where: {id: "${_account}"}) {
-        id
-        name
-        executor
-        benefitor
-        unlockTimestamp
-        isExecuted
-        ethersLocked
-        tokensLocked {
-          id
-          amountLocked
-        }
-        collectiblesLocked {
-          id
-          collectibleId
-          benefitor
-        }
-      }
-    }`;
+    // const SWITCHES = `{
+    //   switches(where: {id: "${_account}"}) {
+    //     id
+    //     name
+    //     executor
+    //     benefitor
+    //     unlockTimestamp
+    //     isExecuted
+    //     ethersLocked
+    //     tokensLocked {
+    //       id
+    //       amountLocked
+    //     }
+    //     collectiblesLocked {
+    //       id
+    //       collectibleId
+    //       benefitor
+    //     }
+    //   }
+    // }`;
     // const SWITCHES = `{
     //   switch(id: "0x80da8831a594327cd9e79e648402cc7c1863aafa") {
     //     id
@@ -197,8 +206,55 @@ window.App = {
     //     }
     //   }
     // }`
-    // const SWITCHES = `{
-    //   switches(where: {id: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
+    const SWITCHES = `{
+      switches(where: {id: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
+        id
+        name
+        unlockTimestamp
+        benefitor
+        executor
+        isExecuted
+        ethersLocked
+        tokensLocked {
+          tokenAddress
+          amountLocked
+        }
+        collectiblesLocked {
+          id
+          collectibleId
+          benefitor
+        }
+      }
+    }`;
+    fetch(graphqlUri, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: SWITCHES }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        const resSwitch = res.data.switches;
+        console.log(resSwitch)
+        resSwitch.map(el=> {
+          this.createSwitchPage(el);
+        })
+        if(resSwitch.length > 0) {
+          if (resSwitch.length < 10){
+            document.getElementById("mySwitchesCounter").innerHTML = "0"+`${resSwitch.length}`
+          }else {
+            document.getElementById("mySwitchesCounter").innerHTML = `${resSwitch.length}`
+          }
+          
+        } else {
+           document.getElementById("mySwitchesCounter").innerHTML = "00"
+        }
+      });
+      // this.getDolarValueOfTokens();
+  },
+
+  fetchReceivedSwitches: function (_account) {
+    // const BENEFITOR_SWITCHES = `{
+    //   switches(where: {benefitor: "${_account}"}) {
     //     id
     //     name
     //     unlockTimestamp
@@ -207,7 +263,7 @@ window.App = {
     //     isExecuted
     //     ethersLocked
     //     tokensLocked {
-    //       tokenAddress
+    //       id
     //       amountLocked
     //     }
     //     collectiblesLocked {
@@ -217,30 +273,8 @@ window.App = {
     //     }
     //   }
     // }`;
-    fetch(graphqlUri, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: SWITCHES }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        const resSwitch = res.data.switches;
-
-        resSwitch.map(el=> {
-          this.createSwitchPage(el);
-        })
-        if(resSwitch.length > 0) {
-          document.getElementById("numOfActiveSwitches").innerHTML = `You currently have ${resSwitch.length} active switches`
-        } else {
-           document.getElementById("numOfActiveSwitches").innerHTML = "You currently have no active switches"
-        }
-      });
-      // this.getDolarValueOfTokens();
-  },
-
-  fetchReceivedSwitches: function (_account) {
     const BENEFITOR_SWITCHES = `{
-      switches(where: {benefitor: "${_account}"}) {
+      switches(where: {benefitor: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
         id
         name
         unlockTimestamp
@@ -259,26 +293,6 @@ window.App = {
         }
       }
     }`;
-    // const BENEFITOR_SWITCHES = `{
-    //   switches(where: {benefitor: "0x9670565d943d1dce25e842e9666da047c55e1bcf"}) {
-    //     id
-    //     name
-    //     unlockTimestamp
-    //     benefitor
-    //     executor
-    //     isExecuted
-    //     ethersLocked
-    //     tokensLocked {
-    //       id
-    //       amountLocked
-    //     }
-    //     collectiblesLocked {
-    //       id
-    //       collectibleId
-    //       benefitor
-    //     }
-    //   }
-    // }`;
 
     fetch(graphqlUri, {
       method: "POST",
@@ -292,28 +306,38 @@ window.App = {
         resData.map(el => {
           this.createReceivedSwitchesPage(el)
         })
+        if(resData.length > 0) {
+          if (resData.length < 10){
+            document.getElementById("receivedSwitchesCounter").innerHTML = "0"+`${resData.length}`
+          }else {
+            document.getElementById("receivedSwitchesCounter").innerHTML = `${resSwitch.length}`
+          } 
+        } else {
+           document.getElementById("receivedSwitchesCounter").innerHTML = "00";
+        }
       }); 
+      
 
-    const EXECUTOR_SWITCHES = `{
-      switches(where: {executor: "${_account}"}) {
-        id
-        name
-        unlockTimestamp
-        benefitor
-        executor
-        isExecuted
-        ethersLocked
-        tokensLocked {
-          id
-          amountLocked
-        }
-        collectiblesLocked {
-          id
-          collectibleId
-          benefitor
-        }
-      }
-    }`;
+    // const EXECUTOR_SWITCHES = `{
+    //   switches(where: {executor: "${_account}"}) {
+    //     id
+    //     name
+    //     unlockTimestamp
+    //     benefitor
+    //     executor
+    //     isExecuted
+    //     ethersLocked
+    //     tokensLocked {
+    //       id
+    //       amountLocked
+    //     }
+    //     collectiblesLocked {
+    //       id
+    //       collectibleId
+    //       benefitor
+    //     }
+    //   }
+    // }`
     // const EXECUTOR_SWITCHES = `{
     //   switches(where: {executor: "0xaaad7966ebe0663b8c9c6f683fb9c3e66e03467f"}) {
     //     id
@@ -335,18 +359,18 @@ window.App = {
     //   }
     // }`;
 
-    fetch(graphqlUri, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: EXECUTOR_SWITCHES }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        let resData = res.data.switches
-        resData.map(el => {
-          this.createReceivedSwitchesPage(el)
-        })
-      }); 
+    // fetch(graphqlUri, {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ query: EXECUTOR_SWITCHES }),
+    // })
+    //   .then((res) => res.json())
+    //   .then((res) => {
+    //     let resData = res.data.switches
+    //     resData.map(el => {
+    //       this.createReceivedSwitchesPage(el)
+    //     })
+    //   }); 
   },
   
   switchOverview: function() {
@@ -693,7 +717,7 @@ window.App = {
             nftTokens.push(nftObj);
           });
        }
-
+       
     let timeoutPeriod;
     const today = new Date(Date.now());
     if(period == "days") {
@@ -821,8 +845,24 @@ window.App = {
       })
     })
    }
-    tokensArray.unshift(ethObj)
+    tokensArray.unshift(ethObj);
 
+    let noSwithcesDiv = `
+    <div class="no-switches">
+      <div class="base">
+      <span class="time-base">Time Based Switch</span>
+      </div>
+      <div class="last-dif">
+      <span class="last-defense">
+        Last line of defense<br/>against losing long-time<br/>access to your funds
+      </span>
+      </div>
+      <div class="keeper-wrap">
+          <span class="keeper">First adopters of Chainlink Keep3r</span>
+          <img class="chainlink-img" src="/app/assets/chainlink-image.png"/>
+      </div>
+    </div>
+   `
     let receivedSwitchDiv = `
     <div class="received-switch">
       <h1 class="title">${name}</h1>
@@ -831,21 +871,23 @@ window.App = {
           <div class="received-assets" style="display:flex; flex-direction:column;">
             <p>ASSETS</p>
             <div id="checkTokensRec${_receivedSwitch.id}" style="display:flex; flex-direction:row;"></div>
-            <span id="tokenValueRec${Number(_receivedSwitch.id)}">${ethLocked} ETH</span>
-            <span id="valueInUsdRec${Number(_receivedSwitch.id)}">${(ethLocked * dolar_val_eth).toFixed(2)} $</span>
+            <div style="display:flex; flex-direction:row;">
+            <span id="tokenValue${Number(_receivedSwitch.id)}" class="tok-value">${ethLocked}</span>
+            <span class="symbol-tok" id="tokSymbol${Number(_receivedSwitch.id)}">ETH</span>
+            </div>
+            <span class="usd-val" id="valueInUsdRec${Number(_receivedSwitch.id)}">$${(ethLocked * dolar_val_eth).toFixed(2)}</span>
           </div>
           <div class="received-total-value" >
             <p>TOTAL VALUE</p>
-            <span id="totalCoinsValue${_receivedSwitch.id}" class="totalCoinsValueClass">${(ethLocked * dolar_val_eth).toFixed(2)} $</span>
+            <span id="totalCoinsValue${_receivedSwitch.id}" class="totalCoinsValueClass"></span>
           </div>
           <div class="received-expires-in" style="display:flex; flex-direction:column;">
             <p>EXPIRES IN</p>
             <span id="timeLeftRec${_receivedSwitch.id}" class="timeBold"></span>
-            <span>${expiresIn}</span>
+            <span class="usd-val">${expiresIn}</span>
           </div>
         </div>
       </div>
-      <hr />
       <div class="down-content">
         <div class="cont-wprp">
           <div class="right-content-title">Recipient</div>
@@ -861,7 +903,12 @@ window.App = {
     </div>
     `;
     const myReceivedSwitch = document.createRange().createContextualFragment(receivedSwitchDiv);
-    myReceivedSwitchData.appendChild(myReceivedSwitch);
+    const noSwitches = document.createRange().createContextualFragment(noSwithcesDiv);
+    if(_receivedSwitch){
+      myReceivedSwitchData.appendChild(myReceivedSwitch);
+    } else {
+      myReceivedSwitchData.appendChild(noSwitches);
+    }
 
     let checkboxOutput="";
     tokensArray.map((item, index) => {
@@ -877,7 +924,7 @@ window.App = {
         }
       })
     })
-    document.getElementById(`totalCoinsValue${_receivedSwitch.id}`).innerHTML= totalCoinsAmount.toFixed(2)+" $"
+    document.getElementById(`totalCoinsValue${_receivedSwitch.id}`).innerHTML= "$"+totalCoinsAmount.toFixed(2);
 
     const date1 = new Date(Date.now());
     const date2 = new Date((_receivedSwitch.unlockTimestamp*1000));
@@ -899,7 +946,7 @@ window.App = {
           dolar_val = item.price;
           let inDolars = dolar_val * target.value
           document.getElementById("tokenValueRec"+recSwitchID).innerHTML= target.value +" "+id.name;
-          document.getElementById("valueInUsdRec"+recSwitchID).innerHTML= inDolars.toFixed(2)+" $";
+          document.getElementById("valueInUsdRec"+recSwitchID).innerHTML= "$ " + inDolars.toFixed(2);
         }
       })
         //  console.log(target.value, id.name, recSwitchID);
@@ -946,7 +993,22 @@ window.App = {
     let timeoutSwitchPeriod = _switch.unlockTimestamp;
 
     console.log(switch_id,benefitor,executor,timeoutSwitchPeriod,name);
-
+   let noSwithcesDiv = `
+    <div class="no-switches">
+      <div class="base">
+      <span class="time-base">Time Based Switch</span>
+      </div>
+      <div class="last-dif">
+      <span class="last-defense">
+        Last line of defense<br/>against losing long-time<br/>access to your funds
+      </span>
+      </div>
+      <div class="keeper-wrap">
+          <span class="keeper">First adopters of Chainlink Keep3r</span>
+          <img class="chainlink-img" src="/app/assets/chainlink-image.png"/>
+      </div>
+    </div>
+   `
    let switchDiv = `
     <div class="switch">
     <h1 class="title">${name}</h1>
@@ -956,13 +1018,16 @@ window.App = {
           <div class="assets" style="display:flex; flex-direction:column;">
             <p>ASSETS</p>
             <div id="checkTokens${_switch.id}" style="display:flex; flex-direction:row;"></div>
-            <span id="tokenValue${Number(_switch.id)}">${ethLocked} ETH</span>
-            <span id="valueInUsd${Number(_switch.id)}">${(ethLocked * dolar_val_eth).toFixed(2)} $</span>
+            <div style="display:flex; flex-direction:row;">
+            <span id="tokenValue${Number(_switch.id)}" class="tok-value">${ethLocked}</span>
+            <span class="symbol-tok" id="tokSymbol${Number(_switch.id)}">ETH</span>
+            </div>
+            <span id="valueInUsd${Number(_switch.id)}" class="usd-val">$${(ethLocked * dolar_val_eth).toFixed(2)}</span>
           </div>
           <div class="expires-in" style="display:flex; flex-direction:column;">
             <p>EXPIRES IN</p>
             <span id="timeLeft${_switch.id}" class="timeBold"></span>
-            <span>${expiresIn}</span>
+            <span class="usd-val">${expiresIn}</span>
           </div>
         </div>
         <div class="total-value">
@@ -991,7 +1056,6 @@ window.App = {
         </div>
       </div>
     </div>
-    <hr />
     <div class="switch-buttons">
       <div class="edit-delete-buttons">
         <button class="button-terciary" onClick="App.singleSwitchEdit('${switch_id}', '${_switch.name}', '${benefitor}', '${executor}', ${timeoutSwitchPeriod})">Edit</button>
@@ -1004,7 +1068,12 @@ window.App = {
    </div>
     `;
     const mySwitch = document.createRange().createContextualFragment(switchDiv);
-    mySwitchData.appendChild(mySwitch);
+    const noSwitches = document.createRange().createContextualFragment(noSwithcesDiv);
+    if(_switch) {
+      mySwitchData.appendChild(mySwitch);
+    } else {
+      mySwitchData.appendChild(noSwitches)
+    }
 
     let checkboxOutput="";
     tokensArray.map((item, index) => {
@@ -1020,7 +1089,7 @@ window.App = {
         }
       })
     })
-    document.getElementById(`totalCoinsValue${_switch.id}`).innerHTML= totalCoinsAmount.toFixed(2)+" $"
+    document.getElementById(`totalCoinsValue${_switch.id}`).innerHTML= "$"+totalCoinsAmount.toFixed(2);
 
     const date1 = new Date(Date.now());
     const date2 = new Date((_switch.unlockTimestamp*1000));
@@ -1034,6 +1103,9 @@ window.App = {
       document.getElementById(`timeLeft${_switch.id}`).innerHTML = diffDays + " days"
       document.getElementById("mySwichExe").disabled = true;
     }
+    if(_switch.executor == keeperRegistry) {
+      document.getElementById("mySwichExe").style.display="none";
+    }
   
   },
   //helper functions
@@ -1042,8 +1114,9 @@ window.App = {
       if (id.name == item.symbol.toUpperCase()){
           dolar_val = item.price;
           let inDolars = dolar_val * target.value
-          document.getElementById("tokenValue"+switchID).innerHTML= target.value +" "+id.name
-          document.getElementById("valueInUsd"+switchID).innerHTML= inDolars.toFixed(2)+" $"
+          document.getElementById("tokenValue"+switchID).innerHTML= target.value +" ";
+          document.getElementById("tokSymbol"+switchID).innerHTML = id.name;
+          document.getElementById("valueInUsd"+switchID).innerHTML= "$"+inDolars.toFixed(2);
       }
      })
     //  console.log(target.value, id.name, switchID);
@@ -1062,6 +1135,8 @@ window.App = {
     let receivedSwitch = document.getElementById("tablinks-receivedSwitches");
     mySwitch.classList.add("blue-undeline");
     receivedSwitch.classList.remove("blue-undeline");
+    mySwitch.classList.add("switch-tab-weight");
+    receivedSwitch.classList.remove("switch-tab-weight");
     document.getElementById("myReceivedSwitchData").style.display="none";
     document.getElementById("mySwitchData").style.display="block"
   },
@@ -1070,6 +1145,8 @@ window.App = {
     let receivedSwitch = document.getElementById("tablinks-receivedSwitches");
     receivedSwitch.classList.add("blue-undeline");
     mySwitch.classList.remove("blue-undeline");
+    receivedSwitch.classList.add("switch-tab-weight");
+    mySwitch.classList.remove("switch-tab-weight");
     document.getElementById("mySwitchData").style.display="none";
     document.getElementById("myReceivedSwitchData").style.display="block";
   },
@@ -1085,8 +1162,8 @@ window.App = {
     assetsFooter.style.display = "none";
     const assestsDiv = document.getElementById('assets');
     assestsDiv.style.display = "none";
-    let date = new Date(Date.now());
-      document.getElementById("periodTime").value = ""
+    let date = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      document.getElementById("periodTime").value = "1"
       document.getElementById("date").innerHTML= date.toString().slice(3,15)
       document.getElementById("time").innerHTML= date.toString().slice(16,21)
   },
@@ -1221,7 +1298,7 @@ window.App = {
     </div>
     </div>
     <div class="asset-buttons">
-      <button class="approve-asset-button" onClick="App.approve(${idNew})">Approve</button>
+      <button class="approve-asset-button" id="approveToken${idNew}" onClick="App.approve(${idNew})">Approve</button>
       <button class="delete-assets-button" onClick="App.deleteAssets('asset${idNew}')">Delete</button>
       </div>
    </div>
@@ -1411,14 +1488,26 @@ window.App = {
   _approveERC20: function(_tokenAddress, _spender, _amount) {
     const token = web3.eth.contract(erc20abi).at(_tokenAddress);
     token.approve(_spender, _amount, { from: account }, function(err, txHash) {
-      if(!err) return txHash;
+      if(!err) {
+        const approveTokenERC20 = document.getElementById("approveToken"+idNew);
+        approveTokenERC20.innerHTML = "Approved";
+        approveTokenERC20.style.backgroundColor = "#00ffae";
+        approveTokenERC20.disabled = true;
+        return txHash;
+      }
     })
   },
 
   _approveERC721: function(_tokenAddress, _spender, _tokenId) {
     const collectible = web3.eth.contract(erc721abi).at(_tokenAddress);
     collectible.approve(_spender, _tokenId, { from: account }, function(err, txHash) {
-      if(!err) return txHash;
+      if(!err) {
+        const approveTokenERC721 = document.getElementById("approveToken"+idNew);
+        approveTokenERC721.innerHTML = "Approved";
+        approveTokenERC721.style.backgroundColor = "#00ffae";
+        approveTokenERC721.disabled = true;
+        return txHash;
+      }
     })
   },
 
@@ -1451,7 +1540,8 @@ initWeb3: function () {
     web3 = new Web3(App.web3Provider);
 
     if (web3.version.network !== '42') {
-      alert('Please connect to the Kovan network');
+      // alert('Please connect to the Kovan network');
+      console.log('Please connect to the Kovan network');
     }
   },
 };

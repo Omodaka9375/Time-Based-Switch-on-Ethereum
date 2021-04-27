@@ -57,24 +57,35 @@
       </div>
     </div>
   </header>
-
-  <div id="dashboard" class="dashboard-box">
+  <div id="dashboard">
     <div class="dashboard-content">
       <div class="welcome-text">
-        <p class="nice-text-class">Nice to see
-          you!</p>
-        <p class="active-switches-class" id="numOfActiveSwitches">
-          You currently have no active switches
-        </p>
+        <div class="avatar-box">
+        <img class="user-avatar" src="avatar1.png" alt="avtr" />
+        <div class="wellcome-address">
+        <span class="nice-text-class" id="welcome"></span>
+        <span class="user-hash" id="hash"></span>
+        </div>
+        </div>
+        <div class="switch-counters">
+          <div class="swi-count">
+            <span id="mySwitchesCounter"></span>
+            <span>My switches</span>
+          </div>
+          <div class="rec-swi-count">
+          <span id="receivedSwitchesCounter"></span>
+          <span>Received switches</span>
+          </div>
+        </div>
       </div>
       <div class="create-switch-button-box">
         <button onclick="App.showCreatePage()" class="button-primary" style="font-weight: 600;">+
           Create switch</button>
       </div>
     </div>
-    <div class="switch-tabs" id="myTabs">
+    <div class="switch-tabs dashboard-box" id="myTabs">
       <div class="tabs">
-        <a id="tablinks-mySwitches" class="tablinks-nav blue-undeline" onclick="App.openMySwitch()">My Switches</a>
+        <a id="tablinks-mySwitches" class="tablinks-nav blue-undeline switch-tab-weight" onclick="App.openMySwitch()">My Switches</a>
         <a id="tablinks-receivedSwitches" class="tablinks-nav" onclick="App.receivedSwitches()">Received Switches</a>
       </div>
       <div id="mySwitchData"></div>
@@ -222,7 +233,7 @@
           </option>
         </select>
         <input type="text" id="executorAddress" placeholder="Paste executor address" value="" style="display: none;" />
-        <div id="chainlinkBot" class="notification-message-box" style="background-color: #f0f0f0; margin-bottom: 10px;">
+        <div id="chainlinkBot" class="notification-message-box" style="background-color: #f0f0f0; margin-bottom: 10px; height: 50px">
           <img class="wallet-image" style="margin-right: 0;" src="chainlink.png" />
           <div class="notification-box">Chainlink Keeper bot</div>
         </div>
@@ -247,7 +258,7 @@
     </div>
     <div class="footer-flex-end-class">
       <button onclick="App.reset();" class="button-primary button-secondary">
-        Reset</button>
+        Discard</button>
       <button onclick="App.showAssetsPage()" class="button-primary" style="background-color: #00ffae;">
         Next step</button>
     </div>
