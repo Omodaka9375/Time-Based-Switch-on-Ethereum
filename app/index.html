@@ -58,23 +58,36 @@
     </div>
   </header>
 
-  <div id="dashboard" class="dashboard-box">
+  <div id="dashboard">
     <div class="dashboard-content">
       <div class="welcome-text">
-        <p class="nice-text-class">Nice to see
-          you!</p>
-        <p class="active-switches-class" id="numOfActiveSwitches">
-          You currently have no active switches
-        </p>
+        <div class="avatar-box">
+          <img class="user-avatar" src="avatar1.png" alt="avtr" />
+          <div class="wellcome-address">
+            <span class="nice-text-class" id="welcome"></span>
+            <span class="user-hash" id="hash"></span>
+          </div>
+        </div>
+        <div class="switch-counters">
+          <div class="swi-count">
+            <span id="mySwitchesCounter"></span>
+            <span>My switches</span>
+          </div>
+          <div class="rec-swi-count">
+            <span id="receivedSwitchesCounter"></span>
+            <span>Received switches</span>
+          </div>
+        </div>
       </div>
       <div class="create-switch-button-box">
         <button onclick="App.showCreatePage()" class="button-primary" style="font-weight: 600;">+
           Create switch</button>
       </div>
     </div>
-    <div class="switch-tabs" id="myTabs">
+    <div class="switch-tabs dashboard-box" id="myTabs">
       <div class="tabs">
-        <a id="tablinks-mySwitches" class="tablinks-nav blue-undeline" onclick="App.openMySwitch()">My Switches</a>
+        <a id="tablinks-mySwitches" class="tablinks-nav blue-undeline switch-tab-weight" onclick="App.openMySwitch()">My
+          Switches</a>
         <a id="tablinks-receivedSwitches" class="tablinks-nav" onclick="App.receivedSwitches()">Received Switches</a>
       </div>
       <div id="mySwitchData"></div>
@@ -111,7 +124,7 @@
     <div class="left-wrapper">
       <div class="text-up-header" id="createTextUpHeader">CREATE NEW SWITCH</div>
       <div class="content-title" id="createContentTitle">Define the basics</div>
-      <div class="central-text" id="createCentralText">Let's start simple. 
+      <div class="central-text" id="createCentralText">Let's start simple.
         What is the purpose of this switch? <br>
         When it should be executed?
       </div>
@@ -143,7 +156,8 @@
       <div class="text-up-header" id="assetsTextUpHeader">CREATE NEW SWITCH</div>
       <div class="content-title" id="assetsContentTitle">Manage assets</div>
       <div class="central-text" id="assetsCentralText">Here you decide which assets you want to lock in your switch.
-        <br> It can be ETH, ERC token or NFT, or all of them! </div>
+        <br> It can be ETH, ERC token or NFT, or all of them!
+      </div>
     </div>
     <div class="right-wrapper">
       <div class="add-new-asset">
@@ -195,8 +209,8 @@
       <div class="content-title" id="executionContentTitle">Execution</div>
       <div class="central-text" id="executionCentralText">
         Choose an account to transfer your assets to.<br>
-        Choose <i>Manually</i>  to allow a predefined account to execute the switch.<br>
-        Choose <i>Automatically</i>  for automatic execution upon expiration.
+        Choose <i>Manually</i> to allow a predefined account to execute the switch.<br>
+        Choose <i>Automatically</i> for automatic execution upon expiration.
       </div>
     </div>
     <div class="right-wrapper">
@@ -217,7 +231,8 @@
           </option>
         </select>
         <input type="text" id="executorAddress" placeholder="Paste executor address" value="" style="display: none;" />
-        <div id="chainlinkBot" class="notification-message-box" style="background-color: #f0f0f0; margin-bottom: 10px;">
+        <div id="chainlinkBot" class="notification-message-box"
+          style="background-color: #f0f0f0; margin-bottom: 10px; height: 50px">
           <img class="wallet-image" style="margin-right: 0;" src="chainlink.png" />
           <div class="notification-box">Chainlink Keeper bot</div>
         </div>
@@ -242,7 +257,7 @@
     </div>
     <div class="footer-flex-end-class">
       <button onclick="App.reset();" class="button-primary button-secondary">
-        Reset</button>
+        Discard</button>
       <button onclick="App.showAssetsPage()" class="button-primary" style="background-color: #00ffae;">
         Next step</button>
     </div>

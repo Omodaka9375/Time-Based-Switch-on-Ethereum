@@ -139,6 +139,14 @@ window.App = {
           const balance = web3.utils.fromWei(result.toString(), "ether");
           walletBalance.innerHTML = `${balance.substring(0, 4)} ETH`;
         });
+        document.getElementById("dashboard").style.display="block";
+        const welcomeMess = document.getElementById("welcome");
+        welcomeMess.innerHTML = "Welcome"
+        const userAddress = document.getElementById("hash");
+        userAddress.innerHTML = `${account.substring(
+          0,
+          6
+        )}...${account.substring(38)}`;
         App.offOverlay();
         App.fetchMySwitches(account);
         App.fetchReceivedSwitches(account);
@@ -191,9 +199,13 @@ window.App = {
           this.createSwitchPage(el);
         })
         if(resSwitch.length > 0) {
-          document.getElementById("numOfActiveSwitches").innerHTML = `You currently have ${resSwitch.length} active switches`
+          if (resSwitch.length < 10) {
+            document.getElementById("mySwitchesCounter").innerHTML = "0"+`${resSwitch.length}`
+          } else {
+            document.getElementById("mySwitchesCounter").innerHTML = `${resSwitch.length}`
+          }
         } else {
-           document.getElementById("numOfActiveSwitches").innerHTML = "You currently have no active switches"
+           document.getElementById("mySwitchesCounter").innerHTML = "00"
         }
       });
       // this.getDolarValueOfTokens();
@@ -233,6 +245,15 @@ window.App = {
         resData.map(el => {
           this.createReceivedSwitchesPage(el)
         })
+        if(resData.length > 0) {
+          if (resData.length < 10){
+            document.getElementById("receivedSwitchesCounter").innerHTML = "0"+`${resData.length}`
+          }else {
+            document.getElementById("receivedSwitchesCounter").innerHTML = `${resSwitch.length}`
+          } 
+        } else {
+           document.getElementById("receivedSwitchesCounter").innerHTML = "00";
+        }
       }); 
 
     const EXECUTOR_SWITCHES = `{
@@ -756,7 +777,23 @@ window.App = {
       })
     })
    }
-    tokensArray.unshift(ethObj)
+    tokensArray.unshift(ethObj);
+
+    let noSwithcesDiv = `
+    <div class="no-switches">
+      <div class="base">
+      <span class="time-base">Time Based Switch</span>
+      </div>
+      <div class="last-dif">
+      <span class="last-defense">
+        Last line of defense<br/>against losing long-time<br/>access to your funds
+      </span>
+      </div>
+      <div class="keeper-wrap">
+          <span class="keeper">First adopters of Chainlink Keep3r</span>
+          <img class="chainlink-img" src="/app/assets/chainlink-image.png"/>
+      </div>
+    </div>`;
 
     let receivedSwitchDiv = `
     <div class="received-switch">
@@ -766,17 +803,20 @@ window.App = {
           <div class="received-assets" style="display:flex; flex-direction:column;">
             <p>ASSETS</p>
             <div id="checkTokensRec${_receivedSwitch.id}" style="display:flex; flex-direction:row;"></div>
-            <span id="tokenValueRec${Number(_receivedSwitch.id)}">${ethLocked} ETH</span>
-            <span id="valueInUsdRec${Number(_receivedSwitch.id)}">${(ethLocked * dolar_val_eth).toFixed(2)} $</span>
+            <div style="display:flex; flex-direction:row;">
+            <span id="tokenValue${Number(_receivedSwitch.id)}" class="tok-value">${ethLocked}</span>
+            <span class="symbol-tok" id="tokSymbol${Number(_receivedSwitch.id)}">ETH</span>
+            </div>
+            <span class="usd-val" id="valueInUsdRec${Number(_receivedSwitch.id)}">$${(ethLocked * dolar_val_eth).toFixed(2)}</span>
           </div>
           <div class="received-total-value" >
             <p>TOTAL VALUE</p>
-            <span id="totalCoinsValue${_receivedSwitch.id}" class="totalCoinsValueClass">${(ethLocked * dolar_val_eth).toFixed(2)} $</span>
+            <span id="totalCoinsValue${_receivedSwitch.id}" class="totalCoinsValueClass"></span>
           </div>
           <div class="received-expires-in" style="display:flex; flex-direction:column;">
             <p>EXPIRES IN</p>
             <span id="timeLeftRec${_receivedSwitch.id}" class="timeBold"></span>
-            <span>${expiresIn}</span>
+            <span class="usd-val">${expiresIn}</span>
           </div>
         </div>
       </div>
@@ -796,7 +836,12 @@ window.App = {
     </div>
     `;
     const myReceivedSwitch = document.createRange().createContextualFragment(receivedSwitchDiv);
-    myReceivedSwitchData.appendChild(myReceivedSwitch);
+    const noSwitches = document.createRange().createContextualFragment(noSwithcesDiv);
+    if(_receivedSwitch){
+      myReceivedSwitchData.appendChild(myReceivedSwitch);
+    } else {
+      myReceivedSwitchData.appendChild(noSwitches);
+    }
 
     let checkboxOutput="";
     tokensArray.map((item, index) => {
@@ -812,7 +857,7 @@ window.App = {
         }
       })
     })
-    document.getElementById(`totalCoinsValue${_receivedSwitch.id}`).innerHTML= totalCoinsAmount.toFixed(2)+" $"
+    document.getElementById(`totalCoinsValue${_receivedSwitch.id}`).innerHTML= "$"+totalCoinsAmount.toFixed(2);
 
     const date1 = new Date(Date.now());
     const date2 = new Date(parseInt(_receivedSwitch.unlockTimestamp));
@@ -882,6 +927,23 @@ window.App = {
 
     console.log(switch_id,benefitor,executor,timeoutSwitchPeriod,name);
 
+    let noSwithcesDiv = `
+    <div class="no-switches">
+      <div class="base">
+      <span class="time-base">Time Based Switch</span>
+      </div>
+      <div class="last-dif">
+      <span class="last-defense">
+        Last line of defense<br/>against losing long-time<br/>access to your funds
+      </span>
+      </div>
+      <div class="keeper-wrap">
+          <span class="keeper">First adopters of Chainlink Keep3r</span>
+          <img class="chainlink-img" src="/app/assets/chainlink-image.png"/>
+      </div>
+    </div>
+   `
+
    let switchDiv = `
     <div class="switch">
     <h1 class="title">${name}</h1>
@@ -891,13 +953,16 @@ window.App = {
           <div class="assets" style="display:flex; flex-direction:column;">
             <p>ASSETS</p>
             <div id="checkTokens${_switch.id}" style="display:flex; flex-direction:row;"></div>
-            <span id="tokenValue${Number(_switch.id)}">${ethLocked} ETH</span>
-            <span id="valueInUsd${Number(_switch.id)}">${(ethLocked * dolar_val_eth).toFixed(2)} $</span>
+            <div style="display:flex; flex-direction:row;">
+            <span id="tokenValue${Number(_switch.id)}" class="tok-value">${ethLocked}</span>
+            <span class="symbol-tok" id="tokSymbol${Number(_switch.id)}">ETH</span>
+            </div>
+            <span id="valueInUsd${Number(_switch.id)}" class="usd-val">$${(ethLocked * dolar_val_eth).toFixed(2)}</span>
           </div>
           <div class="expires-in" style="display:flex; flex-direction:column;">
             <p>EXPIRES IN</p>
             <span id="timeLeft${_switch.id}" class="timeBold"></span>
-            <span>${expiresIn}</span>
+            <span class="usd-val">${expiresIn}</span>
           </div>
         </div>
         <div class="total-value">
@@ -939,7 +1004,13 @@ window.App = {
    </div>
     `;
     const mySwitch = document.createRange().createContextualFragment(switchDiv);
-    mySwitchData.appendChild(mySwitch);
+    const noSwitches = document.createRange().createContextualFragment(noSwithcesDiv);
+    
+    if(_switch) {
+      mySwitchData.appendChild(mySwitch);
+    } else {
+      mySwitchData.appendChild(noSwitches)
+    }
 
     let checkboxOutput="";
     tokensArray.map((item, index) => {
@@ -955,7 +1026,7 @@ window.App = {
         }
       })
     })
-    document.getElementById(`totalCoinsValue${_switch.id}`).innerHTML= totalCoinsAmount.toFixed(2)+" $"
+    document.getElementById(`totalCoinsValue${_switch.id}`).innerHTML= "$"+totalCoinsAmount.toFixed(2);
 
     const date1 = new Date(Date.now());
     const date2 = new Date(parseInt(_switch.unlockTimestamp));
@@ -969,6 +1040,9 @@ window.App = {
       document.getElementById(`timeLeft${_switch.id}`).innerHTML = diffDays + " days"
       document.getElementById("mySwichExe").disabled = true;
     }
+    if(_switch.executor == keeperRegistry) {
+      document.getElementById("mySwichExe").style.display="none";
+    }
   
   },
   //helper functions
@@ -977,8 +1051,9 @@ window.App = {
       if (id.name == item.symbol.toUpperCase()){
           dolar_val = item.price;
           let inDolars = dolar_val * target.value
-          document.getElementById("tokenValue"+switchID).innerHTML= target.value +" "+id.name
-          document.getElementById("valueInUsd"+switchID).innerHTML= inDolars.toFixed(2)+" $"
+          document.getElementById("tokenValue"+switchID).innerHTML= target.value +" ";
+          document.getElementById("tokSymbol"+switchID).innerHTML = id.name;
+          document.getElementById("valueInUsd"+switchID).innerHTML= "$"+inDolars.toFixed(2);
       }
      })
     //  console.log(target.value, id.name, switchID);
@@ -997,6 +1072,8 @@ window.App = {
     let receivedSwitch = document.getElementById("tablinks-receivedSwitches");
     mySwitch.classList.add("blue-undeline");
     receivedSwitch.classList.remove("blue-undeline");
+    mySwitch.classList.add("switch-tab-weight");
+    receivedSwitch.classList.remove("switch-tab-weight");
     document.getElementById("myReceivedSwitchData").style.display="none";
     document.getElementById("mySwitchData").style.display="block"
   },
@@ -1005,6 +1082,8 @@ window.App = {
     let receivedSwitch = document.getElementById("tablinks-receivedSwitches");
     receivedSwitch.classList.add("blue-undeline");
     mySwitch.classList.remove("blue-undeline");
+    mySwitch.classList.add("switch-tab-weight");
+    receivedSwitch.classList.remove("switch-tab-weight");
     document.getElementById("mySwitchData").style.display="none";
     document.getElementById("myReceivedSwitchData").style.display="block";
   },
@@ -1156,7 +1235,7 @@ window.App = {
     </div>
     </div>
     <div class="asset-buttons">
-      <button class="approve-asset-button" onClick="App.approve(${idNew})">Approve</button>
+      <button class="approve-asset-button" id="approveToken${idNew}" onClick="App.approve(${idNew})">Approve</button>
       <button class="delete-assets-button" onClick="App.deleteAssets('asset${idNew}')">Delete</button>
       </div>
    </div>
@@ -1365,14 +1444,26 @@ window.App = {
     console.log(`${_amount}`);
     const token = new web3.eth.Contract(erc20abi,_tokenAddress);
     token.methods.approve(_spender, `${_amount}`).send({ from: account }, function(err, txHash) {
-      if(!err) return txHash;
+      if(!err) {
+        const approveTokenERC20 = document.getElementById("approveToken"+idNew);
+        approveTokenERC20.innerHTML = "Approved";
+        approveTokenERC20.style.backgroundColor = "#00ffae";
+        approveTokenERC20.disabled = true;
+        return txHash;
+      }
     })
   },
 
   _approveERC721: function(_tokenAddress, _spender, _tokenId) {
     const collectible = new web3.eth.Contract(erc721abi,_tokenAddress);
     collectible.methods.approve(_spender, _tokenId).send({ from: account }, function(err, txHash) {
-      if(!err) return txHash;
+      if(!err) {
+        const approveTokenERC721 = document.getElementById("approveToken"+idNew);
+        approveTokenERC721.innerHTML = "Approved";
+        approveTokenERC721.style.backgroundColor = "#00ffae";
+        approveTokenERC721.disabled = true;
+        return txHash;
+      }
     })
   },
 
