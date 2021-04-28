@@ -904,7 +904,7 @@ window.App = {
     `;
     const myReceivedSwitch = document.createRange().createContextualFragment(receivedSwitchDiv);
     const noSwitches = document.createRange().createContextualFragment(noSwithcesDiv);
-    if(_receivedSwitch){
+    if(_receivedSwitch.name){
       myReceivedSwitchData.appendChild(myReceivedSwitch);
     } else {
       myReceivedSwitchData.appendChild(noSwitches);
@@ -995,10 +995,8 @@ window.App = {
     console.log(switch_id,benefitor,executor,timeoutSwitchPeriod,name);
    let noSwithcesDiv = `
     <div class="no-switches">
-      <div class="base">
-      <span class="time-base">Time Based Switch</span>
-      </div>
       <div class="last-dif">
+      <span class="time-base">Time Based Switch</span>
       <span class="last-defense">
         Last line of defense<br/>against losing long-time<br/>access to your funds
       </span>
@@ -1069,7 +1067,7 @@ window.App = {
     `;
     const mySwitch = document.createRange().createContextualFragment(switchDiv);
     const noSwitches = document.createRange().createContextualFragment(noSwithcesDiv);
-    if(_switch) {
+    if(_switch.name) {
       mySwitchData.appendChild(mySwitch);
     } else {
       mySwitchData.appendChild(noSwitches)
