@@ -849,10 +849,8 @@ window.App = {
 
     let noSwithcesDiv = `
     <div class="no-switches">
-      <div class="base">
-      <span class="time-base">Time Based Switch</span>
-      </div>
       <div class="last-dif">
+      <span class="time-base">Time Based Switch</span>
       <span class="last-defense">
         Last line of defense<br/>against losing long-time<br/>access to your funds
       </span>
