@@ -164,7 +164,6 @@ window.App = {
     });
     
   },
-
   fetchMySwitches: function (_account) {
     // const SWITCHES = `{
     //   switches(where: {id: "${_account}"}) {
@@ -235,9 +234,14 @@ window.App = {
       .then((res) => {
         const resSwitch = res.data.switches;
         console.log(resSwitch)
-        resSwitch.map(el=> {
-          this.createSwitchPage(el);
-        })
+        if(resSwitch.lenght != 0) {
+          resSwitch.map(el=> {
+            this.createSwitchPage(el);
+          })
+        }else {
+          this.makeImageWhenNoSwc();
+        }
+        
         if(resSwitch.length > 0) {
           if (resSwitch.length < 10){
             document.getElementById("mySwitchesCounter").innerHTML = "0"+`${resSwitch.length}`
@@ -302,10 +306,14 @@ window.App = {
       .then((res) => res.json())
       .then((res) => {
         let resData = res.data.switches;
+        if(resData.length != 0) {
+          resData.map(el => {
+            this.createReceivedSwitchesPage(el)
+          }) 
+        } else {
+          this.makeImageWhenNoRecievSwc()
+        }
         
-        resData.map(el => {
-          this.createReceivedSwitchesPage(el)
-        })
         if(resData.length > 0) {
           if (resData.length < 10){
             document.getElementById("receivedSwitchesCounter").innerHTML = "0"+`${resData.length}`
@@ -821,6 +829,25 @@ window.App = {
   openExternalWebsite: function (uri) {
     window.open(uri);
   },
+  makeImageWhenNoRecievSwc: function() {
+    const myReceivedSwitchData = document.getElementById("myReceivedSwitchData");
+    let noSwithcesDiv = `
+    <div class="no-switches">
+      <div class="last-dif">
+      <span class="time-base">Time Based Switch</span>
+      <span class="last-defense">
+        Last line of defense<br/>against losing long-time<br/>access to your funds
+      </span>
+      </div>
+      <div class="keeper-wrap">
+          <span class="keeper">First adopters of Chainlink Keep3r</span>
+          <img class="chainlink-img" src="/app/assets/chainlink-image.png"/>
+      </div>
+    </div>
+  `;
+  const noSwitches = document.createRange().createContextualFragment(noSwithcesDiv);
+  myReceivedSwitchData.appendChild(noSwitches)
+  },
   createReceivedSwitchesPage: function(_receivedSwitch) {
     const myReceivedSwitchData = document.getElementById("myReceivedSwitchData");
 
@@ -847,20 +874,6 @@ window.App = {
    }
     tokensArray.unshift(ethObj);
 
-    let noSwithcesDiv = `
-    <div class="no-switches">
-      <div class="last-dif">
-      <span class="time-base">Time Based Switch</span>
-      <span class="last-defense">
-        Last line of defense<br/>against losing long-time<br/>access to your funds
-      </span>
-      </div>
-      <div class="keeper-wrap">
-          <span class="keeper">First adopters of Chainlink Keep3r</span>
-          <img class="chainlink-img" src="/app/assets/chainlink-image.png"/>
-      </div>
-    </div>
-   `
     let receivedSwitchDiv = `
     <div class="received-switch">
       <h1 class="title">${name}</h1>
@@ -901,13 +914,8 @@ window.App = {
     </div>
     `;
     const myReceivedSwitch = document.createRange().createContextualFragment(receivedSwitchDiv);
-    const noSwitches = document.createRange().createContextualFragment(noSwithcesDiv);
-    if(_receivedSwitch.name){
-      myReceivedSwitchData.appendChild(myReceivedSwitch);
-    } else {
-      myReceivedSwitchData.appendChild(noSwitches);
-    }
-
+    myReceivedSwitchData.appendChild(myReceivedSwitch);
+   
     let checkboxOutput="";
     tokensArray.map((item, index) => {
       checkboxOutput +=`<label class="box-rec" ><input type="radio" onclick="App.checkValueRec(this,${item.symbol+_receivedSwitch.id},${_receivedSwitch.id})" id=${item.symbol+_receivedSwitch.id} class="radio-option-rec" name="${item.symbol}" value="${item.amountLocked}"><span class="radio-checkmark-rec" id="${'rec'+index}" onclick="App.changeClassRec(${'rec'+index})">${item.symbol}</span></label>`;
@@ -957,6 +965,25 @@ window.App = {
       document.getElementById(id.id).classList.add("active");
       // console.log(id.id, elem)
 },
+  makeImageWhenNoSwc: function() {
+    const mySwitchData = document.getElementById("mySwitchData");
+    let noSwithcesDiv = `
+    <div class="no-switches">
+      <div class="last-dif">
+      <span class="time-base">Time Based Switch</span>
+      <span class="last-defense">
+        Last line of defense<br/>against losing long-time<br/>access to your funds
+      </span>
+      </div>
+      <div class="keeper-wrap">
+          <span class="keeper">First adopters of Chainlink Keep3r</span>
+          <img class="chainlink-img" src="/app/assets/chainlink-image.png"/>
+      </div>
+    </div>
+  `;
+  const noSwitches = document.createRange().createContextualFragment(noSwithcesDiv);
+  mySwitchData.appendChild(noSwitches)
+  },
   createSwitchPage: function(_switch) {
     const mySwitchData = document.getElementById("mySwitchData");
     const expiresIn = new Date((_switch.unlockTimestamp)*1000).toString().slice(3,15)
@@ -991,20 +1018,7 @@ window.App = {
     let timeoutSwitchPeriod = _switch.unlockTimestamp;
 
     console.log(switch_id,benefitor,executor,timeoutSwitchPeriod,name);
-   let noSwithcesDiv = `
-    <div class="no-switches">
-      <div class="last-dif">
-      <span class="time-base">Time Based Switch</span>
-      <span class="last-defense">
-        Last line of defense<br/>against losing long-time<br/>access to your funds
-      </span>
-      </div>
-      <div class="keeper-wrap">
-          <span class="keeper">First adopters of Chainlink Keep3r</span>
-          <img class="chainlink-img" src="/app/assets/chainlink-image.png"/>
-      </div>
-    </div>
-   `
+   
    let switchDiv = `
     <div class="switch">
     <h1 class="title">${name}</h1>
@@ -1064,12 +1078,7 @@ window.App = {
    </div>
     `;
     const mySwitch = document.createRange().createContextualFragment(switchDiv);
-    const noSwitches = document.createRange().createContextualFragment(noSwithcesDiv);
-    if(_switch.name) {
-      mySwitchData.appendChild(mySwitch);
-    } else {
-      mySwitchData.appendChild(noSwitches)
-    }
+    mySwitchData.appendChild(mySwitch);
 
     let checkboxOutput="";
     tokensArray.map((item, index) => {
