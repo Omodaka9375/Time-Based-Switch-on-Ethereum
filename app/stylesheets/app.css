@@ -683,18 +683,17 @@ scrollbar-width: none;
 } */
 .no-switches {
   background-image: url("/app/assets/image-fill-the-blanks.png");
-  height: 450px;
   color: #ffffff;
 }
 .time-base {
   font-size: 10px;
 }
-.base {
-  padding-top: 120px;
-  margin-left: 45px
-}
+
 .last-dif {
+  display: flex;
+  flex-direction: column;
   margin-left: 45px;
+  padding-top: 10%;
 }
 .last-defense {
   font-size: 35px;
@@ -702,8 +701,10 @@ scrollbar-width: none;
 .keeper-wrap {
   display: flex;
   align-items: center;
-  margin-top: 100px;
-  margin-left: 450px;
+  margin-top: 8%;
+  margin-left: 70%;
+  padding-right: 35px;
+  padding-bottom: 20px
 }
 .keeper {
   font-size: 10px;
