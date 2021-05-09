@@ -21,16 +21,18 @@ label {
 input, select {
   border: 1px solid #e5e5e5;
   border-radius: 5px;
-  margin-top: 5px;
+  margin-top: 12px;
   height: 44px;
-  width: 94%;
-  padding-left: 8px;
+  width: 97%;
+  padding-left: 12px;
   font-size: 14px;
   font-weight: bold;
-  margin-bottom: 25px;
+  margin-bottom: 12px;
   font-family: "Poppins", sans-serif;
 }
-
+.nft-id-class {
+  margin-top: -4px;
+}
 button {
   font-size: 16px;
   padding: 5px;
@@ -71,7 +73,7 @@ h3 {
 }
 
 #createFooter, #assetsFooter, #executionFooter, #overviewFooter, #editSwicthFooter {
-  height: 12%;
+  height: 76px;
   bottom: 1px;
   position: fixed;
   text-align: center;
@@ -183,7 +185,8 @@ li {
 }
 
 .dashboard-content {
-  background-image: url("/bg.png"); 
+  /* background-image: url("/bg.png");  */
+  background-color: #10159c;
   height: 12%; 
   display: flex; 
   justify-content: space-between; 
@@ -254,8 +257,8 @@ li {
 }
 
 .button-primary {
-  height: 40px;
-  width: 170px;
+  height: 46px;
+  width: 130px;
   font-size: 13px;
   font-weight: bold;
   align-self: center;
@@ -264,7 +267,9 @@ li {
   background-color: #00ffae;  
   cursor: pointer;
 }
-
+.button-primary:hover {
+  background-color: #7cfcca;
+}
 .button-secondary {
   background-color: #fff;
   text-decoration: underline;
@@ -405,11 +410,11 @@ li {
 }
 .left-wrapper {
     flex: 50%;
-    padding-top: 10%;
+    padding-top: 6%;
 }
 
 .right-wrapper {
-    padding-top: 12%;
+    padding-top: 6%;
     margin-left: 30px;
     flex: 50%;
     /* max-width: 450px; */
@@ -435,7 +440,7 @@ li {
     text-align: left;
     font-weight: 1000;
     padding: 5px 0 10px 0;
-    font-size: 30px
+    font-size: 38px
 }
 
 .central-text {
@@ -443,6 +448,8 @@ li {
     color: #AAA;
     font-weight: bold;
     font-size: 13px;
+    max-width: 360px;
+    line-height: 1.75em;
 }
 
 .form-element-header {
@@ -484,12 +491,12 @@ li {
   display: none;
 } */
 .select-element-tokens {
-  width: 42%;
+  width: 45%;
   background-color: #fff;
   font-size: 13px;
   height: 48px;
   padding-bottom: 12px;
-  padding-top: 6px
+  padding-top: 12px
 }
 
 .ss-main {
@@ -498,7 +505,7 @@ li {
 }
 .ss-main .ss-single-selected {
     height: 48px;
-    padding: 8px;
+    padding: 12px;
     border: 1px solid #e5e5e5;
     border-radius: 5px;
     color: black;
@@ -602,7 +609,7 @@ li {
   background-color: #e8e8e8; 
   height: 38px; 
   font-size: 11px; 
-  width: 42.5%; 
+  width: 46.5%; 
   font-weight: bold; 
   outline: none; 
   align-self: center;
@@ -622,7 +629,9 @@ li {
   display: flex; 
   cursor: pointer;
 }
-
+.new-asset-button:hover {
+  background-color: #eaeaea;
+}
 .new-asset-button h5 {
   margin-left: 5%; 
   align-self: center;
@@ -798,8 +807,8 @@ scrollbar-width: none;
   margin-top: 20px;
 }
 .button-terciary {
-  height: 40px;
-  width: 170px;
+  height: 46px;
+  width: 130px;
   font-size: 13px;
   font-weight: bold;
   align-self: center;
@@ -807,6 +816,9 @@ scrollbar-width: none;
   border-radius: 5px;
   background-color: #dddfde;  
   cursor: pointer;
+}
+#tercDel {
+  margin-left: 10px;
 }
 /* .switch-tabs {
   margin-bottom: 30px;
