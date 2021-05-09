@@ -1007,7 +1007,7 @@ mySwitchData.appendChild(noSwitches)
     <div class="switch-buttons">
       <div class="edit-delete-buttons">
         <button class="button-terciary" onClick="App.singleSwitchEdit('${switch_id}', '${_switch.name}', '${benefitor}', '${executor}', ${timeoutSwitchPeriod})">Edit</button>
-        <button class="button-terciary" onClick="App.deleteSwitch()">Delete</button>
+        <button class="button-terciary" id="tercDel" onClick="App.deleteSwitch()">Delete</button>
       </div>
       <div class="execute-button">
         <button class="button-primary" id="mySwichExe" onClick="App._tryExecuteSwitch('${switch_id}')">Execute</button>
@@ -1237,8 +1237,8 @@ mySwitchData.appendChild(noSwitches)
       and sent once the
       switch expires</div>
     <div style="display: flex; justify-content: space-between;">
-      <input name="otherToken" class="only-positive" type="number" style="width: 42%" id="tokenAmount${idNew}" min="0" oninput="App.inputTokenValue(${idNew})"/>
-      <input style="width: 42%" id="tokenAmountCash${idNew}" disabled value="0.00$"/>
+      <input name="otherToken" class="only-positive" type="number" style="width: 45%" id="tokenAmount${idNew}" min="0" oninput="App.inputTokenValue(${idNew})"/>
+      <input style="width: 45%" id="tokenAmountCash${idNew}" disabled value="0.00$"/>
     </div>
     </div>
     </div>
@@ -1297,8 +1297,8 @@ mySwitchData.appendChild(noSwitches)
     <div class="form-element-header">Address & ID</div>
     <div class="form-element-subheader">Please provide contract addreess and ID of NFT tocken you want to lock</div>
     <div>
-      <input name="conAddress" type="text" style="width: 94%" id="contractAddressNFT${idNew}" value="" placeholder="Contract address"/>
-      <input name="nftIdName" type="text" style="width: 94%"  id="nftId${idNew}"  value="" placeholder="NFT ID"/>
+      <input name="conAddress" type="text" style="width: 97%" id="contractAddressNFT${idNew}" value="" placeholder="Contract address"/>
+      <input name="nftIdName" type="text" class="nft-id-class" style="width: 97%"  id="nftId${idNew}"  value="" placeholder="NFT ID"/>
     </div>
     </div>
     `;
@@ -1310,8 +1310,8 @@ mySwitchData.appendChild(noSwitches)
       switch expires
     </div>
     <div style="display: flex; justify-content: space-between;">
-      <input name="otherToken" class="only-positive" type="number" style="width: 42%" id="tokenAmount${idNew}" min="0" oninput="App.inputTokenValue(${idNew})"/>
-      <input style="width: 42%" id="tokenAmountCash${idNew}" disabled value="0.00$"/>
+      <input name="otherToken" class="only-positive" type="number" style="width: 45%" id="tokenAmount${idNew}" min="0" oninput="App.inputTokenValue(${idNew})"/>
+      <input style="width: 45%" id="tokenAmountCash${idNew}" disabled value="0.00$"/>
     </div>
     </div>
     `
