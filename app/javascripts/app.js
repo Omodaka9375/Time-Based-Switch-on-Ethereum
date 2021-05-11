@@ -139,6 +139,7 @@ window.App = {
           const balance = web3.utils.fromWei(result.toString(), "ether");
           walletBalance.innerHTML = `${balance.substring(0, 4)} ETH`;
         });
+        document.getElementById("connectCards").style.display="none";
         document.getElementById("dashboard").style.display="block";
         const welcomeMess = document.getElementById("welcome");
         welcomeMess.innerHTML = "Welcome"
@@ -163,7 +164,17 @@ window.App = {
     });
     
   },
+  copyAddress: function() {
+    const el = document.createElement("input");
+    el.style.height = '0px';
+    el.style.width = '1px';
+    document.body.appendChild(el);
+    el.value = account;
+    el.select();
+    document.execCommand("copy");
+    document.body.removeChild(el);
 
+  },
   fetchMySwitches: function (_account) {
     const SWITCHES = `{
       switches(where: {id: "${_account.toLowerCase()}"}) {
