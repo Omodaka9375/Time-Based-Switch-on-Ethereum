@@ -49,7 +49,8 @@
         <img class="metamask-image" src="metamask.png" />
         <div class="metamask-button-text">Connect Wallet</div>
       </div>
-      <div id="wallet" class="wallet-box">
+      <div id="wallet" class="wallet-box" onclick="App.copyAddress()">
+        <span class="coupontooltip">copy address</span>
         <img class="wallet-image" src="avatar1.png" />
         <div class="wallet-address-box" id="walletAddress"></div>
         <div class="wallet-balance-box" id="walletBalance">
@@ -57,6 +58,45 @@
       </div>
     </div>
   </header>
+  <div id="connectCards" class="connect-cards">
+    <div class="intro-text">
+      <h3 class="get-start">Getting started</h3>
+      <p class="get-start-text">Last line of defense
+        against losing long-time
+        access to your funds</p>
+    </div>
+    <div class="card-wrapper">
+     <div class="connect-metamask-card">
+        <div class="metamask-img">
+          <img class="metamask-image-two" src="metamask.png" />
+        </div>
+        <div>
+          <h4 class="head-card-text">Connect your wallet</h4>
+        </div>
+        <div>
+          <h6 class="connect-text">
+            Please connect you to MetaMask wallet in order to use the app
+          </h6>
+        </div>
+        <button onclick="App.initWeb3()" class="button-primary">
+          Connect</button>
+     </div>
+     <div class="connect-metamask-card">
+      <div class="metamask-img">
+      </div>
+      <div>
+        <h4 class="head-card-text">Create your first switch</h4>
+      </div>
+      <div>
+        <h6 class="connect-text">
+          In order to fully finalize this flow, you will have to connect your wallet
+        </h6>
+      </div>
+      <button onclick="App.initWeb3()" class="button-primary">
+        Create</button>
+     </div>
+    </div>
+  </div>
   <div id="dashboard">
     <div class="dashboard-content">
       <div class="welcome-text">
@@ -93,8 +133,7 @@
     </div>
   </div>
   <div class="overview" id="swOverview">
-    <h1>Switch Overview</h1>
-    <hr>
+    <h1 class="switch-border">Switch Overview</h1>
   </div>
   <div class="overview" id="editOverview">
     <h1 id="editSwitchName">Name</h1>

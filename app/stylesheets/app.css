@@ -149,7 +149,23 @@ li {
   border-radius: 5px; 
   cursor: pointer;
 }
-
+.wallet-box:hover {
+  border: 1px solid #f3f2f2;
+}
+.coupontooltip {
+  display: none;
+  background: #f0f0f0;
+  font-size: 10px;
+  margin-top: 38px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1000;
+  width: auto;
+  height: auto;
+}
+.wallet-box:hover .coupontooltip {
+  display: block;
+}
 .wallet-image {
   width: 25px; 
   height: 25px; 
@@ -183,7 +199,74 @@ li {
   padding-left: 15%; 
   padding-right: 15%; 
 }
-
+/* #connectCards {
+  display: none;
+} */
+.get-start {
+  color: black;
+  font-weight: bolder;
+}
+.get-start-text {
+  color: #a0a0a0;
+  font-size: 14px;
+  font-weight: bold;
+}
+.connect-cards {
+  margin-top: 50px;
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.card-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+.connect-metamask-card {
+  background-color:white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  margin: 15px;
+  width: 320px;
+  height: 320px;
+  box-shadow: 1px 1px 2px 2px #e4e2e2;
+}
+.metamask-img {
+  height: 70px;
+  width: 70px;
+  border-radius: 50%;
+  background-color: #F4F6F7;
+  text-align: center;
+  align-content: center;
+  align-items: center;
+  margin-top: 15px;
+}
+.metamask-image-two {
+  width: 35px;
+  height: 35px;
+  align-self: center;
+  /* margin-top: 17.5px; */
+}
+.metamask-img img{
+  position: relative;
+  top: 50%;
+  transform: translate(0%, -50%);
+}
+.head-card-text {
+  font-size: 18px;
+  color: black;
+}
+.connect-text {
+  font-size: 11px;
+  color: #AAA;
+  margin-top: -18px;
+  max-width: 220px;
+  margin-bottom: 45px;
+}
 .dashboard-content {
   /* background-image: url("/bg.png");  */
   background-color: #10159c;
@@ -274,6 +357,7 @@ li {
   background-color: #fff;
   text-decoration: underline;
   outline: none;
+  margin-right: 10px;
 }
 
 #overlay {
@@ -392,9 +476,10 @@ li {
 }
 .overview {
   display: none;
-  padding-left: 15%;
+  /* padding-left: 15%; */
   padding-right: 15%;
   padding-top: 5%;
+  border-bottom: 1.5px solid #dddddd;
 }
 .overview-wrapper {
     display: none;
@@ -402,8 +487,12 @@ li {
     height: auto;
     padding-left: 15%;
     padding-right: 15%;
-    margin-bottom: -15px;
+    /* margin-bottom: -15px; */
     padding-top: 0;
+}
+#swOverview {
+  margin-right: 15%;
+  margin-left: 15%;
 }
 .temporary-padding {
   padding-bottom: 10%;
