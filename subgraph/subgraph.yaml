@@ -7,9 +7,9 @@ dataSources:
     name: TimeBasedSwitch
     network: kovan
     source:
-      address: "0x0e179683C05b430487e88ca0baa6080Ac00fc03D"
+      address: '0xdacB5424f941F100Ad54e02af5b46dEef2873567'
       abi: TimeBasedSwitch
-      startBlock: 23887432
+      startBlock: 24896246
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

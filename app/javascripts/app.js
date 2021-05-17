@@ -13,7 +13,7 @@ import erc721abi from '../abis/erc721abi.json';
 // import TimeBasedSwitch_artifacts from '../../build/contracts/TimeBasedSwitch.json'
 // import TimeBasedSwitch_artifacts from "web3";
 
-const timeBaseSwitchAddress = `0x0e179683C05b430487e88ca0baa6080Ac00fc03D`; // kovan network
+const timeBaseSwitchAddress = `0xdacB5424f941F100Ad54e02af5b46dEef2873567`; // kovan network
 const graphqlUri = "https://api.thegraph.com/subgraphs/name/andrejrakic/time-based-switch";
 const keeperRegistry = `0xAaaD7966EBE0663b8C9C6f683FB9c3e66E03467F`;
 const dolarTokensValue = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum%2C%20binancecoin%2C%20uniswap%2C%20chainlink%2C%20aave%2C%20tether%2C%20dai%2C%20usd-coin%2C%20havven%2C%20sushi%2C%20enjincoin%2C%20celsius-degree-token%2C%20maker%2C%20compound-coin%2C%20matic-network%2C%20uma%2C%200x&order=market_cap_desc&per_page=100&page=1&sparkline=false";//not functional api
