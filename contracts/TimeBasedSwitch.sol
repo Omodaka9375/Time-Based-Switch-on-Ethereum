@@ -36,6 +36,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, Ownable, ReentrancyGuard, IERC721R
     
     /* Storage */
     address internal keeperRegistry;
+    address[] internal scheduledSwitches;
     mapping(address => Switch) internal users; //store switch per user account
 
     /* Modifiers */
@@ -135,6 +136,10 @@ contract TimeBasedSwitch is ITimeBasedSwitch, Ownable, ReentrancyGuard, IERC721R
         users[msg.sender].benefitor = _benefitor;
         users[msg.sender].amount = _amount;
         users[msg.sender].isValid = true;
+
+        if (_executor == keeperRegistry) {
+          scheduledSwitches.push(msg.sender);
+        }
         
         emit SwitchCreated(
           _switchName,
@@ -221,6 +226,9 @@ contract TimeBasedSwitch is ITimeBasedSwitch, Ownable, ReentrancyGuard, IERC721R
         withdrawCollectible(currentCollectible.tokenAddress, currentCollectible.id, msg.sender);
       }
       
+      if (users[msg.sender].executor == keeperRegistry) {
+          deleteScheduledSwitch(msg.sender);
+      }
       delete users[msg.sender];
       emit SwitchTerminated(msg.sender);
     }
@@ -296,6 +304,14 @@ contract TimeBasedSwitch is ITimeBasedSwitch, Ownable, ReentrancyGuard, IERC721R
     override
     onlyValid(msg.sender)
     {
+      if (_executor == keeperRegistry) {
+          scheduledSwitches.push(msg.sender);
+      }
+
+      if (users[msg.sender].executor == keeperRegistry && _executor != keeperRegistry) {
+          deleteScheduledSwitch(msg.sender);
+      }
+
       users[msg.sender].executor = _executor;
       emit ExecutorUpdated(_executor);
     }
@@ -341,10 +357,19 @@ contract TimeBasedSwitch is ITimeBasedSwitch, Ownable, ReentrancyGuard, IERC721R
     override
     returns(bool upkeepNeeded, bytes memory performData)
     {
-      address account = bytesToAddress(checkData);
-
-      upkeepNeeded = block.timestamp >= users[account].unlockTimestamp;
-      performData = checkData;
+        uint i = 0;
+        uint length = scheduledSwitches.length;
+        bool isExpired = false;
+        address currentSwitch = address(0);
+        
+        while(i < length && !isExpired) {
+            currentSwitch = scheduledSwitches[i];
+            isExpired = block.timestamp >= users[currentSwitch].unlockTimestamp;
+            i++;
+        }
+        
+        upkeepNeeded = isExpired;
+        performData = abi.encodePacked(currentSwitch);
     }
 
 
@@ -357,6 +382,7 @@ contract TimeBasedSwitch is ITimeBasedSwitch, Ownable, ReentrancyGuard, IERC721R
 
       address account = bytesToAddress(performData);
 
+      deleteScheduledSwitch(account);
       tryExecuteSwitch(account);
     }
 
@@ -416,6 +442,28 @@ contract TimeBasedSwitch is ITimeBasedSwitch, Ownable, ReentrancyGuard, IERC721R
         require(_receiver != address(0), "withdrawCollectible: Invalid receiver address");
 
         ERC721(_tokenAddress).safeTransferFrom(address(this), _receiver, _tokenId);
+    }
+
+
+    /**
+     * @notice Function to delete address from Bot Scheduled Switches array
+     *
+     * @param user - address of switch to delete
+     *
+     * No return, reverts on error
+     */
+    function deleteScheduledSwitch(address user) 
+    private 
+    {
+        uint length = scheduledSwitches.length;
+        
+        for (uint i = 0; i < length; i++) {
+            if (scheduledSwitches[i] == user) {
+                scheduledSwitches[i] = scheduledSwitches[length - 1];
+                scheduledSwitches.pop();
+                return;
+            }
+        }
     }
 
 
