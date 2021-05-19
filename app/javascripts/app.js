@@ -719,8 +719,9 @@ window.App = {
     const day = 86400000;
     timeoutPeriod *= day;
     timeoutPeriod += Date.now();
+    timeoutPeriod += 300000; // 5 minutes of slippage time
     timeoutPeriod = Math.floor(timeoutPeriod / 1000);
-		console.log(timeoutPeriod);
+    console.log(timeoutPeriod);
 
     const _amount = web3.utils.toWei(tokenAmountETH, 'ether');
 
